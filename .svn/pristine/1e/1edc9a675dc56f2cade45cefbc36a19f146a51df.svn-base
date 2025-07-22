@@ -1,0 +1,151 @@
+<%@page import="adm.parametros.spring.AdmParametros"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/bootstrap5.1/css/bootstrap.min.css">
+<script src="<%=request.getContextPath()%>/js/jquery-3.3.1.min.js"></script>
+<script src="<%=request.getContextPath()%>/js/popper.min.js"></script>
+<script src="<%=request.getContextPath()%>/bootstrap5.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/login.css" type="text/css">
+
+<script type="text/javascript">
+	function Valida(){
+		if(document.frmLogin.usuario.value != "" && document.frmLogin.clave.value != ""){
+			document.frmLogin.submit();
+		}else{
+			alert("<spring:message code='login.LleneLogin'/>");
+		}		
+	}
+</script>
+<style type="text/css">
+	.alert-success{
+		margin:0 auto;
+	}
+		
+	@media (min-width: 320px) {
+		.alert-success {
+			width: 550px;
+			margin:0 auto;
+			margin-bottom: 50px;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+	}	
+	
+	body{
+		background-image: url("imagenes/Rectoria.jpg");
+		/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+		background-position: center center;
+		/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+		background-attachment: fixed;
+		background-repeat: no-repeat;
+		/* La imagen de fondo se reescala autom�ticamente con el cambio del ancho de ventana del navegador */
+		background-size: cover;
+		
+	}
+</style>
+</head>
+<%
+	AdmParametros admParametros = (AdmParametros)request.getAttribute("admParametros");
+
+	String widthBackgroundImg = "670px";
+
+	if(admParametros.getInstitucion().equals("Sonoma")){ widthBackgroundImg = "270px"; }
+	if(admParametros.getInstitucion().equals("Pacific Adventist University")){ widthBackgroundImg = "1000px"; }
+%>
+<body>
+	<div class="d-flex justify-content-center">
+		<img src="imagenes/logo-lineal-blanco.png"  width="<%=widthBackgroundImg%>"> <!-- TOP LOGO -->
+	</div>	
+	<hr style="background-color:white">
+	<div class="alert alert-secondary text-center" style="background-color:rgba(255, 255, 255, 0.7); margin: 10px 10px 10px; 10px;"> <!-- TEXTO BIENVENIDA -->
+		<span>
+<% if(admParametros.getInstitucion().equals("Sonoma")){ %><spring:message code='login.Bienvenida.Sonoma'/><% }%>
+<% if(admParametros.getInstitucion().equals("Pacific Adventist University")){ %><spring:message code='login.Bienvenida.Pau'/><% }%>
+<% if(admParametros.getInstitucion().equals("Fulton")){ %><spring:message code='login.Bienvenida.Fulton'/><% }%>
+		</span>
+	</div>
+	<div class="well-white">
+		<form name="frmLogin" action="valida?redir=1" method="post">
+        <div class="group mt-3">
+        	<input onKeyDown="funcionEnter(event);" class="input" id="usuario" name="usuario" type="text" placeholder="<spring:message code='login.Usuario'/>">
+        </div>                	
+        <div class="group mt-3">
+        	<input onKeyDown="funcionEnter(event);" class="input" id="password" name="clave" type="password" placeholder="<spring:message code='login.Password'/>">
+        </div>
+		<span class="loginError mt-3"></span>					
+		<div class="group mt-3" align="center">
+			<a href="javascript:Valida();" class="btn btn-secondary" style="background-color:#5b3e90"><spring:message code="login.Ingresar"/></a>
+        </div>
+        <div class="group mt-1" align="center">
+        	<a href="intentaRecuperar" style="color:black"><spring:message code="login.LigaOlvidar"/></a>
+        </div>
+        <div class="hr mt-2"></div>
+        <div class="mt-2" align="center">
+        	<span style="color:black"><spring:message code="login.eresNuevo"/></span>
+        </div>
+        <div class="group" align="center">
+        	<a href="registro" class="btn btn-danger"><spring:message code="login.Registrarse"/></a>
+        </div>
+        </form>	
+	</div>	
+	<br>
+<%	if(request.getParameter("error")!=null){ %>
+	
+	<div class="alert alert-success">
+		<center><spring:message code="login.FraseOlvidar"/></center>
+		<hr>
+		<div class="row">
+		<div class="col-md-3" align="center"></div>
+		<div class="col-md-6" align="center">
+<% if(admParametros.getInstitucion().equals("Sonoma")){ %><a class="link text-decoration-none" href="tel:<spring:message code="adm.Phone.Sonoma"/>" data-role="button" rel="external"><% }%>
+<% if(admParametros.getInstitucion().equals("Pacific Adventist University")){ %><a class="link text-decoration-none" href="tel:<spring:message code="adm.Phone.Pau"/>" data-role="button" rel="external"><% }%>
+<% if(admParametros.getInstitucion().equals("Fulton")){ %><a class="link text-decoration-none" href="tel:<spring:message code="adm.Phone.Fulton"/>" data-role="button" rel="external"><% }%>
+				<span class="fa fa-phone"></span>
+				&nbsp;
+<% if(admParametros.getInstitucion().equals("Sonoma")){ %><spring:message code="adm.Telefono"/>: <spring:message code="adm.Phone.Sonoma"/><% }%>
+<% if(admParametros.getInstitucion().equals("Pacific Adventist University")){ %><spring:message code="adm.Telefono"/>: <spring:message code="adm.Phone.Pau"/><% }%>
+<% if(admParametros.getInstitucion().equals("Fulton")){ %><spring:message code="adm.Telefono"/>: <spring:message code="adm.Phone.Fulton"/><% }%>
+
+			</a>
+			<br>			
+<% if(admParametros.getInstitucion().equals("Sonoma")){ %><a class="link text-decoration-none" href="mailto:<spring:message code="adm.Correo.Sonoma"/>" data-role="button" rel="external"><% }%>
+<% if(admParametros.getInstitucion().equals("Pacific Adventist University")){ %><a class="link text-decoration-none" href="mailto:<spring:message code="adm.Correo.Pau"/>" data-role="button" rel="external"><% }%>
+<% if(admParametros.getInstitucion().equals("Fulton")){ %><a class="link text-decoration-none" href="mailto:<spring:message code="adm.Correo.Fulton"/>" data-role="button" rel="external"><% }%>
+				<span class="fas fa-envelope"></span>
+				&nbsp;
+<% if(admParametros.getInstitucion().equals("Sonoma")){ %><spring:message code="adm.Correo"/>: <spring:message code="adm.Correo.Sonoma"/><% }%>
+<% if(admParametros.getInstitucion().equals("Pacific Adventist University")){ %><spring:message code="adm.Correo"/>: <spring:message code="adm.Correo.Pau"/><% }%>
+<% if(admParametros.getInstitucion().equals("Fulton")){ %><spring:message code="adm.Correo"/>: <spring:message code="adm.Correo.Fulton"/><% }%>
+			</a>
+		</div>
+		<div class="col-md-3"></div>		
+		</div>
+	</div>				
+<% 	} %>
+	<div class="footer" style="position: fixed; left: 0; bottom: 0; width: 100%; text-align: center;">
+		<center><span class="text-center"><a target="_blank" href="AvisoDePrivacidad.pdf" style="color:white"><spring:message code="inicial.AvisoPrivacidad"/></a></span></center>
+	</div>
+<script type="text/javascript">
+	function funcionEnter(evento){ 
+		//para IE 
+		if (window.event) { 
+			if (window.event.keyCode==13){ 
+				Valida();
+			} 
+		} 
+		else{ 
+		//Firefox y otros navegadores 
+			if (evento){ 
+				if(evento.which==13) { 
+					validar();
+				} 
+			} 
+		} 
+	}
+</script>
+</body>
+</html>

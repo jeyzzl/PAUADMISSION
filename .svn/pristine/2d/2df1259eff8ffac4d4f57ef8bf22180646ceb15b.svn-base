@@ -1,0 +1,53 @@
+<jsp:useBean id="sol" scope="page" class="adm.alumno.AdmSolicitud" />
+
+<%@page import="adm.alumno.spring.AdmFoto"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+
+
+<%
+	String usSesion 		= session.getAttribute("Usuario")==null?"0":session.getAttribute("Usuario").toString();
+	String usuarioNombre  	= session.getAttribute("UsuarioNombre")==null?"":session.getAttribute("UsuarioNombre").toString();
+	String folSesion		= session.getAttribute("Folio")==null?"0":session.getAttribute("Folio").toString();	
+	String idioma			= session.getAttribute("Idioma")==null?"es":session.getAttribute("Idioma").toString();
+	String colorEspanol		= idioma.equals("es")?"style='color:yellow'":"style='color:white'";
+	String colorIngles		= idioma.equals("en")?"style='color:yellow'":"style='color:white'";	
+	String colorFrances		= idioma.equals("fr")?"style='color:yellow'":"style='color:white'";
+		
+	boolean existeUser		= session.getAttribute("existeUsuario")==null?false:(boolean)session.getAttribute("existeUsuario");	
+	boolean existeFoto		= session.getAttribute("existeFoto")==null?false:(boolean)session.getAttribute("existeFoto");	
+%>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+</head>
+<script type="text/javascript">
+	function Idioma(opcion){
+		document.location.href = document.location.href+"?IdiomaUsuario="+opcion
+	}
+</script>
+<div class="container-fluid py-3" style="background-color:rgba(255, 255, 255, 0.7);">
+	<div class="d-flex justify-content-between" style="height:37px;">
+	   	<div class="d-flex align-items-end">
+		    <a href="<%=request.getContextPath()%>/inicio" title="Home" style="color:white; text-decoration:none;">
+		    	<img border="0" style="position:relative;top:-1.3px;left:35px; " src="<%=request.getContextPath()%>/imagenes/flamaTransparente.png" width="37px"/>
+		    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		    <p style="position:relative;top:10px;"><%=usuarioNombre%></p>
+	   	</div> 
+		<div class="d-flex align-items-center">
+	       	<%-- <a href="<%=request.getContextPath()%>/inicial?IdiomaUsuario=es" title="Espa�ol"> <img src="<%=request.getContextPath()%>/imagenes/esp.png" height="28x"><em <%=colorEspanol%>></em></a>&nbsp; --%>
+	       	<%-- <a href="<%=request.getContextPath()%>/inicial?IdiomaUsuario=en" title="English"> <img src="<%=request.getContextPath()%>/imagenes/eng.png" height="28px"><em <%=colorIngles%>></em></a>&nbsp; --%>
+	       	<%-- <a href="<%=request.getContextPath()%>/inicial?IdiomaUsuario=fr" title="Francais"> <img src="<%=request.getContextPath()%>/imagenes/fra.png" height="28px"><em <%=colorFrances%>></em></a>&nbsp; --%>
+<%	if(existeUser){ %>
+			&nbsp;			
+	       	<a href="<%=request.getContextPath()%>/registro?usuario=<%=usSesion%>" title="<%=usuarioNombre%>">
+<% 		if(existeFoto){%>
+	       		<img src="<%=request.getContextPath()%>/fotoMenu" height="28x">
+<% 		}else{ %>
+				<i class="fas fa-user fa-2x style="color:black"></i>	       		
+<% 		} %>
+	       	</a>&nbsp;&nbsp;&nbsp;&nbsp;
+	       	<a href="<%=request.getContextPath()%>/salir" title="<spring:message code='adm.Salir'/>"><i class="fa fa-power-off fa-2x" style="color:black"></i></a>&nbsp;
+<% 	} %>
+		</div>	    
+  	</div>
+</div>
+<body style="background-color:#FFFFFF; margin:0px 0px 0px 0px;">

@@ -1,0 +1,291 @@
+<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="adm.alumno.spring.AdmAcademico"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmCartaSubir"%>
+<%@page import="adm.catalogo.spring.CatModalidad"%>
+<%@page import="adm.catalogo.spring.CatCarrera"%>
+
+<%@ include file= "../head.jsp"%>
+<%@ include file= "../menu.jsp"%>
+<head> 
+	<link rel="STYLESHEET" href="/admision.css"  type="text/css">	  			
+	<style>		
+		body{
+			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");
+			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+			background-position: center center;
+			/* La imagen se fija en la ventana de visualización para que la altura de la imagen no supere a la del contenido */
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			/* La imagen de fondo se reescala automáticamente con el cambio del ancho de ventana del navegador */
+			background-size: cover;	
+		}				
+		@media (min-width: 587px) {
+			.col-md-3{
+				float: left;
+				margin-left: 85px;
+			}
+		}
+		@media (min-width: 764px) {
+			.col-md-3{
+				float: left;
+				margin-left: 0;
+			}		
+		}
+		@media (min-width: 480px) {
+			.col-md-5{
+				float: left;
+			}
+		}	
+	</style>		
+</head>
+<%	
+	String folio 						= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	AdmAcademico admAcademico 			= (AdmAcademico) request.getAttribute("admAcademico");
+	AdmSolicitud admSolicitud 			= (AdmSolicitud) request.getAttribute("admSolicitud");
+	AdmCartaSubir admCartaSubir 		= (AdmCartaSubir)request.getAttribute("admCartaSubir");
+	boolean existeAcademico 			= (boolean) request.getAttribute("existeAcademico");
+	String mensaje						= (String)request.getAttribute("mensaje");
+	String colorGrabar					= existeAcademico?"style='color:purple'":"style='color:orange'";
+	
+	List<CatModalidad> lisModalidades	= (List<CatModalidad>) request.getAttribute("lisModalidades");	
+	List<CatCarrera> lisCarreras 		= (List<CatCarrera>) request.getAttribute("lisCarreras");
+	
+	HashMap<String,String> mapaNivel 	= (HashMap<String,String>) request.getAttribute("mapaNivel");
+	HashMap<String,String> mapaFacultad = (HashMap<String,String>) request.getAttribute("mapaFacultad");
+	
+	String modalidad 					= admAcademico.getModalidad();
+	
+	// ----------------CALCULAR FECHAS-----------------------------
+		String [] fecha = adm.fecha.Fecha.getHoy().split("/");
+		int mes 		= Integer.parseInt(fecha[1]);
+		int year		= Integer.parseInt(fecha[2]);
+		
+		ArrayList<String> fechas = new ArrayList<String>();
+		
+		if(!modalidad.equals("")){
+			int agosto = 8;
+			int enero  = 1;
+			int junio  = 6;
+			
+			String f1  = "";
+			String f2  = "";
+			String f3  = "";
+			
+			if(mes>agosto){
+				f1 = (year+1)+"08";
+			}else{
+				f1 = year+"08";
+			}
+			
+			if(mes>enero){
+				f2 = (year+1)+"01";
+			}else{
+				f2 = year+"01";
+			}
+			
+			fechas.add(f1);
+			fechas.add(f2);
+			
+			if(modalidad.equals("1")){//Si es Presencial
+				if(mes>junio){
+					f3 = (year+1)+"06";
+				}else{
+					f3 = year+"06";
+				}
+				fechas.add(f3);
+			}
+		}
+		Collections.sort(fechas);
+		
+		ArrayList<String> FECHAS = new ArrayList<String>();
+		for(String str:fechas){
+			String date = "";
+			String tmp  = str.substring(4,6);
+			if(tmp.equals("01")){
+				date="Enero";
+			}else if(tmp.equals("06")){
+				date="Junio";
+			}else if(tmp.equals("08")){
+				date="Agosto";
+			}
+			
+			date = date+"/";
+			date = date+str.substring(0,4);
+			FECHAS.add(date);
+		}		
+%>
+<body>
+<!-- style="height:calc(100vh - 37px);" -->
+<div class="container-fluid">
+	<div class="row">
+	<div class="col-lg-1" style="background-color:rgba(255, 255, 255, 0.7);">
+		<span class="btn btn-outline-light" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/registro" style="color:black">					
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Datos usuario"><i class="fas fa-user fa-2x"></i><br>Cuenta</span>&nbsp;
+			</a>
+		</span>
+		<span class="btn btn-outline-light" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/solicitud/modalidad" style="color:black">					
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Solicitud de admisi�n"><i class="far fa-file-alt fa-2x"></i><br>Solicitud</span>&nbsp;
+			</a>
+		</span>			
+		<span class="btn btn-outline-light" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/documentos/documentos" style="color:black">					
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Documentos de ingreso"><i class="fas fa-tasks fa-2x"></i><br>Documentos</span>&nbsp;
+			</a>
+		</span>					
+		<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/directo/ingreso" style="color:black">
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Ingreso directo"><i class="fas fa-door-open fa-2x"></i><br>Ingreso</span>&nbsp;
+			</a>
+		</span>					
+		<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/referencias?Folio=<%=folio%>" style="color:black">
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Pago en linea"><i class="fas fa-credit-card fa-2x"></i><br>Pago</span>&nbsp;
+			</a>
+		</span>					
+		<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/cita/evento" style="color:black">
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Reservar examen"><i class="far fa-calendar-alt fa-2x"></i><br>Examen</span>&nbsp;
+			</a>
+		</span>					
+		<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+			<a href="<%=request.getContextPath()%>/resultados/resultados" style="color:black">
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Resultados examen"><i class="fas fa-trophy fa-2x"></i><br>Resultados</span>&nbsp;
+			</a>
+		</span>					
+		<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+<% 				String colorCarta = "black";
+				if(admCartaSubir.getCarta() != null){	
+					colorCarta = "green";										
+ 				}%>	
+			<a href="<%=request.getContextPath()%>/descargarCartaAdmision" style="color:<%=colorCarta%>">
+				<span data-bs-toggle="tooltip" data-bs-placement="right" title="Carta de admisi&oacute;n"><i class="fas fa-envelope fa-2x"></i><br>Carta</span>&nbsp;
+			</a>
+		</span>					
+	</div>
+	<div class="col-lg-11" style="background-color:white; min-height:calc(100vh - 37px);">
+		<div class="d-flex bd-highlight page-header">
+			<div class="p-2 w-100 bd-highlight">
+		  		<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabar%>></i>&nbsp;<spring:message code="solicitud.modalidad.Modalidad"/>/<spring:message code="adm.Carrera"/></h2>
+		  	</div>
+			<div class="p-2 flex-shrink-1 bd-highlight">
+<%	if(existeAcademico){ %>
+				<div class="d-flex justify-content-start position-absolute top-5 end-0">
+					<div class="d-flex align-items-center">				
+						<a href="<%=request.getContextPath()%>/inicial"><i class="fas fa-caret-left fa-3x"></i></a>
+						&nbsp;<b class="fs-5">1/8</b>&nbsp;
+				    	<a href="<%=request.getContextPath()%>/solicitud/datos"><i class="fas fa-caret-right fa-3x"></i></a>
+				    	&nbsp;&nbsp;
+					</div>
+				</div>
+<% 	}%>	  
+		  	</div>
+		</div>
+		<div class="alert alert-info" role="alert">
+			<p><spring:message code="solicitud.modalidad.ParteProceso"/></p>
+		</div>
+		<div class="well">
+			<form id="frmModalidad" name="frmModalidad" action="modalidad" method="post">
+			<input type="hidden" name="Accion"/>
+			<label><spring:message code="solicitud.modalidad.Modalidad"/></label>
+	  		<select name="Modalidad" id="Modalidad" class="form-select" style="max-width:200px;" onchange="javascript:document.frmModalidad.submit();">
+<%		for(CatModalidad mod : lisModalidades){ %>
+	  			<option <%=admAcademico.getModalidad().equals(mod.getModalidadId())?"Selected":""%> value="<%=mod.getModalidadId() %>">
+		  		<%=mod.getNombreModalidad() %>
+		 		</option>
+<%		} %>
+			</select>
+			<br>				
+			<spring:message code="solicitud.nivel.NivelEstudios"/>
+			<select name="Nivel" id="Nivel" class="form-select" style="max-width:400px;" onchange="javascript:document.frmModalidad.submit();">
+	  			<option <%=admAcademico.getNivelId().equals("1")?"Selected":""%> value="1"><spring:message code="solicitud.nivel.Bachillerato"/></option>
+	  			<option <%=admAcademico.getNivelId().equals("2")?"Selected":""%> value="2"><spring:message code="solicitud.nivel.Pregrado"/></option>
+	  			<option <%=admAcademico.getNivelId().equals("3")?"Selected":""%> value="3"><spring:message code="solicitud.nivel.Maestria"/></option>
+	  			<option <%=admAcademico.getNivelId().equals("6")?"Selected":""%> value="6"><spring:message code="solicitud.nivel.Especialidad"/></option>
+	  			<option <%=admAcademico.getNivelId().equals("4")?"Selected":""%> value="4"><spring:message code="solicitud.nivel.Doctorado"/></option>
+	  			<option <%=admAcademico.getNivelId().equals("5")?"Selected":""%> value="5"><spring:message code="solicitud.nivel.EducacionContinua"/></option>	  				
+			</select>
+			<br>				
+			<label><b><spring:message code="adm.Carrera"/>: </b></label>
+			<select class="form-select" id="CarreraId" name="CarreraId" data-live-search="true" style="width:400px;" onchange="javascript:document.frmModalidad.submit();">
+<%				String fac 			= "";
+				String nivelTemp 	= "";
+				String anotacion	= "";				
+				 for (CatCarrera carrera : lisCarreras){
+					// Texto informativo para que los alumnos de rumania sepan que carrera elegir		
+					if(carrera.getNivelId().equals(admAcademico.getNivelId())){
+						if(!carrera.getNivelId().equals(nivelTemp)){
+						    nivelTemp = carrera.getNivelId();
+%>
+				<optgroup style = "font-size:10pt; font-weight:bold;" label="<%=mapaNivel.containsKey(nivelTemp)?mapaNivel.get(nivelTemp):"-" %> "></optgroup>
+<% 						}	
+						if(!carrera.getFacultadId().equals(fac)){
+							fac = carrera.getFacultadId();	
+%>					
+				&nbsp;<optgroup style = "font-size:11pt; font-weight:bold;" label="-<%=mapaFacultad.containsKey(fac)?mapaFacultad.get(fac):"-" %> "></optgroup>
+			
+<%						}
+						if (carrera.getCarreraId().equals("10228")||carrera.getCarreraId().equals("10216")) anotacion =" (Rumania)"; else anotacion = "";
+%>
+				<option style = "font-size:9pt;" value="<%=carrera.getCarreraId() %>" title="<%= carrera.getNombreCarrera() %>" <%if(carrera.getCarreraId().equals(admAcademico.getCarreraId()))out.print("selected"); %>><%= carrera.getCarreraId()+" - "+ carrera.getNombreCarrera() %><%=anotacion%></option>	
+<%					}
+				}
+%>			
+			</select>
+			<br>
+			<label><b><spring:message code="adm.Fecha"/>:</b></label>
+			<select class="form-select" name="Fecha" style="max-width:200px;">
+<%			for(String str : FECHAS){ 
+	  	    	String value = "01/";
+	  	    	String [] tmp = str.split("/");
+	  	    	if(tmp[0].equals("Junio")){
+	  	    		value = value+"06/"+tmp[1];
+	  	    	}else if(tmp[0].equals("Agosto")){
+	  	    		value = value+"08/"+tmp[1];	
+	  	    	}else if(tmp[0].equals("Enero")){
+	  	    		value = value+"01/"+tmp[1];
+	  	    	}
+	  	    	
+	  	    	String f = admAcademico.getFecha()==null ? "" : admAcademico.getFecha();
+	  	    	if(str.equals("Junio/2012")){
+	  	    		str = "Curso intensivo Verano(s&oacute;lo algunos programas no formales y postgrados)";
+	  	    	}
+	  	    	else if(str.equals("Agosto/2012")){
+	  	    		str = "I Semestre inicio del curso escolar ("+str.replaceAll("/", " ")+")";
+	  	    	}
+	  	    	else if(str.equals("Enero/2013")){
+	  	    		str = " II Semestre curso escolar ("+str.replaceAll("/", " ")+")";
+	  	    	}
+%>
+  	   			<option style = "font-size:7pt;" value="<%=value %>" title="<%=value %>" <%if(value.equals(f))out.print("selected"); %>><%=str %></option>		
+<%			} %>			
+			</select>
+			<br>
+<%		if( admSolicitud.getEstado().equals("1")){ %>
+			<button type="button" class="btn alert-info" onclick="javascript:Grabar();"><spring:message code="adm.Guardar"/></button>
+<%		}else if (admSolicitud.getEstado().equals("2")){ %>
+			<a type="button" class="btn btn-warning" href="<%=request.getContextPath()%>/solicitud/solicitudPDF" target="_blank">PDF</a>
+<%		} %>
+			</form>
+		</div>
+	</div>
+	</div>
+</div>
+</body>
+<script>
+	function Grabar(){
+		document.frmModalidad.Accion.value = "1";
+		document.frmModalidad.submit();
+	}
+</script>
+<%	if (mensaje.equals("1")){%>
+	<table align="center"><tr><td><spring:message code="solicitud.modalidad.GraboModalidad"/></td></tr></table>
+	<meta http-equiv="refresh" content="1;url=datos" />
+<%	}else if(mensaje.equals("2")||mensaje.equals("3")){%>
+	<table align="center"><tr><td><spring:message code="solicitud.modalidad.NoGraboModalidad"/></td></tr></table>
+<%	}%>

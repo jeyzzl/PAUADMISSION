@@ -1,0 +1,26 @@
+package adm.documento.spring;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+public class AdmRequisitoMapper implements RowMapper<AdmRequisito> {
+
+	public AdmRequisito mapRow(ResultSet rs, int arg1) throws SQLException {
+		AdmRequisito objeto = new AdmRequisito();
+		
+		objeto.setCarreraId(rs.getString("CARRERA_ID"));				
+		objeto.setDocumentoId(rs.getString("DOCUMENTO_ID"));
+		objeto.setModalidades(rs.getString("MODALIDADES"));
+		objeto.setAutorizar(rs.getString("AUTORIZAR"));
+		objeto.setRequerido(rs.getString("REQUERIDO"));
+		objeto.setNiveles(rs.getString("NIVELES"));
+		objeto.setTipos(rs.getString("TIPOS"));
+		objeto.setNacionalidades(rs.getString("NACIONALIDADES"));
+		objeto.setEstadosCiviles(rs.getString("ESTADOS_CIVILES"));
+		
+		return objeto;
+	}
+
+}

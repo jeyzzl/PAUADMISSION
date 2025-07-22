@@ -1,0 +1,58 @@
+table{
+	font-family: arial;
+	font-size: 8pt;
+	border-spacing: 0;
+}
+
+th{
+	font-family: Times;
+}
+
+td{
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+}
+
+input{
+	font-size: 8pt;
+}
+
+select{
+	font-size: 8pt;
+}
+
+.etiqueta{
+	background: #000000;
+	text-align: center;
+	color: white;
+	font-family: Times;
+	font-size: 7pt;
+}
+
+.dato{
+	border-left: solid 1px black;
+	border-top: solid 1px black;
+	border-bottom: solid 1px black;
+}
+
+.derecha{
+	border-right: solid 1px black;
+}
+
+.apartado{
+	padding-top: 4px;
+	padding-left: 10px;
+	font-style: italic;
+	font-weight: bold;
+	font-size: 8pt;
+}
+	
+.seccion{
+	font-size: 12pt;
+}

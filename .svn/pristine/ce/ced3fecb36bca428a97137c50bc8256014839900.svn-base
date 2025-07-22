@@ -1,0 +1,62 @@
+package adm;
+import java.io.IOException;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+//import javax.servlet.annotation.WebFilter;
+//import javax.servlet.annotation.WebInitParam;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+//import javax.servlet.DispatcherType;
+
+import org.springframework.core.annotation.Order;
+/*
+@WebFilter(
+        urlPatterns = "/*",
+        filterName = "myFilter",
+        description = "Filtra los jsp",
+   		dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD},
+   		initParams = @WebInitParam(name = "exclusions", value = "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/fontawesome/*")   				
+)
+*/
+@Order(1)
+public class MyFilter implements Filter {
+	
+	@Override
+	public void init(final FilterConfig filterConfig) throws ServletException {
+		System.out.println("Init de filtro");
+	}
+
+	@Override
+	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
+		String uriOriginal		= ((HttpServletRequest)request).getRequestURI();
+		String contexto			= ((HttpServletRequest)request).getContextPath();
+		
+		// Codificacion de caracteres
+		request.setCharacterEncoding("ISO-8859-1");
+		response.setCharacterEncoding("ISO-8859-1");
+		
+		HttpSession sesion = ((HttpServletRequest)request).getSession();
+        if (sesion != null){
+        	String usuarioId = sesion.getAttribute("UsuarioId")==null?"0":sesion.getAttribute("UsuarioId").toString();
+        	//System.out.println("Entre:"+uriOriginal+" Folio:"+folio);
+        	if (!usuarioId.equals("0") || uriOriginal.contains("inicio") || uriOriginal.contains("inicial") || uriOriginal.contains("login") || uriOriginal.contains("valida") || uriOriginal.contains("salir") || uriOriginal.contains("registro") || uriOriginal.contains("encuesta") || uriOriginal.contains("intentaRecuperar")) {
+        		chain.doFilter( request, response );
+        	}else {
+        		((HttpServletResponse)response).sendRedirect(contexto+"/login" );
+        	}    						
+		}else {
+			((HttpServletResponse)response).sendRedirect(contexto+"/login" );
+		}        	       
+	}
+
+	@Override
+	public void destroy() {
+		System.out.println("Fin de filtro");
+	}
+}

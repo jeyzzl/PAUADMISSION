@@ -1,0 +1,52 @@
+<%@ include file= "con_salomon.jsp" %>
+<%@page import="adm.alumno.AdmContacto"%>
+<%@page import="adm.fecha.Fecha"%>
+<%@page import="java.util.Date"%>
+<jsp:useBean id="solicitud" scope="page" class="adm.alumno.Solicitud" />
+<jsp:useBean id="admContacto" scope="page" class="adm.alumno.AdmContacto" />
+<jsp:useBean id="admContactoU" scope="page" class="adm.alumno.AdmContactoUtil" />
+<%
+	String usuario	= (String) session.getAttribute("usuario");
+	String respuestaMensaje = "";
+	int accion	= request.getParameter("Accion")==null?0:Integer.parseInt(request.getParameter("Accion"));
+
+	boolean existeUsuario = solicitud.existeUsuario(conSalomon, usuario);
+	int estado = 0;
+	if(existeUsuario)
+		estado = Integer.parseInt(solicitud.getEstado());
+	
+	switch(accion){
+		case 1:{
+			admContacto.setFolio(solicitud.getFolio());
+			admContacto.setOrden(admContacto.maximoOrden(conSalomon, solicitud.getFolio()));
+			admContacto.setEnvio("0000000");
+			admContacto.setMensaje(request.getParameter("mensaje"));
+			admContacto.setEstado("N");
+			if(admContacto.insertReg(conSalomon)){
+				respuestaMensaje = "<font size=2 color=blue><b>Mensaje Enviado!!!</b></font>";
+			}else{
+				respuestaMensaje = "<font size=2 color=red><b>Error al enviar. Int&eacute;ntelo de nuevo</b></font>";
+			}
+		}break;
+	}
+%>
+<html>
+<head>
+ <link href="portales/alumno/css/pa.css" rel="STYLESHEET" type="text/css">
+  <script type="text/javascript" src="js/prototype-1.6.js"></script>
+  <script type="text/javascript" src="js/iframeResizer.contentWindow.min.js"></script>
+</head>
+ <body background="imagenes/4.jpg">
+<table width="100%"  id="noayuda" align="right" border="0" cellspacing="0" cellpadding="0">
+ <% if(existeUsuario){%>
+ <tr>
+   <td align="right">
+	 <a href="salir" target="frameContenido">
+	 <img src="imagenes/cerrar.png" border="0"  align="bottom"/>
+	 </a>
+	</td> 
+</tr>
+<% } %>
+</table>
+</body>
+<%@ include file= "cierra_salomon.jsp"%>

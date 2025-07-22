@@ -1,0 +1,52 @@
+			<div class="col-lg-1 p-0" style="background-color:rgba(255, 255, 255, 0.7);">			
+				<span class="btn btn-outline-light" style="width: 150px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/registro" style="color:black">					
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="User Details"><i class="fas fa-user fa-2x"></i><br>Account</span>&nbsp;
+					</a>
+				</span>
+<% if (opciones.contains("1")){  %>
+				<span class="btn btn-outline-light" style="width: 150px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/solicitud/modalidad" style="color:black">					
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Admisison Application"><i class="far fa-file-alt fa-2x"></i><br>Application</span>&nbsp;
+					</a>
+				</span>	
+<% } %>		
+<% if (opciones.contains("2")){ %>
+				<span class="btn btn-outline-light" style="width: 150px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/documentos/documentos" style="color:black">					
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Required Documents"><i class="fas fa-tasks fa-2x"></i><br>Documents</span>&nbsp;
+					</a>
+				</span>
+<% } %>
+<% if (opciones.contains("5")){ %>			
+				<span class="btn btn-outline-light tip" style="width: 150px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/banco/banco?Folio=<%=folio%>" style="color:black">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Bank Account"><i class="fas fa-money-check-alt fa-2x"></i><br>Bank</span>&nbsp;
+					</a>
+				</span>
+<% } %>
+<% if (opciones.contains("3")){ 
+		String step5 = "";
+		if(admParametros.getInstitucion().equals("Pacific Adventist University")){ step5 = "Fees";} 
+		if(admParametros.getInstitucion().equals("Sonoma")){ step5 = "Application Fee";}
+		if(admParametros.getInstitucion().equals("Fulton")){ step5 = "Fees";} 
+%>
+				<span class="btn btn-outline-light tip" style="width: 150px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/referencias?Folio=<%=folio%>" style="color:black">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="<%=step5%>"><i class="fas fa-credit-card fa-2x"></i><br><%=step5%></span>&nbsp;
+					</a>
+				</span>		
+<% } %>
+<% if (opciones.contains("4")){ %>			
+				<%-- <span class="btn btn-outline-light tip" style="width: 150px; font-size: 13px;"> --%>
+<% 				String colorCarta = "black";
+				if(admCartaSubir.getCarta() != null){	
+					colorCarta = "green";													
+%>	
+				<span class="btn btn-outline-light tip" style="width: 150px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/descargarCartaAdmision" style="color:<%=colorCarta%>">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Acceptance Letter"><i class="fas fa-envelope fa-2x"></i><br>Acceptance Letter</span>&nbsp;
+					</a>
+				</span>
+<%  				} } %>	
+			</div>

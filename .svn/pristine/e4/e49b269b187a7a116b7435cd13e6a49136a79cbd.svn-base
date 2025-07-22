@@ -1,0 +1,149 @@
+<%@page import="java.util.List"%>
+<%@page import="adm.alumno.spring.AdmEstudio"%>
+<%@page import="adm.alumno.spring.AdmAcademico"%>
+<%@page import="adm.alumno.spring.AdmCartaSubir"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmAcomodo"%>
+<%@page import="adm.parametros.spring.AdmParametros"%>
+
+<%@ include file= "../head.jsp"%>
+<%@ include file= "../menu.jsp"%>
+
+<head> 
+	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
+	<style>		
+		body{
+			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");
+			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+			background-position: center center;
+			/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			/* La imagen de fondo se reescala autom�ticamente con el cambio del ancho de ventana del navegador */
+			background-size: cover;	
+		} 
+		a {text-decoration: none;} 
+		a:hover {text-decoration: underline;} 
+		.tabla td{padding:5px;}
+		
+		.tinyTip {
+			width: 325px;
+			padding: 17px 0px 0px 0px;
+			display: block;
+			background: url(js/Globo/tinyTip-top.png) 0px 0px no-repeat;
+		}
+		.tinyTip .content {
+			padding: 0px 15px 0px 15px;
+			font-size: 14px;
+			font-family: "Lucida Sans Unicode";
+			color: #010101;
+			background: url(js/Globo/tinyTip-content.png) 0px 0px repeat-y;
+		}
+		.tinyTip .bottom {
+			height: 47px;
+			background: url(js/Globo/tinyTip-bottom.png) 0px 0px no-repeat;
+			font: 0px/0px sans-serif;
+		}
+		.fa{
+			color: black;
+		}
+		a> .fa{
+			color: #337ab7;
+		}
+		
+		@media (min-width: 587px) {
+			.col-md-3{
+				float: left;
+				margin-left: 85px;
+			}
+		}
+		@media (min-width: 764px) {
+			.col-md-3{
+				float: left;
+				margin-left: 0;
+			}		
+		}
+		@media (min-width: 480px) {
+			.col-md-5{
+				float: left;
+			}
+		}	
+	</style>	
+	<script type="text/javascript">
+
+		function grabar(){
+			if(revisa()){
+				document.frmAcomodo.submit();
+			}
+		}
+
+		function revisa(){
+			if(document.getElementById("acomodoId").value != "0"){
+				return true;	
+			}else{
+				alert("Please select your preferred accommodation");
+				document.getElementById("acomodoId").focus();	
+			}
+		}	
+	</script>
+</head>
+<%	
+	String folio 			= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	List<String> opciones	= (List<String>)session.getAttribute("Opciones");
+	boolean existeAcomodo	= (boolean)request.getAttribute("existeAcomodo");
+	String colorGrabarAcomodo	= existeAcomodo?"style='color:green'":"style='color:orange'";
+	String mensaje 				= request.getParameter("Mensaje")==null?"":request.getParameter("Mensaje");
+	
+	AdmSolicitud admSolicitud 		= (AdmSolicitud)request.getAttribute("admSolicitud");
+	AdmParametros admParametros 	= (AdmParametros)request.getAttribute("admParametros");
+	
+	List<AdmAcomodo> lisAcomodos 	= (List<AdmAcomodo>)request.getAttribute("lisAcomodos");
+%>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<%-- <%@ include file= "../opciones.jsp"%> --%>
+			<div class="col-lg-12" style="background-color:white; min-height:calc(100vh - 37px);">
+				<div>																											<!-- DIV DE ACOMODO PREFERIDO -->
+					<div class="d-flex bd-highlight page-header">
+						<div class="p-2 w-100 bd-highlight">
+							<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabarAcomodo%>></i>&nbsp;<spring:message code="solicitud.acomodo.Acomodo"/></h2>
+						</div>
+						<div class="p-2 flex-shrink-1 bd-highlight">
+							<div class="d-flex align-items-center">
+								<a href="<%=request.getContextPath()%>/solicitud/otroEstudio"><i class="fas fa-caret-left fa-3x"></i></a>
+								&nbsp;<b class="fs-5">5/12</b>&nbsp;
+	<%					if(existeAcomodo){ %>
+								<a href="<%=request.getContextPath()%>/solicitud/salud"><i class="fas fa-caret-right fa-3x"></i></a>
+	<%					}else{
+							out.print("&nbsp;");
+						}%>	         
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-info">
+						<b><spring:message code="solicitud.acomodo.Instruccion"/></b>
+					</div>
+					<form id="frmAcomodo" name="frmAcomodo" action="grabarAcomodo" method="post">
+						<label class="mt-3"><b><spring:message code="solicitud.acomodo.Titulo"/></b></label>
+						<select class="form-select mb-4" style="width: 35rem" id="acomodoId" name="acomodoId">						<!-- ACOMODACION ID -->
+<% 						for(AdmAcomodo acomodo : lisAcomodos){	%>
+							<option value="<%=acomodo.getAcomodoId()%>" <%=admSolicitud.getAcomodoId().equals(acomodo.getAcomodoId())?"selected":""%>><%=acomodo.getNombreAcomodo()%></option>
+<% 						}		
+%>
+						</select>
+<% if(admSolicitud.getEstado().equals("1")){%>
+<%				if(existeAcomodo){%>
+						<a href="borrarAcomodo?acomodoId=<%=admSolicitud.getAcomodoId()%>" class="btn alert-warning text-decoration-none me-3">Remove Selection</a>
+<%				}%>
+						<button type="button" onclick="grabar();" class="btn alert-info"><spring:message code="adm.Guardar"/></button>
+<% }%>	
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<% if (mensaje.equals("1")){ %>
+	<meta http-equiv="refresh" content="1;url=salud" />
+<% } %>

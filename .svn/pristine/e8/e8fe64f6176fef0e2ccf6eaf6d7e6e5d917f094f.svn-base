@@ -1,0 +1,81 @@
+.button{
+	cursor: pointer
+}
+
+body{
+	background:#FBEFEF;
+}
+
+div{
+	font-family: Helvetica;
+}
+
+table{
+	border-spacing: 0;
+	color: #4B088A;
+	font-family: Helvetica;
+}
+
+table.goback{
+	position: fixed;
+	left: 5px;
+	text-decoration:none;
+	font-family:helvetica;
+}
+
+td.title{
+	color: #4B088A;
+	/*font-family: Georgia, �Times New Roman�, Times, serif ;*/
+	font-family: arial, sans-serif;
+	font-style: normal;
+	font-weight: 100;
+	font-size: x-large;
+	text-align: center;
+	letter-spacing:1px;
+}
+
+td.title2{
+	color: #190710;
+	/*font-family: Georgia, �Times New Roman�, Times, serif  ;*/
+	font-family: arial, sans-serif;
+	/*font-style: italic;*/
+	
+	font-size: large;
+	text-align: center;
+	font-weight: 100;
+}
+
+td.title3{
+	color: #190710;
+	/*font-family: Georgia, �Times New Roman�, Times, serif  ;*/
+	font-family: arial, sans-serif;
+	/*font-style: italic;*/
+	font-size: large;
+	text-align: left;
+	font-weight: 100;
+}
+
+th, .th{
+	/*background-color: #4724F2;*/
+	background-color: #3C277D;
+	color: #FFFFFF;;
+	text-align: center;
+	border-radius:3px;
+	border:1px solid white;padding:1px;
+	font: bold 10pt Arial, Arial Narrow;
+}
+.tr2:Hover{
+	background: #FBEFEF;
+}
+.link:hover{
+	background:#FFEFFF;
+}
+.tabla{
+	border:2px solid black;background:#fff;border-radius:5px;
+}
+input,select{
+	border:1px solid #424242;
+	border-radius:5px;
+	height:20px;
+	font:8pt 'trebuchet ms',helvetica,sans-serif;size:11pt;letter-spacing:1px;color:#000
+}

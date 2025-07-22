@@ -1,0 +1,200 @@
+<%@page import="java.util.List"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Collections"%>
+
+<%@page import="java.text.DateFormat"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.Date"%>
+<%@page import="adm.alumno.spring.AdmAcademico"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmCartaSubir"%>
+<%@page import="adm.catalogo.spring.CatModalidad"%>
+<%@page import="adm.catalogo.spring.CatCarrera"%>
+<%@page import="adm.plan.spring.MapaPlan"%>
+<%@page import="adm.alumno.spring.AdmIngreso"%>
+<%@page import="adm.alumno.spring.AdmIngresoPlan"%>
+<%@page import="adm.parametros.spring.AdmParametros"%>
+
+<%@ include file= "../head.jsp"%>
+<%@ include file= "../menu.jsp"%>
+<head>	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/js-plugins/chosen/chosen.css" /> 
+	<%-- <link rel="STYLESHEET" href="/admision.css"  type="text/css">  			 --%>
+	<style>		
+		body{
+			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");
+			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+			background-position: center center;
+			/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			/* La imagen de fondo se reescala autom�ticamente con el cambio del ancho de ventana del navegador */
+			background-size: cover;	
+		}				
+		@media (min-width: 587px) {
+			.col-md-3{
+				float: left;
+				margin-left: 85px;
+			}
+		}
+		@media (min-width: 764px) {
+			.col-md-3{
+				float: left;
+				margin-left: 0;
+			}		
+		}
+		@media (min-width: 480px) {
+			.col-md-5{
+				float: left;
+			}
+		}	
+	</style>		
+</head>
+<%	
+	String folio 						= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	List<String> opciones				= (List<String>)session.getAttribute("Opciones");
+	
+	AdmAcademico admAcademico 			= (AdmAcademico) request.getAttribute("admAcademico");
+	AdmSolicitud admSolicitud 			= (AdmSolicitud) request.getAttribute("admSolicitud");
+	AdmCartaSubir admCartaSubir 		= (AdmCartaSubir)request.getAttribute("admCartaSubir");
+	AdmParametros admParametros			= (AdmParametros)request.getAttribute("admParametros");
+
+	boolean existeAcademico 			= (boolean) request.getAttribute("existeAcademico");
+	String mensaje						= (String)request.getAttribute("mensaje");
+	String colorGrabar					= existeAcademico?"style='color:purple'":"style='color:orange'";	
+	List<CatModalidad> lisModalidades	= (List<CatModalidad>) request.getAttribute("lisModalidades");	
+	List<MapaPlan> lisPlanes			= (List<MapaPlan>) request.getAttribute("lisPlanes");	
+
+	HashMap<String,String> mapaNivel 		= (HashMap<String,String>) request.getAttribute("mapaNivel");
+	HashMap<String,String> mapaFacultades 	= (HashMap<String,String>) request.getAttribute("mapaFacultades");
+	HashMap<String,CatCarrera> mapaCarreras = (HashMap<String,CatCarrera>) request.getAttribute("mapaCarreras");
+	List<AdmIngreso> lisPeriodos 			= (List<AdmIngreso>)request.getAttribute("lisPeriodos");
+	String periodoId						= (String)request.getAttribute("periodoId");
+	String modo								= (String)request.getAttribute("modo");
+	String planId							= (String)request.getAttribute("planId");
+	String modalidadId						= (String)request.getAttribute("modalidadId");
+	String fecha 							= request.getParameter("Fecha")==null ? "-" : request.getParameter("Fecha");
+	String modalidad 						= admAcademico.getModalidad();	
+
+%>
+<body>
+<div class="container-fluid">
+	<div class="row">
+		<%@ include file= "../opciones.jsp"%>
+		<div class="col-lg-11" style="background-color:white; min-height:calc(100vh - 37px);">
+			<div class="d-flex bd-highlight page-header">
+			<div class="p-2 w-100 bd-highlight">
+			<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabar%>></i>&nbsp;<spring:message code="solicitud.modalidad.Modalidad"/></h2>
+		</div>
+		<div class="p-2 flex-shrink-1 bd-highlight">
+<%	if(existeAcademico){ %>
+			<div class="d-flex justify-content-start position-absolute top-5 end-0">
+				<div class="d-flex align-items-center">				
+					<a href="<%=request.getContextPath()%>/inicial"><i class="fas fa-caret-left fa-3x"></i></a>
+					&nbsp;<b class="fs-5">1/8</b>
+					&nbsp;
+					<a href="<%=request.getContextPath()%>/solicitud/datos"><i class="fas fa-caret-right fa-3x"></i></a>
+					&nbsp;&nbsp;
+				</div>
+			</div>
+<% 	}%>	  
+		</div>
+	</div>
+	<div class="alert alert-info" role="alert">
+		<p><spring:message code="solicitud.modalidad.ParteProceso"/></p>
+	</div>
+	<form name="frmPlan" action="modalidad" method="post">
+		<input type="hidden" name="Accion"/>  
+		<label><b>Entry <spring:message code="adm.Fecha"/>:</b></label>
+		<select class="form-select" name="PeriodoId" id="PeriodoId" onchange="javascript:document.frmPlan.submit();" style="width:200px">
+<% 	for(AdmIngreso periodo : lisPeriodos){		 %>
+			<option value="<%=periodo.getPeriodoId()%>" <%=periodo.getPeriodoId().equals(periodoId) ? "Selected" : "" %> ><%=periodo.getPeriodoNombre()%> </option>
+<%	}%>
+		</select>
+		<br>
+<%	if(admParametros.getInstitucion().equals("Pacific Adventist University")){ %>
+		<label><b>Application Type: </b></label>
+		<select class="form-select" name="Tipo" id="Tipo" style="width:200px">
+			<option value="S" <%=admAcademico.getTipo().equals("S")?"selected":""%>>School Leaver</option>
+			<option value="N" <%=admAcademico.getTipo().equals("N")?"selected":""%>>Non-School Leaver</option>
+			<option value="R" <%=admAcademico.getTipo().equals("R")?"selected":""%>>Re-admission</option>
+			<option value="P" <%=admAcademico.getTipo().equals("P")?"selected":""%>>Post Graduate</option>
+		</select>
+		<br>
+<% 	}%>		
+		<label><b>Attendance <spring:message code="adm.Modalidad"/>:</b></label>
+		<select name="Modo" id="Modo" class="form-select" style="max-width:200px;" onchange="javascript:document.frmPlan.submit();">
+			<option value="N" <%=modo.equals("N")?"Selected":""%>>Face to Face</option>
+<% // DESHABILITA LA MODALIDAD ONLINE PARA SONOMA UC
+	if(!admParametros.getInstitucion().equals("Sonoma")){
+%>
+			<option value="S" <%=modo.equals("S")?"Selected":""%>>Online</option>
+<%
+	}
+%>
+		</select>			
+		<br>		
+		<label><b><spring:message code="adm.Carrera"/>: </b></label><br>
+		<select class="form-select chzn-select" id="PlanId" name="PlanId" data-live-search="true" style="width:500px;" onchange="javascript:document.frmPlan.submit();">	
+<%	String nivel			= "X";
+	String nivelNom 		= "";
+	String carreraNom 		= "";
+	String facId 			= "X";
+	for (MapaPlan plan : lisPlanes){ 
+		// String facuId = plan.getCarreraId().substring(0, 3);
+		// if (!mapaCarreras.get(plan.getCarreraId()).getNivelId().equals(nivel)){
+		if (!mapaCarreras.get(plan.getCarreraId()).getFacultadId().equals(facId)){	
+			// if (!nivel.equals("X")) out.print("</optgroup>");
+			if (!facId.equals("X")) out.print("</optgroup>");
+			if ( mapaCarreras.containsKey(plan.getCarreraId())){
+				nivel 		= mapaCarreras.get(plan.getCarreraId()).getNivelId();	
+				nivelNom 	= mapaNivel.get(nivel);
+				carreraNom 	= mapaCarreras.get(plan.getCarreraId()).getNombreCarrera();	
+				facId 		= plan.getCarreraId().substring(0, 3);
+			}%>	
+			<%-- <optgroup  class='group-result' style = 'font-size:11pt; font-weight:bold;' label="<%=nivelNom + " in " + mapaFacultades.get(facuId)%>"> --%>
+			<optgroup  class='group-result' style = 'font-size:11pt; font-weight:bold;' label="<%="Schoool of "+mapaFacultades.get(facId)%>">
+	<%	} %>
+				<option value="<%=plan.getPlanId()%>" <%=plan.getPlanId().equals(planId)?"Selected":""%>><%=plan.getPlanId()+"-"+plan.getNombrePlan()%></option>			
+<%	}	%>	
+			</optgroup>
+		</select>	
+		<br>			
+		<label><b>Course Modality:</b></label>
+	  	<select name="ModalidadId" id="ModalidadId" class="form-select" style="max-width:200px;" onchange="javascript:document.frmPlan.submit();">
+<%		
+		for(CatModalidad mod : lisModalidades){ 
+%>
+	  		<option value="<%=mod.getModalidadId() %>" <%=mod.getModalidadId().equals(modalidadId)?"Selected":""%>><%=mod.getNombreModalidad() %></option>
+<%
+		} 
+%>
+		</select>
+		<br>	
+<%		if( admSolicitud.getEstado().equals("1")){ %>
+		<button type="button" class="btn alert-info" onclick="javascript:Grabar();"><spring:message code="adm.Siguiente"/></button>
+<%		}else if (admSolicitud.getEstado().equals("2") || admSolicitud.getEstado().equals("3") || admSolicitud.getEstado().equals("4")){ %>
+		<a type="button" class="btn btn-warning" href="<%=request.getContextPath()%>/solicitud/solicitudPDF" target="_blank">PDF</a>
+<%		} %>
+	</form>
+</div>
+</body>
+<script> 
+	function Grabar(){
+		document.frmPlan.Accion.value = "1";
+		document.frmPlan.submit();
+	}
+</script>	
+	
+<%	if (mensaje.equals("1")){%>
+	<table align="center"><tr><td><spring:message code="solicitud.modalidad.GraboModalidad"/></td></tr></table>
+	<meta http-equiv="refresh" content="1;url=datos" />
+<%	}else if(mensaje.equals("2")||mensaje.equals("3")){%>
+	<table align="center"><tr><td><spring:message code="solicitud.modalidad.NoGraboModalidad"/></td></tr></table>
+<%	}%>
+<%-- <script src="../../js-plugins/chosen/chosen.jquery.js" type="text/javascript"></script> --%>
+<%-- <script type="text/javascript">	
+	$(".chzn-select").chosen();
+</script> --%>

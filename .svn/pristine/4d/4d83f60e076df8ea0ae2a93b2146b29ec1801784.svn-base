@@ -1,0 +1,297 @@
+<%@page import="adm.alumno.spring.AdmEncuesta"%>	
+<%@page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<head>
+	<link rel="SHORTCUT ICON" href="imagenes/iconAd.ico">
+	<link href="admision.css" rel="STYLESHEET" type="text/css">	
+	<script type="text/javascript" src="js/iframeResizer.contentWindow.min.js"></script>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/bootstrap3/css/bootstrap.css" type="text/css">	
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/bootstrap3/js/bootstrap.js"></script>		
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/Globo/jquery.tinyTips.js"></script>
+	<script type="text/javascript">	
+		function continua(){
+			document.frmEncuesta.Accion.value="1";
+		    document.frmEncuesta.submit();
+		}
+	
+		function cambiaRelacion(){
+			document.frmEncuesta.Accion.value="2";
+			document.frmEncuesta.submit();
+		}
+		
+		function cambiaCensura(){
+			document.frmEncuesta.Accion.value="3";
+			document.frmEncuesta.submit();
+		}	
+	</script>
+	<style>
+		.next{
+			cursor: hand;cursor: pointer;
+			background:#3C277D;
+			height:32px;
+			width: 165px;
+			
+			border: 4px solid #2C176D;
+			border-radius:1.4em;
+			
+			background: -webkit-gradient(linear, left top, left bottom, from(#644FA5), to(#3C277D));
+			background: -webkit-linear-gradient(#644FA5, #3C277D 60%);
+			background: -moz-linear-gradient(#644FA5, #3C277D 60%);
+			background: -o-linear-gradient(#644FA5, #3C277D 60%);
+		}
+		.next:hover{
+			background:#644FA5;
+			background: -webkit-gradient(linear, left top, left bottom, from(#8C77CD), to(#644FA5));
+			background: -webkit-linear-gradient(#8C77CD, #644FA5 60%);
+			background: -moz-linear-gradient(#8C77CD, #644FA5 60%);
+			background: -o-linear-gradient(#8C77CD, #644FA5 60%);
+		}
+		.image{
+			background: white;
+			width: 27px;
+			height: 26px;
+			border-radius:20em;
+		}
+		.flecha{
+			position:relative;
+			left: 7px;
+			top: 4px;
+			border-left: 16px solid #2C176D; 
+			border-right: 9px solid transparent; 
+			border-bottom: 9px solid transparent; 
+			border-top: 9px solid transparent; 
+		}
+	</style>
+</head>
+<% 
+	boolean mal 				= false;
+	
+	String folio				= request.getParameter("Folio") == null ? "0" : request.getParameter("Folio");
+	String clave				= request.getParameter("Clave") == null ? "0" : request.getParameter("Clave");
+	String recomendacionId		= request.getParameter("Id") == null ? "0" : request.getParameter("Id");				
+	String dias					= request.getParameter("Dias")==null?"0":request.getParameter("Dias");
+	String meses				= request.getParameter("Meses")==null?"0":request.getParameter("Meses");
+	String anos					= request.getParameter("Anos")==null?"0":request.getParameter("Anos");
+	boolean existe				= (boolean) request.getAttribute("existe");
+	boolean autorizado			= (boolean) request.getAttribute("autorizado");
+	AdmEncuesta encuesta 		= (AdmEncuesta)request.getAttribute("encuesta");
+	boolean grabo 				= (boolean) request.getAttribute("grabo");
+	String nombreCandidato		= (String) request.getAttribute("nombreCandidato");
+	
+	if(!existe && autorizado){
+%>
+	
+	<body>	
+	<table class="tabla" style="width:90%; margin: 0 auto;">
+	<% if (grabo){%>  
+	  	<tr>
+	  		<td align="center">
+	  			<div class="alert alert-success">
+			  		<h2>Su recomendaci&oacute;n ha sido guardada...</h2>
+	  			</div>
+			</td>
+		</tr>	  
+	<% }%>
+	  <h1 align="center">Universidad De Montemorelos <small>(Direcci&oacute;n de admisiones)</small></h1> 
+	  <tr><td>&nbsp;</td></tr>
+	  <tr><th align="left">NOMBRE DEL SOLICITANTE: &nbsp; <%=nombreCandidato.toUpperCase() %></th></tr>
+	  <tr><td>&nbsp;</td></tr>
+	  <tr><td><b>INSTRUCCIONES PARA EL RECOMENDANTE</b></td></tr>	     
+	  <tr>  
+	    <td class="title3" align="justify">
+	    Por favor eval&uacute;e al aspirante en un rango del 1 al 5 en cada una de las caracter&iacute;sticas mencionadas en el cuadro de abajo.<br>
+	    Agradecemos su colaboraci&oacute;n al enviarnos esta evaluaci&oacute;n lo m&aacute;s pronto posible. Esta informaci&oacute;n ser&aacute; manejada en forma
+	    confidencial y ser&aacute; para uso exclusivo en el proceso de admisi&oacute;n.  
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>&nbsp;</td>
+	  </tr>  
+	</table>	
+	<form id="frmEncuesta" name="frmEncuesta" action="encuesta" method="post">
+	<input name="Accion" type="hidden">
+	<input name="Folio" type="hidden" value=<%=folio%>>
+	<input name="Clave" type="hidden" value=<%=clave%>>
+	<input name="Id" type="hidden" value=<%=recomendacionId%>>
+	<table class="table table-condensed table-bordered table-striped" style="width:90%; margin: 0 auto;">
+	  <tr>
+	    <th>CARACTERISTICA</th>
+	    <th>1</th>
+	    <th>2</th>
+	    <th>3</th>
+	    <th>4</th>
+	    <th>5</th>
+	  <tr>
+	  <tr>
+	    <td>Motivaci&oacute;n y perseverancia</td>
+	    <td><input type="radio" name="R1" value="1" <% if(encuesta.getR1().equals("1")) out.print("Checked");%> /> Por debajo del promedio</td>
+	    <td><input type="radio" name="R1" value="2" <% if(encuesta.getR1().equals("2")) out.print("Checked");%> /> Promedio</td>
+	    <td><input type="radio" name="R1" value="3" <% if(encuesta.getR1().equals("3")) out.print("Checked");%> /> Por arriba del promedio</td>
+	    <td><input type="radio" name="R1" value="4" <% if(encuesta.getR1().equals("4")) out.print("Checked");%> /> Superior</td>
+	    <td><input type="radio" name="R1" value="5" <% if(encuesta.getR1().equals("5")) out.print("Checked");%> />&nbsp;&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Confiabilidad (realiza su trabajo concienzudamente y con responsabilidad)</td>
+	    <td><input type="radio" name="R2" value="1" <% if(encuesta.getR2().equals("1")) out.print("Checked");%> /> A menudo es irresponsable</td>
+	    <td><input type="radio" name="R2" value="2" <% if(encuesta.getR2().equals("2")) out.print("Checked");%> /> Debe ser supervisado</td>
+	    <td><input type="radio" name="R2" value="3" <% if(encuesta.getR2().equals("3")) out.print("Checked");%> /> Frecuentemente confiable</td>
+	    <td><input type="radio" name="R2" value="4" <% if(encuesta.getR2().equals("4")) out.print("Checked");%> /> Totalmente confiable</td>
+	    <td><input type="radio" name="R2" value="5" <% if(encuesta.getR2().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Habilidad Intelectual</td>
+	    <td><input type="radio" name="R3" value="1" <% if(encuesta.getR3().equals("1")) out.print("Checked");%> /> Por debajo del promedio</td>
+	    <td><input type="radio" name="R3" value="2" <% if(encuesta.getR3().equals("2")) out.print("Checked");%> /> Promedio</td>
+	    <td><input type="radio" name="R3" value="3" <% if(encuesta.getR3().equals("3")) out.print("Checked");%> /> Por arriba del promedio</td>
+	    <td><input type="radio" name="R3" value="4" <% if(encuesta.getR3().equals("4")) out.print("Checked");%> /> Superior</td>
+	    <td><input type="radio" name="R3" value="5" <% if(encuesta.getR3().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Integridad</td>
+	    <td><input type="radio" name="R4" value="1" <% if(encuesta.getR4().equals("1")) out.print("Checked");%> /> Frecuentemente deshonesto: roba o copia</td>
+	    <td><input type="radio" name="R4" value="2" <% if(encuesta.getR4().equals("2")) out.print("Checked");%> /> A veces cuestionable</td>
+	    <td><input type="radio" name="R4" value="3" <% if(encuesta.getR4().equals("3")) out.print("Checked");%> /> B&aacute;sicamente honesto</td>
+	    <td><input type="radio" name="R4" value="4" <% if(encuesta.getR4().equals("4")) out.print("Checked");%> /> Persona consistentemente honesta y veraz</td>
+	    <td><input type="radio" name="R4" value="5" <% if(encuesta.getR4().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Estabilidad emocional</td>
+	    <td><input type="radio" name="R5" value="1" <% if(encuesta.getR5().equals("1")) out.print("Checked");%> /> Tenso, excitable a menudo pierde el control</td>
+	    <td><input type="radio" name="R5" value="2" <% if(encuesta.getR5().equals("2")) out.print("Checked");%> /> Ocasionalmente afectado por los sentimientos, de temperamento cambiable</td>
+	    <td><input type="radio" name="R5" value="3" <% if(encuesta.getR5().equals("3")) out.print("Checked");%> /> Generalmente bien balanceado</td>
+	    <td><input type="radio" name="R5" value="4" <% if(encuesta.getR5().equals("4")) out.print("Checked");%> /> Autocontrolado, sereno, alegre</td>
+	    <td><input type="radio" name="R5" value="5" <% if(encuesta.getR5().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Empat&iacute;a: muestra sensibilidad hacia las necesidades de otros, consideraci&oacute;n y tacto</td>
+	    <td><input type="radio" name="R6" value="4" <% if(encuesta.getR6().equals("4")) out.print("Checked");%> /> Siempre</td>
+	    <td><input type="radio" name="R6" value="3" <% if(encuesta.getR6().equals("3")) out.print("Checked");%> /> Frecuentemente</td>
+	    <td><input type="radio" name="R6" value="2" <% if(encuesta.getR6().equals("2")) out.print("Checked");%> /> Ocasionalmente</td>
+	    <td><input type="radio" name="R6" value="1" <% if(encuesta.getR6().equals("1")) out.print("Checked");%> /> Nunca</td>
+	    <td><input type="radio" name="R6" value="5" <% if(encuesta.getR6().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Consistencia del desempe&ntilde;o acad&eacute;mico</td>
+	    <td><input type="radio" name="R7" value="1" <% if(encuesta.getR7().equals("1")) out.print("Checked");%> /> Por debajo del promedio</td>
+	    <td><input type="radio" name="R7" value="2" <% if(encuesta.getR7().equals("2")) out.print("Checked");%> /> Promedio</td>
+	    <td><input type="radio" name="R7" value="3" <% if(encuesta.getR7().equals("3")) out.print("Checked");%> /> Por arriba del promedio</td>
+	    <td><input type="radio" name="R7" value="4" <% if(encuesta.getR7().equals("4")) out.print("Checked");%> /> Superior</td>
+	    <td><input type="radio" name="R7" value="5" <% if(encuesta.getR7().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Madurez (personalidad equilibrada, habilidad para enfrentarse a las situaciones de la vida diaria)</td>
+	    <td><input type="radio" name="R8" value="1" <% if(encuesta.getR8().equals("1")) out.print("Checked");%> /> Por debajo del promedio</td>
+	    <td><input type="radio" name="R8" value="2" <% if(encuesta.getR8().equals("2")) out.print("Checked");%> /> Promedio</td>
+	    <td><input type="radio" name="R8" value="3" <% if(encuesta.getR8().equals("3")) out.print("Checked");%> /> Por arriba del promedio</td>
+	    <td><input type="radio" name="R8" value="4" <% if(encuesta.getR8().equals("4")) out.print("Checked");%> /> Superior</td>
+	    <td><input type="radio" name="R8" value="5" <% if(encuesta.getR8().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>
+	    <td>Disposici&oacute;n para acatar reglas</td>
+	    <td><input type="radio" name="R9" value="1" <% if(encuesta.getR9().equals("1")) out.print("Checked");%> /> Nula </td>
+	    <td><input type="radio" name="R9" value="2" <% if(encuesta.getR9().equals("2")) out.print("Checked");%> /> Regular</td>
+	    <td><input type="radio" name="R9" value="3" <% if(encuesta.getR9().equals("3")) out.print("Checked");%> /> Buena</td>
+	    <td><input type="radio" name="R9" value="4" <% if(encuesta.getR9().equals("4")) out.print("Checked");%> /> Excelente</td>
+	    <td><input type="radio" name="R9" value="5" <% if(encuesta.getR9().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>  
+	    <td>Las amistades que frecuenta son personas de buena reputaci&oacute;n y principios morales</td>
+	    <td><input type="radio" name="R10" value="4" <% if(encuesta.getR10().equals("4")) out.print("Checked");%> /> Siempre</td>
+	    <td><input type="radio" name="R10" value="3" <% if(encuesta.getR10().equals("3")) out.print("Checked");%> /> Frecuentemente</td>
+	    <td><input type="radio" name="R10" value="2" <% if(encuesta.getR10().equals("2")) out.print("Checked");%> /> Rara vez</td>
+	    <td><input type="radio" name="R10" value="1" <% if(encuesta.getR10().equals("1")) out.print("Checked");%> /> Nunca</td>
+	    <td><input type="radio" name="R10" value="5" <% if(encuesta.getR10().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>  
+	    <td>Apariencia personal (en ambos sexos evaluar nitidez y limpieza, en el sexo femenino adem&aacute;s recato y decencia en su vestimenta).</td>
+	    <td><input type="radio" name="R11" value="1" <% if(encuesta.getR11().equals("1")) out.print("Checked");%> /> Indeseable </td>
+	    <td><input type="radio" name="R11" value="2" <% if(encuesta.getR11().equals("2")) out.print("Checked");%> /> Descuidada</td>
+	    <td><input type="radio" name="R11" value="3" <% if(encuesta.getR11().equals("3")) out.print("Checked");%> /> Buena</td>
+	    <td><input type="radio" name="R11" value="4" <% if(encuesta.getR11().equals("4")) out.print("Checked");%> /> Excelente</td>
+	    <td><input type="radio" name="R11" value="5" <% if(encuesta.getR11().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	   <tr>  
+	  <td>Relaciones Sociales</td>
+	    <td><input type="radio" name="R12" value="1" <% if(encuesta.getR12().equals("1")) out.print("Checked");%> /> Persona retra&iacute;da y t&iacute;mida</td>
+	    <td><input type="radio" name="R12" value="2" <% if(encuesta.getR12().equals("2")) out.print("Checked");%> /> Posee s&oacute;lo un c&iacute;rculo peque&ntilde; de amistades</td>
+	    <td><input type="radio" name="R12" value="3" <% if(encuesta.getR12().equals("3")) out.print("Checked");%> /> Generalmente gusta de las relaciones sociales</td>
+	    <td><input type="radio" name="R12" value="4" <% if(encuesta.getR12().equals("4")) out.print("Checked");%> /> Excepcional facilidad para relaciones sociales</td>
+	    <td><input type="radio" name="R12" value="5" <% if(encuesta.getR12().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>
+	  <tr>  
+	    <td>Inter&eacute;s por el aspecto espiritual</td>
+	    <td><input type="radio" name="R13" value="1" <% if(encuesta.getR13().equals("1")) out.print("Checked");%> /> Negativo</td>
+	    <td><input type="radio" name="R13" value="2" <% if(encuesta.getR13().equals("2")) out.print("Checked");%> /> Pasivo</td>
+	    <td><input type="radio" name="R13" value="3" <% if(encuesta.getR13().equals("3")) out.print("Checked");%> /> Participa</td>
+	    <td><input type="radio" name="R13" value="4" <% if(encuesta.getR13().equals("4")) out.print("Checked");%> /> Muestra liderazgo activo</td>
+	    <td><input type="radio" name="R13" value="5" <% if(encuesta.getR13().equals("5")) out.print("Checked");%> />&nbsp;No dispongo de informaci&oacute;n suficiente</td>
+	  </tr>  
+	</table>
+	<table class="table" style="width:90%; margin: 0 auto;">
+	  <tr>
+	    <td colspan="3">&nbsp;</td>
+	  </tr>
+	  <tr>
+	    <td>&iquestDesde hace cu&aacute;nto tiempo conoce al solicitante?(es muy importante este dato):</td>
+	    <td colspan="2">Desde hace algunos&nbsp;<input type="text" id="Dias" name="Dias" maxlength="3" value="<%=dias%>" size="3"/>&nbsp;d&iacute;as&nbsp;&nbsp;
+	    Desde hace algunos&nbsp;<input type="text" id="Meses" name="Meses" maxlength="2" value="<%=meses%>" size="3"/>&nbsp;meses&nbsp;&nbsp;
+	    Desde hace algunos&nbsp;<input type="text" id="Anos" name="Anos" maxlength="2" value="<%=anos%>" size="3"/>&nbsp;a&ntilde;os
+	    </td>
+	  </tr>
+	  <tr>
+	  <td>&iquestCu&aacute;n bien considera conocerlo?</td>
+	    <td colspan="2"><input type="radio" Checked id="Conocer" name="Conocer"  value="1" <% if(encuesta.getConocer().equals("1")) out.print("Checked");%> />&nbsp;poco&nbsp;&nbsp;
+	    <input type="radio" id="Conocer" name="Conocer"  value="2" <% if(encuesta.getConocer().equals("2")) out.print("Checked");%> />&nbsp;bien&nbsp;&nbsp;
+	    <input type="radio" id="Conocer" name="Conocer"  value="3" <% if(encuesta.getConocer().equals("3")) out.print("Checked");%> />&nbsp;muy bien
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>&iquestCu&aacute;l es su relaci&oacute;n?</td>
+	    <td colspan="2"><input type="radio" Checked id="Relacion" name="Relacion"  value="1" />&nbsp;maestro&nbsp;&nbsp;
+	    <input type="radio" id="Relacion" name="Relacion"  value="4" <% if(encuesta.getRelacion().equals("4")) out.print("Checked");%> />&nbsp;jefe&nbsp;&nbsp;	    
+	    <input type="radio" id="Relacion" name="Relacion"  value="2" <% if(encuesta.getRelacion().equals("2")) out.print("Checked");%> />&nbsp;preceptor	    
+	    <input type="radio" id="Relacion" name="Relacion"  value="3" <% if(encuesta.getRelacion().equals("3")) out.print("Checked");%> />&nbsp;otra(indique):	  
+	    <input type="text" id="Otra" name="Otra"  value="<%= encuesta.getOtra()%>" maxlength="100" size="10"/>	    
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Conoce usted alguna acci&oacute;n disciplinaria, censura, suspensi&oacute;n o expulsi&oacute;n que haya sido ejercida contra el aspirante:</td>
+	    <td><input type="radio" id="Censura" name="Censura"  value="S" <% if(encuesta.getCensura().equals("S")) out.print("Checked");%>/>&nbsp;SI&nbsp;&nbsp;
+	    <input type="radio" id="Censura" name="Censura" Checked value="N" <% if(encuesta.getCensura().equals("N")) out.print("Checked");%> />&nbsp;NO&nbsp;&nbsp;</td>	      
+	    <td><textarea id="Conducta" name="Conducta"><%= encuesta.getConducta()%></textarea></td>	    
+	  </tr>
+	  <tr>
+	    <td>Basado en las caracter&iacute;sticas evaluadas el aspirante es:</td>
+	    <td ><input type="radio" id="Opinion" name="Opinion"  value="1" <% if(encuesta.getOpinion().equals("1")) out.print("Checked");%> />Altamente recomendado&nbsp;<br>
+	    <input type="radio" id="Opinion" name="Opinion"  value="2" <% if(encuesta.getOpinion().equals("2")) out.print("Checked");%> />Recomendado con reservas </td>
+	    <td><input type="radio" id="Opinion" name="Opinion"  value="3" Checked <% if(encuesta.getOpinion().equals("3")) out.print("Checked");%> />Recomendado&nbsp;<br>
+	        <input type="radio" id="Opinion" name="Opinion"  value="4" <% if(encuesta.getOpinion().equals("4")) out.print("Checked");%> />No Recomendado</td>
+	  </tr>
+	  <tr>
+	    <td colspan= "3">Si tiene alg&uacute;n comentario adicional sobre el aspirante utilice libremente el siguiente espacio</td>
+	  </tr>
+	  <tr>
+	    <td colspan="3"><textarea id="Adicional" name="Adicional" cols="100" rows="7"><%=encuesta.getAdicional()==null?"":encuesta.getAdicional()%></textarea></td>
+	  </tr>
+	  <tr>
+	    <td colspan="3">&nbsp;</td>
+	  </tr>
+	  <tr>
+		  <td colspan="3" align="center">
+			<div onClick="javascript:continua()" >
+				<button class="btn btn-primary btn-lg">Guardar</button>
+			</div>
+		  </td>
+		</tr>
+	</table>
+	</form>
+	</td></tr>
+	</table>
+	</body>
+<%	}else if (existe){
+		out.print("Gracias por participar, ya está registrada la recomendación.");
+	}else{
+		out.print("El código de acceso no coincide con la información registrada en la solicitud. Contacta a un asesor de admisiones.");
+	}
+%>

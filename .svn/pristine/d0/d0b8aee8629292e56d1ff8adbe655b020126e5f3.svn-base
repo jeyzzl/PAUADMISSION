@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="(All)" including="adm/" kind="src" path=""/>
+	<classpathentry kind="lib" path="WEB-INF/lib/com.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/commons-fileupload-1.2.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/fileupload-ext.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/itext-2.0.0.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/iText-5.0.2.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/jmf.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/mail.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/pgjdbc2.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/servlet-2_3-fcs-classfiles.zip"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/twain.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="WEB-INF/classes"/>
+</classpath>

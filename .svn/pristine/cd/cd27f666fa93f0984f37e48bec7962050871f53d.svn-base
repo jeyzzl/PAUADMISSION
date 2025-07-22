@@ -1,0 +1,101 @@
+<%@page import="adm.parametros.spring.AdmParametros"%>
+<!DOCTYPE html">
+<html>
+<head>
+<title>Forgot Passowrd</title>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/bootstrap5.1/css/bootstrap.min.css">
+<script src="<%=request.getContextPath()%>/js/jquery-3.3.1.min.js"></script>
+<script src="<%=request.getContextPath()%>/js/popper.min.js"></script>
+<script src="<%=request.getContextPath()%>/bootstrap5.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/login.css" type="text/css">
+<link rel="SHORTCUT ICON" href="<%=request.getContextPath()%>/imagenes/iconAd.ico">
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
+<script type="text/javascript">
+	function Enviar(){
+		if(document.frmRecuperar.Email.value != ""){
+			document.frmRecuperar.submit();
+		}else{
+			alert("<spring:message code='login.LleneLogin'/>");
+		}		
+	}
+</script>
+<style type="text/css">
+	.alert-success{
+			margin:0 auto;
+	}
+		
+	@media (min-width: 320px) {
+		.alert-success {
+			width: 550px;
+			margin:0 auto;
+			margin-bottom: 50px;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+	}
+	
+	body{
+		background-image: url("imagenes/fondoRecuperar.jpeg");
+		/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+		background-position: center center;
+		/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+		background-attachment: fixed;
+		background-repeat: no-repeat;
+		/* La imagen de fondo se reescala autom�ticamente con el cambio del ancho de ventana del navegador */
+		background-size: cover;
+		
+	}
+</style>
+</head>
+<%
+	AdmParametros admParametros 	= (AdmParametros)request.getAttribute("parametros");
+	String email 				= request.getParameter("Email")==null?"":request.getParameter("Email");
+	String mensaje 				= request.getParameter("Mensaje")==null?"-":request.getParameter("Mensaje");
+
+	String widthBackgroundImg = "700px";
+
+	if(admParametros.getInstitucion().equals("Sonoma")){ widthBackgroundImg = "270px"; }
+	if(admParametros.getInstitucion().equals("Pacific Adventist University")){ widthBackgroundImg = "100px"; }
+	if(admParametros.getInstitucion().equals("Fulton")){widthBackgroundImg = "700px";}
+%>
+<body>
+<div class="container-fluid">
+	<div class="d-flex justify-content-center">
+		<img src="imagenes/logoLineal.png" width="<%=widthBackgroundImg%>">
+	</div>
+	<div class="mt-1">&nbsp;</div>
+<%	if (mensaje.equals("1")){%>
+		<div class="alert alert-secondary text-center" style="opacity:0.7;">
+			There is no account associated with this email address. If you would like more information, please contact us. 
+<% 	if(admParametros.getInstitucion().equals("Sonoma")){%><spring:message code="adm.Correo.Sonoma"/><% }%>
+<% 	if(admParametros.getInstitucion().equals("Pacific Adventist University")){%><spring:message code="adm.Correo.Pau"/><% }%>
+<% 	if(admParametros.getInstitucion().equals("Fulton")){%><spring:message code="adm.Correo.Fulton"/><% }%>
+		</div>
+<%	}else if(mensaje.equals("0")){ %>
+		<div class="alert alert-secondary text-center" style="opacity:0.7;">
+			A recovery code has been sent to your email. If you require additional asistance, please contact us at 
+<% 	if(admParametros.getInstitucion().equals("Sonoma")){%><spring:message code="adm.Correo.Sonoma"/><% }%>
+<% 	if(admParametros.getInstitucion().equals("Pacific Adventist University")){%><spring:message code="adm.Correo.Pau"/><% }%>
+<% 	if(admParametros.getInstitucion().equals("Fulton")){%><spring:message code="adm.Correo.Fulton"/><% }%>
+		</div>
+<%  }%>		
+	<div class="well-white mt-5">
+		<form name="frmRecuperar" action="enviaRecuperar" method="post">
+	 	<div class="page-header mt-3">
+            <h2>Information will be sent to your email</h2>
+        </div>
+		<p>
+        	<div class="group">
+        		<input onKeyDown="funcionEnter(event);" name="Email" type="text" value="<%=email%>" placeholder="Enter the email you registered in your account">
+        	</div>
+        </p>        	
+		<p>			
+        	<a href="javascript:Enviar();" class="btn btn-success btn-large">Send</a>
+        </p>
+        </form>	
+	</div>
+</div>	
+</body>
+</html>

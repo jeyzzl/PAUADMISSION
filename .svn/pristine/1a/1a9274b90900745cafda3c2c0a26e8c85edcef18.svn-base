@@ -1,0 +1,170 @@
+package adm;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import adm.alumno.spring.AdmAcademico;
+import adm.alumno.spring.AdmAcademicoDao;
+import adm.alumno.spring.AdmCartaSubir;
+import adm.alumno.spring.AdmCartaSubirDao;
+import adm.alumno.spring.AdmSolicitud;
+import adm.alumno.spring.AdmSolicitudDao;
+import adm.banco.spring.AdmBanco;
+import adm.banco.spring.AdmBancoDao;
+import adm.catalogo.spring.CatCarreraDao;
+import adm.catalogo.spring.CatNivelDao;
+
+import org.springframework.ui.Model;
+
+
+@Controller
+public class ControllerBanco {
+
+    @Autowired
+	@Qualifier("dataSourceSalomon")
+	private DataSource salomon;
+
+    @Autowired	
+	private AdmBancoDao admBancoDao;
+
+    @Autowired	
+	private AdmAcademicoDao admAcademicoDao;
+
+    @Autowired	
+	private AdmSolicitudDao admSolicitudDao;
+
+    @Autowired	
+	private AdmCartaSubirDao admCartaSubirDao;
+
+    @Autowired	
+	private CatNivelDao catNivelDao;
+	
+	@Autowired	
+	private CatCarreraDao catCarreraDao;
+
+    @RequestMapping("/banco/banco")
+    public String bancoBanco(HttpServletRequest request, Model model) {
+        String folio = "";
+        HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}
+
+        AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		if (admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		}
+
+        boolean tieneBanco = false;
+        AdmBanco admBanco = new AdmBanco();
+        if(admBancoDao.existeReg(folio)){
+            admBanco = admBancoDao.mapeaRegId(folio);
+            tieneBanco = true;
+        }else{
+            tieneBanco = false;
+        }
+
+        AdmAcademico admAcademico 		= new AdmAcademico();
+        AdmCartaSubir admCartaSubir 	= new AdmCartaSubir();
+
+        String nivelNombre		= "-";
+		String carreraNombre	= "-";
+		if (admAcademicoDao.existeReg(folio)) {
+			admAcademico 		= admAcademicoDao.mapeaRegId(folio);
+			nivelNombre 		= catNivelDao.getNivelNombre(admAcademico.getNivelId());
+			carreraNombre 		= catCarreraDao.getNombreCarrera(admAcademico.getCarreraId());
+		}
+
+        if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+
+        model.addAttribute("admSolicitud", admSolicitud);
+        model.addAttribute("admCartaSubir",admCartaSubir);
+        model.addAttribute("admBanco", admBanco);
+        model.addAttribute("tieneBanco", tieneBanco);
+        model.addAttribute("admAcademico", admAcademico);
+        model.addAttribute("nivelNombre", nivelNombre);
+        model.addAttribute("carreraNombre", carreraNombre);
+
+        return "banco/banco";
+    }
+    
+    @RequestMapping("/banco/grabarBanco")
+    public String bancoGrabarBanco(HttpServletRequest request, Model model) {
+        String folio = "";
+        String banco        = request.getParameter("Banco")==null?"-":request.getParameter("Banco");
+        String bancoRama    = request.getParameter("Rama")==null?"-":request.getParameter("Rama");
+        String cuentaNombre = request.getParameter("NombreCuenta")==null?"-":request.getParameter("NombreCuenta");
+        String cuentaNumero = request.getParameter("NumeroCuenta")==null?"0":request.getParameter("NumeroCuenta");
+        String numeroBbs    = request.getParameter("NumeroBBS")==null?"0":request.getParameter("NumeroBBS");
+        String cuentaTipo   = request.getParameter("TipoCuenta")==null?"-":request.getParameter("TipoCuenta");
+        String codigoSwift  = request.getParameter("CodigoSwift")==null?"0":request.getParameter("CodigoSwift");
+        String mensaje      = "";
+
+        HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}
+
+        AdmBanco admBanco = new AdmBanco();
+
+        admBanco.setFolio(folio);
+        admBanco.setBanco(banco);
+        admBanco.setBancoRama(bancoRama);
+        admBanco.setCuentaNombre(cuentaNombre);
+        admBanco.setCuentaNumero(cuentaNumero);
+        admBanco.setNumeroBbs(numeroBbs);
+        admBanco.setCuentaTipo(cuentaTipo);
+        admBanco.setCodigoSwift(codigoSwift);
+
+        if(admBancoDao.existeReg(folio)){
+            if(admBancoDao.updateReg(admBanco)){
+                mensaje = "1";
+            }else{
+                mensaje = "0";
+            }
+        }else{
+            if(admBancoDao.insertReg(admBanco)){
+                mensaje = "1";
+            }else{
+                mensaje = "0";
+            }
+        }
+
+        return "redirect:/banco/banco?Folio="+folio+"&Mensaje="+mensaje;
+    }
+
+    @RequestMapping("/banco/borrarBanco")
+    public String bancoBorrarBanco(HttpServletRequest request, Model model) {
+        String folio = "";
+        String mensaje = "";
+        HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}
+
+        if(admBancoDao.deleteReg(folio)){
+            mensaje = "1";
+        }else{
+            mensaje = "0";
+        }
+
+        return "redirect:/banco/banco?Folio="+folio+"&Mensaje="+mensaje;
+    }
+}

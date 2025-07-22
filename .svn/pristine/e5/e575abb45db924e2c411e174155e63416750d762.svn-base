@@ -1,0 +1,121 @@
+package adm.alumno.spring;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AdmRecuperarDao {
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	public boolean insertReg(AdmRecuperar recuperar) {
+		boolean ok = false;		
+		try{
+			String comando = "INSERT INTO SALOMON.ADM_RECUPERAR"
+					+ " (CORREO, FECHA, CLAVE ) "
+					+ " VALUES(?, TO_DATE(?,'DD/MM/YYYY'), ?)";			
+			Object[] parametros = new Object[] { recuperar.getCorreo(), recuperar.getFecha(), recuperar.getClave() };
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|insertReg|:"+ex);
+		}
+		return ok;
+	}
+
+	public boolean updateReg(AdmRecuperar recuperar) {
+		boolean ok = false;	
+		try{
+			String comando = "UPDATE SALOMON.ADM_RECUPERAR"
+					+ " SET CLAVE = ?, FECHA = TO_DATE(?,'DD/MM/YYYY') "
+					+ " WHERE CORREO = ?";			
+			Object[] parametros = new Object[] {recuperar.getClave(), recuperar.getFecha(), recuperar.getCorreo() };
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|updatetReg|:"+ex);
+		}
+		return ok;
+	}
+	
+	public AdmRecuperar mapeaRegId(String correo){
+		AdmRecuperar objeto = new AdmRecuperar();		
+		try {
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_RECUPERAR WHERE CORREO = ?";
+			Object[] parametros = new Object[] {correo};
+			if (salomonJdbc.queryForObject(comando, Integer.class, parametros) >= 1){
+				comando = "SELECT CLAVE, CORREO, FECHA FROM SALOMON.ADM_RECUPERAR WHERE CLAVE = ?";
+				objeto = salomonJdbc.queryForObject(comando, new AdmRecuperarMapper(), parametros);	
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|mapeaRegId|:"+ex);
+		}
+		
+		return objeto;
+	}
+	
+	public boolean existeReg(String correo) {
+		boolean ok = false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_RECUPERAR WHERE CORREO = ?";			
+			Object[] parametros = new Object[] {correo};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros) >= 1){
+				ok = true;
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|existeReg|:"+ex);
+		}		
+		return ok;
+	}
+	
+	public AdmRecuperar getReg(String clave){
+		AdmRecuperar objeto = new AdmRecuperar();		
+		try {
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_RECUPERAR WHERE CLAVE = ?";
+			Object[] parametros = new Object[] {clave};
+			if (salomonJdbc.queryForObject(comando, Integer.class, parametros) >= 1){
+				comando = "SELECT CLAVE, CORREO, FECHA FROM SALOMON.ADM_RECUPERAR WHERE CLAVE = ?";
+				objeto = salomonJdbc.queryForObject(comando, new AdmRecuperarMapper(), parametros);	
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|getReg|:"+ex);
+		}
+		
+		return objeto;
+	}
+
+	public boolean existeClave(String correo, String clave) {
+		boolean ok = false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_RECUPERAR WHERE CORREO = ? AND CLAVE = ?";
+			Object[] parametros = new Object[] {correo, clave};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros) >= 1){
+				ok = true;
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|existeClave|:"+ex);
+		}		
+		return ok;
+	}
+
+	public boolean deleteReg(String correo) {
+		boolean ok = false;		
+		try{
+			String comando = "DELETE FROM SALOMON.ADM_RECUPERAR WHERE CORREO = ?";			
+			Object[] parametros = new Object[] {correo};
+			if (salomonJdbc.update(comando,parametros) >= 1){
+				ok = true;
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmRecuperarDao|deleteReg|:"+ex);
+		}		
+		return ok;
+	}
+
+}

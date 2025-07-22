@@ -1,0 +1,538 @@
+package adm.alumno.spring;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AdmSolicitudDao {
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	public boolean insertReg(AdmSolicitud admSolicitud) { 
+		boolean ok = false;
+		
+		try{
+			String comando = "INSERT INTO SALOMON.ADM_SOLICITUD ("+ 
+				" FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO, PAIS_ID, ESTADO_ID, CIUDAD_ID, NACIONALIDAD, FECHA_NAC, ESTADOCIVIL, GENERO," +
+				" RELIGION_ID, BAUTIZADO, CLAVE, FECHA, MATRICULA, ESTADO, EMAIL, ASESOR_ID, CURP, FECHA_INGRESO, AGENTE, ASESOR_SEC, RED_SOCIAL,"+
+				" FELIGRESIA, TELEFONO, CARTA, CODIGO, USUARIO_ID, FECHA_BAUTIZO, LUGAR_BAUTIZO, CULTURAL_ID, REGION_ID, RES_PAIS_ID, RES_ESTADO_ID, RES_CIUDAD_ID, ACOMODO_ID,"+
+				" TIPO, NIVEL_ESTUDIO, TIPO_APLICANTE, PERIODO_ID, TIPO_ACOMODO)" +
+				" VALUES( TO_NUMBER(?,'9999999'), ?, ?, ?, TO_NUMBER(?,'999'), TO_NUMBER(?,'999'), TO_NUMBER(?,'999'), TO_NUMBER(?,'999'), TO_DATE(?,'DD/MM/YYYY'), ?, ?," +
+				" TO_NUMBER(?,'99'), ?, ?, SYSDATE, ?, ?, ?, ?, ?, ?, TO_NUMBER(?,'99'), ?, ?, ?, ?, ?, ?, TO_NUMBER(?,'9999999'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TO_NUMBER(?,'999'), TO_NUMBER(?))";			
+			Object[] parametros = new Object[] {
+					admSolicitud.getFolio(), admSolicitud.getNombre(), admSolicitud.getApellidoPaterno(), admSolicitud.getApellidoMaterno(), admSolicitud.getPaisId(), admSolicitud.getEstadoId(), admSolicitud.getCiudadId(), admSolicitud.getNacionalidad(),
+					admSolicitud.getFechaNac(), admSolicitud.getEstadoCivil(), admSolicitud.getGenero(), admSolicitud.getReligionId(), admSolicitud.getBautizado(), admSolicitud.getClave(), admSolicitud.getMatricula(), admSolicitud.getEstado(),
+					admSolicitud.getEmail(), admSolicitud.getAsesorId(), admSolicitud.getCurp(), admSolicitud.getFechaIngreso(), admSolicitud.getAgente(), admSolicitud.getAsesorSec(), admSolicitud.getRedSocial(), admSolicitud.getFeligresia(), admSolicitud.getTelefono(),
+					admSolicitud.getCarta(), admSolicitud.getCodigo(), admSolicitud.getUsuarioId(), admSolicitud.getFechaBautizo(), admSolicitud.getLugarBautizo(), admSolicitud.getCulturalId(), admSolicitud.getRegionId(),
+					admSolicitud.getResPaisId(), admSolicitud.getResEstadoId(), admSolicitud.getResCiudadId(), admSolicitud.getAcomodoId(), admSolicitud.getTipo(), admSolicitud.getNivelEstudio(), admSolicitud.getTipoAplicante(), admSolicitud.getPeriodoId(), admSolicitud.getTipoAcomodo()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|insertReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean insertRegistro(AdmSolicitud admSolicitud) {
+		boolean ok = false;
+		
+		try{
+			String comando = "INSERT INTO SALOMON.ADM_SOLICITUD" + 
+					"(FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO, GENERO, EMAIL, USUARIO, CLAVE, ESTADO, CURP, FECHA_INGRESO, AGENTE, TELEFONO, CODIGO, USUARIO_ID)" +
+					" VALUES (TO_NUMBER(?,'99999999'), ?, ?, ?, ?, ?, ?, 1, ?, TO_DATE(?,'DD/MM/YYYY'), TO_NUMBER(?,'99'), ?,?,TO_NUMBER(?,'99999'))";
+			Object[] parametros = new Object[] {
+				admSolicitud.getFolio(),admSolicitud.getNombre(),admSolicitud.getApellidoPaterno(),admSolicitud.getApellidoMaterno(),
+				admSolicitud.getGenero(),admSolicitud.getEmail(),admSolicitud.getClave(),
+				admSolicitud.getCurp(),admSolicitud.getFechaIngreso(),admSolicitud.getAgente(), admSolicitud.getTelefono(), admSolicitud.getCodigo(), admSolicitud.getUsuarioId()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}					
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|insertRegistro|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean updateReg(AdmSolicitud admSolicitud) {
+		boolean ok = false;
+		
+		try{
+  		   	String comando = "UPDATE SALOMON.ADM_SOLICITUD " + 
+					" SET" +
+					" NOMBRE = ?," +
+					" APELLIDO_PATERNO = ?," +
+					" APELLIDO_MATERNO = ?," +
+					" PAIS_ID = TO_NUMBER(?,'999')," +
+					" ESTADO_ID = TO_NUMBER(?,'999')," +
+					" CIUDAD_ID = TO_NUMBER(?,'999')," +
+					" NACIONALIDAD = TO_NUMBER(?,'999')," +
+					" FECHA_NAC = TO_DATE(?,'DD/MM/YYYY')," +
+					" ESTADOCIVIL = ?," +
+					" GENERO = ?," +
+					" RELIGION_ID = TO_NUMBER(?,'99')," +
+					" BAUTIZADO = ?," +
+					" EMAIL = ?," +
+					" CLAVE = ?," +
+					" FECHA = TO_DATE(?, 'DD/MM/YYYY')," +
+					" MATRICULA = ?," +
+					" ESTADO = ?, " +
+					" ASESOR_ID = ?, " +
+					" CURP = ?," +
+					" FECHA_INGRESO = ?, " +
+					" AGENTE = TO_NUMBER(?,'99'), " +
+					" ASESOR_SEC = ?,"+
+					" RED_SOCIAL = ?,"+
+					" FELIGRESIA = ?,"+
+					" TELEFONO = ?,"+
+					" CODIGO = ?,"+
+					" FECHA_BAUTIZO = ?," +
+					" LUGAR_BAUTIZO = ?," +
+					" CULTURAL_ID = TO_NUMBER(?,'999')," +
+					" REGION_ID = TO_NUMBER(?,'999')," +
+					" RES_PAIS_ID = TO_NUMBER(?,'999')," +
+					" RES_ESTADO_ID = TO_NUMBER(?,'999')," +
+					" RES_CIUDAD_ID = TO_NUMBER(?,'999')," +
+					" ACOMODO_ID = ?,"+
+					" TIPO = ?,"+
+					" NIVEL_ESTUDIO = ?,"+
+					" TIPO_APLICANTE = ?,"+
+					" PERIODO_ID = TO_NUMBER(?,'999'),"+
+					" TIPO_ACOMODO = TO_NUMBER(?)"+
+					" WHERE FOLIO = TO_NUMBER(?,'9999999')";
+  		   
+	  		 Object[] parametros = new Object[] {
+				admSolicitud.getNombre(),admSolicitud.getApellidoPaterno(),admSolicitud.getApellidoMaterno(),admSolicitud.getPaisId(),admSolicitud.getEstadoId(),
+				admSolicitud.getCiudadId(),admSolicitud.getNacionalidad(),admSolicitud.getFechaNac(),admSolicitud.getEstadoCivil(),admSolicitud.getGenero(),admSolicitud.getReligionId(),
+				admSolicitud.getBautizado(),admSolicitud.getEmail(),admSolicitud.getClave(),admSolicitud.getFecha(),admSolicitud.getMatricula(),
+				admSolicitud.getEstado(),admSolicitud.getAsesorId(),admSolicitud.getCurp(),admSolicitud.getFechaIngreso(),admSolicitud.getAgente(),admSolicitud.getAsesorSec(),
+				admSolicitud.getRedSocial(),admSolicitud.getFeligresia(),admSolicitud.getTelefono(), admSolicitud.getCodigo(), admSolicitud.getFechaBautizo(), admSolicitud.getLugarBautizo(),
+				admSolicitud.getCulturalId(), admSolicitud.getRegionId(), admSolicitud.getResPaisId(), admSolicitud.getResEstadoId(), admSolicitud.getResCiudadId(), admSolicitud.getAcomodoId(),
+				admSolicitud.getTipo(), admSolicitud.getNivelEstudio(), admSolicitud.getTipoAplicante(), admSolicitud.getPeriodoId(), admSolicitud.getTipoAcomodo(),
+				admSolicitud.getFolio() 
+		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}
+	   
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|updateReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean updateRegistro(AdmSolicitud admSolicitud) {
+		boolean ok = false;	
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD " + 
+					" SET" +
+					" NOMBRE = ?," +
+					" APELLIDO_PATERNO = ?," +
+					" APELLIDO_MATERNO = ?," +
+					" GENERO = ?," +					
+					" EMAIL = ?," +
+					" CLAVE = ?, " +
+					" ESTADO = ?, " +
+					" CURP = ?, " +
+					" FECHA_INGRESO = ?, " +
+					" AGENTE = TO_NUMBER(?,'99'), " + 	
+					" TELEFONO = ?,"+
+					" CODIGO = ?"+
+					" WHERE FOLIO = TO_NUMBER(?,'9999999')";
+			
+			Object[] parametros = new Object[] {
+				admSolicitud.getNombre(),admSolicitud.getApellidoPaterno(),admSolicitud.getApellidoMaterno(),admSolicitud.getGenero(),admSolicitud.getEmail(),
+				admSolicitud.getClave(),admSolicitud.getEstado(),admSolicitud.getCurp(),admSolicitud.getFechaIngreso(),admSolicitud.getAgente(),
+				admSolicitud.getTelefono(), admSolicitud.getCodigo(), admSolicitud.getFolio()
+		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|updateRegistro|:"+ex);
+		}
+
+		return ok;
+	}
+
+	public boolean updateEstadoAndFecha(String folio, String estado) { 
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD SET ESTADO = ?, FECHA = TO_DATE(TO_CHAR(SYSDATE, 'DD/MON/YYYY HH24:MI:SS'), 'DD/MM/YYYY HH24:MI:SS') WHERE FOLIO = TO_NUMBER(?,'9999999')";		
+			Object[] parametros = new Object[] {estado, folio};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - aca.admision.spring.AdmSolicitudDao|updateEstado|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	/* Metodo que actualiza la fecha del ultimo movimiento del alumno que sea reelevante */
+	public boolean updateFecha(String folio) {
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD SET FECHA = SYSDATE WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			Object[] parametros = new Object[] { folio };
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|updateFecha|:"+ex);
+		}
+		return ok;
+	}
+	
+	/* Metodo que actualiza la fecha del ultimo movimiento del alumno que sea reelevante */
+	public boolean updateBautizado(String folio, String valor) {
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD SET BAUTIZADO = ? WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			Object[] parametros = new Object[] { valor, folio };
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|updateBautizado|:"+ex);
+		}
+		return ok;
+	}	
+	
+	public boolean updateClave(String usuario, String clave){
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD SET CLAVE = ? WHERE USUARIO = ?";
+			Object[] parametros = new Object[] { clave, usuario };
+			if (salomonJdbc.update(comando,parametros)>=1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|updateClave|:"+ex);
+		}
+		return ok;
+	}
+
+	public boolean updateAcomodo(String folio, String acomodoId, String tipoAcomodo){
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD SET ACOMODO_ID = ?, TIPO_ACOMODO = TO_NUMBER(?) WHERE FOLIO = ?";
+			Object[] parametros = new Object[] { acomodoId, tipoAcomodo, folio};
+			if (salomonJdbc.update(comando,parametros)>=1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|updateAcomodo|:"+ex);
+		}
+		return ok;
+	}
+
+	public boolean eliminarAcomodo(String folio){
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_SOLICITUD SET ACOMODO_ID = '0' WHERE FOLIO = ?";
+			Object[] parametros = new Object[] { folio };
+			if (salomonJdbc.update(comando,parametros)>=1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|eliminarAcomodo|:"+ex);
+		}
+		return ok;
+	}
+	
+	public boolean deleteReg(String folio) {
+		boolean ok = false;
+		
+		try{
+			String comando = "DELETE FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			Object[] parametros = new Object[] {folio};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|deleteReg|:"+ex);
+		}
+		return ok;
+	}
+	
+	public AdmSolicitud mapeaRegId(String folio ){
+		AdmSolicitud objeto = new AdmSolicitud();		
+		try {
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando = "SELECT FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO,"
+						+ " PAIS_ID, ESTADO_ID, CIUDAD_ID, NACIONALIDAD, TO_CHAR(FECHA_NAC,'DD/MM/YYYY') AS FECHA_NAC,"
+						+ " ESTADOCIVIL, GENERO, RELIGION_ID, BAUTIZADO, EMAIL, CLAVE, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA,"
+						+ " MATRICULA, ESTADO, ASESOR_ID, CURP, FECHA_INGRESO, AGENTE, ASESOR_SEC, RED_SOCIAL, FELIGRESIA, TELEFONO, CARTA, CODIGO, USUARIO_ID, FECHA_BAUTIZO, LUGAR_BAUTIZO,"
+						+ " CULTURAL_ID, REGION_ID, RES_PAIS_ID, RES_ESTADO_ID, RES_CIUDAD_ID, ACOMODO_ID, TIPO, NIVEL_ESTUDIO, TIPO_APLICANTE, PERIODO_ID, TIPO_ACOMODO"
+						+ " FROM SALOMON.ADM_SOLICITUD "
+						+ " WHERE FOLIO = TO_NUMBER(?,'9999999')";				
+				objeto = salomonJdbc.queryForObject(comando, new AdmSolicitudMapper(), folio);
+				
+			}						
+		} catch (Exception ex) {
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|mapeaRegId|:"+ex);
+		}
+		
+		return objeto;
+	}
+	
+	public AdmSolicitud mapeaRegPorUsuario(String usuario ){
+		AdmSolicitud objeto = new AdmSolicitud();		
+		try {
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE USUARIO_ID = TO_NUMBER(?,'99999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, usuario)>=1){
+				comando = "SELECT FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO,"
+						+ " PAIS_ID, ESTADO_ID, CIUDAD_ID, NACIONALIDAD, TO_CHAR(FECHA_NAC,'DD/MM/YYYY') AS FECHA_NAC,"
+						+ " ESTADOCIVIL, GENERO, RELIGION_ID, BAUTIZADO, EMAIL, CLAVE, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA,"
+						+ " MATRICULA, ESTADO, ASESOR_ID, CURP, FECHA_INGRESO, AGENTE, ASESOR_SEC, RED_SOCIAL, FELIGRESIA, TELEFONO, CARTA, CODIGO, USUARIO_ID, FECHA_BAUTIZO, LUGAR_BAUTIZO, CULTURAL_ID, REGION_ID,"
+						+ " RES_PAIS_ID, RES_ESTADO_ID, RES_CIUDAD_ID, ACOMODO_ID, TIPO, NIVEL_ESTUDIO, TIPO_APLICANTE, PERIODO_ID, TIPO_ACOMODO"
+						+ " FROM SALOMON.ADM_SOLICITUD "
+						+ " WHERE USUARIO_ID = TO_NUMBER(?,'99999')";				
+				objeto = salomonJdbc.queryForObject(comando, new AdmSolicitudMapper(), usuario);			
+			}						
+		} catch (Exception ex) {
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|mapeaRegPorUsuario|:"+ex);
+		}		
+		return objeto;
+	}
+	
+	public boolean existeReg(String folio) {
+		boolean ok 	= false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'9999999')";
+			Object[] parametros = new Object[] {folio};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|existeReg|:"+ex);
+		}
+		
+		return ok;
+	}
+	
+	public boolean existeUsuario(String usuario, String clave) {
+		boolean ok 	= false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE USUARIO = ? AND CLAVE = ?";			
+			Object[] parametros = new Object[] {usuario,clave};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|existeUsuario1|:"+ex);
+		}		
+		return ok;
+	}
+	
+	public String getFolio(String usuario, String clave) {
+		String folio = "0";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE USUARIO = ? AND CLAVE = ?";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, usuario,clave)>=1){
+				comando = "SELECT FOLIO FROM SALOMON.ADM_SOLICITUD WHERE USUARIO = ? AND CLAVE = ?";
+				folio = salomonJdbc.queryForObject(comando,String.class, usuario,clave);
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|existeUsuario1|:"+ex);
+		}		
+		return folio;
+	}
+	
+	public String getFolioReciente(String usuarioId) {
+		String folio = "0";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE USUARIO_ID = ?";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, usuarioId) >= 1){
+				comando = "SELECT MAX(FOLIO) FROM SALOMON.ADM_SOLICITUD WHERE USUARIO_ID = ?";
+				folio 	= salomonJdbc.queryForObject(comando,String.class, usuarioId);
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|existeUsuario1|:"+ex);
+		}		
+		return folio;
+	}
+	
+	public boolean existeUsuario(String usuario ) {
+		boolean ok 			= false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE USUARIO = ?";	
+			Object[] parametros = new Object[] {usuario};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|existeUsuario2|:"+ex);
+		}		
+		return ok;
+	}
+
+	public boolean existeEmail(String email) {
+		boolean ok = false;
+		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE EMAIL = ?";
+			
+			Object[] parametros = new Object[] {email};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|existeEmail|:"+ex);
+		}
+		
+		return ok;
+	}
+	
+	public List<AdmSolicitud> listAll(String email) {
+		List<AdmSolicitud> lista = new ArrayList<AdmSolicitud>();
+		
+		try{
+			String comando = "SELECT FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO," 
+					+ " PAIS_ID, ESTADO_ID, CIUDAD_ID, NACIONALIDAD, TO_CHAR(FECHA_NAC,'DD/MM/YYYY') AS FECHA_NAC," 
+					+ " ESTADOCIVIL, GENERO, RELIGION_ID, BAUTIZADO, EMAIL, CLAVE, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA," 
+					+ " MATRICULA, ESTADO, ASESOR_ID, CURP, FECHA_INGRESO, AGENTE, ASESOR_SEC, RED_SOCIAL, FELIGRESIA, TELEFONO, CARTA, CODIGO, USUARIO_ID, FECHA_BAUTIZO, LUGAR_BAUTIZO, CULTURAL_ID, REGION_ID,"
+					+ " RES_PAIS_ID, RES_ESTADO_ID, RES_CIUDAD_ID, ACOMODO_ID, TIPO, NIVEL_ESTUDIO, TIPO_APLICANTE, PERIODO_ID, TIPO_ACOMODO"
+					+ " FROM SALOMON.ADM_SOLICITUD WHERE EMAIL = ?";
+			
+			lista = salomonJdbc.query(comando, new AdmSolicitudMapper(), email);
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|getAll|:"+ex);
+		}
+		
+		return lista;
+	}
+	
+	public List<AdmSolicitud> listPorUsuario(String usuarioId) {
+		List<AdmSolicitud> lista = new ArrayList<AdmSolicitud>();		
+		try{
+			String comando = "SELECT FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO," 
+					+ " PAIS_ID, ESTADO_ID, CIUDAD_ID, NACIONALIDAD, TO_CHAR(FECHA_NAC,'DD/MM/YYYY') AS FECHA_NAC," 
+					+ " ESTADOCIVIL, GENERO, RELIGION_ID, BAUTIZADO, EMAIL, CLAVE, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA," 
+					+ " MATRICULA, ESTADO, ASESOR_ID, CURP, FECHA_INGRESO, AGENTE, ASESOR_SEC, RED_SOCIAL, FELIGRESIA, TELEFONO, CARTA, CODIGO, USUARIO_ID, FECHA_BAUTIZO, LUGAR_BAUTIZO, CULTURAL_ID, REGION_ID,"
+					+ " RES_PAIS_ID, RES_ESTADO_ID, RES_CIUDAD_ID, ACOMODO_ID, TIPO, NIVEL_ESTUDIO, TIPO_APLICANTE, PERIODO_ID, TIPO_ACOMODO"
+					+ " FROM SALOMON.ADM_SOLICITUD WHERE USUARIO_ID = TO_NUMBER(?,'99999')";			
+			lista = salomonJdbc.query(comando, new AdmSolicitudMapper(), usuarioId);			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|listPorUsuario|:"+ex);
+		}		
+		return lista;
+	}
+
+	public List<AdmSolicitud> listPorUsuario(String usuarioId, String periodoId) {
+		List<AdmSolicitud> lista = new ArrayList<AdmSolicitud>();		
+		try{
+			String comando = "SELECT FOLIO, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO," 
+					+ " PAIS_ID, ESTADO_ID, CIUDAD_ID, NACIONALIDAD, TO_CHAR(FECHA_NAC,'DD/MM/YYYY') AS FECHA_NAC," 
+					+ " ESTADOCIVIL, GENERO, RELIGION_ID, BAUTIZADO, EMAIL, CLAVE, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA," 
+					+ " MATRICULA, ESTADO, ASESOR_ID, CURP, FECHA_INGRESO, AGENTE, ASESOR_SEC, RED_SOCIAL, FELIGRESIA, TELEFONO, CARTA, CODIGO, USUARIO_ID, FECHA_BAUTIZO, LUGAR_BAUTIZO, CULTURAL_ID, REGION_ID,"
+					+ " RES_PAIS_ID, RES_ESTADO_ID, RES_CIUDAD_ID, ACOMODO_ID, TIPO, NIVEL_ESTUDIO, TIPO_APLICANTE, PERIODO_ID, TIPO_ACOMODO"
+					+ " FROM SALOMON.ADM_SOLICITUD WHERE USUARIO_ID = TO_NUMBER(?,'99999') AND PERIODO_ID = TO_NUMBER(?)";	
+			Object[] parametros = new Object[] {usuarioId, periodoId};		
+			lista = salomonJdbc.query(comando, new AdmSolicitudMapper(), parametros);			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|listPorUsuario|:"+ex);
+		}		
+		return lista;
+	}
+	
+	public String maximoReg() {
+		String folio = "1";		
+		try{
+			String comando = "SELECT COALESCE(MAX(FOLIO), 0)+1 AS MAXIMO FROM SALOMON.ADM_SOLICITUD";			
+			folio = salomonJdbc.queryForObject(comando,String.class);			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|maximoReg|:"+ex);
+		}
+		
+		return folio;
+	}
+	
+	public String getEdad(String folio) {
+		String edad	= "1";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'9999999')";
+			Object[] parametros = new Object[] {folio};
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando = "SELECT FLOOR(MONTHS_BETWEEN(SYSDATE, FECHA_NAC)/12) AS EDAD" +
+						" FROM SALOMON.ADM_SOLICITUD" + 
+						" WHERE FOLIO = TO_NUMBER(?, '99999999')";				
+				edad = salomonJdbc.queryForObject(comando,String.class, parametros);
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|getEdad|:"+ex);
+		}
+		
+		return edad;
+	}
+	
+	public String getNombre(String folio) {
+		String nombre = "X";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando = "SELECT NOMBRE||' '||APELLIDO_PATERNO||' '||APELLIDO_MATERNO AS NOMBRE" +
+						" FROM SALOMON.ADM_SOLICITUD" + 
+						" WHERE FOLIO = TO_NUMBER(?, '99999999')";				
+				nombre = salomonJdbc.queryForObject(comando,String.class, folio);
+			}						
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|getNombre|:"+ex);
+		}
+		
+		return nombre;
+	}
+	
+	public String getNombreCorto(String folio){
+		String nombre = "X";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando = "SELECT NOMBRE||' '||APELLIDO_PATERNO AS NOMBRE FROM SALOMON.ADM_SOLICITUD WHERE FOLIO = TO_NUMBER(?,'99999999')";
+				nombre = salomonJdbc.queryForObject(comando,String.class, folio);
+			}						
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|getNombreCorto|:"+ex);
+		}		
+		return nombre;
+	}
+	
+	public String getClaveInicial(String codigoAlumno) {
+		String clave = "";		
+		try{
+			String comando = "SELECT COUNT(*) FROM ENOC.ACCESO WHERE CODIGO_PERSONAL = ?";
+			Object[] parametros = new Object[] {codigoAlumno};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros) >= 1) {
+				comando 	= "SELECT COALESCE(CLAVE_INICIAL,'X') FROM ENOC.ACCESO WHERE CODIGO_PERSONAL = ?";
+				clave 		= salomonJdbc.queryForObject(comando,String.class, parametros);
+			}		
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmSolicitudDao|getClaveInicial|:"+ex);
+		}		
+		return clave;
+	}
+	
+	public boolean validarCurp(String curp){
+ 		if (curp==null) curp = "-";
+ 		curp=curp.toUpperCase().trim();
+ 		return curp.matches("[A-Z]{4}[0-9]{6}[H,M][A-Z]{5}[A-Z,0-9]{2}");
+	}
+
+}

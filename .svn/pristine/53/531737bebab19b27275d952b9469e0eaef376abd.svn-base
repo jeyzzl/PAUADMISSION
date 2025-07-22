@@ -1,0 +1,70 @@
+// Bean del Cat�logo de Estados
+package  adm.documento.spring;
+
+
+public class AdmRequisito{
+	private String carreraId;
+	private String documentoId;
+	private String modalidades;	
+	private String requerido;
+	
+	public AdmRequisito(){
+		carreraId 		= "0";
+		documentoId 	= "0";
+		modalidades		= "0";
+		requerido		= "S";			
+	}
+
+	/**
+	 * @return the carreraId
+	 */
+	public String getCarreraId() {
+		return carreraId;
+	}
+
+	/**
+	 * @param carreraId the carreraId to set
+	 */
+	public void setCarreraId(String carreraId) {
+		this.carreraId = carreraId;
+	}
+
+
+	/**
+	 * @return the documentoId
+	 */
+	public String getDocumentoId() {
+		return documentoId;
+	}
+
+	/**
+	 * @param documentoId the documentoId to set
+	 */
+	public void setDocumentoId(String documentoId) {
+		this.documentoId = documentoId;
+	}
+
+
+	/**
+	 * @return the modalidades
+	 */
+	public String getModalidades() {
+		return modalidades;
+	}
+
+	/**
+	 * @param modalidades the modalidades to set
+	 */
+	public void setModalidades(String modalidades) {
+		this.modalidades = modalidades;
+	}
+	
+	public String getRequerido() {
+		return requerido;
+	}
+
+	public void setRequerido(String requerido) {
+		this.requerido = requerido;
+	}
+
+}

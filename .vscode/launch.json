@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AdmisionApplication<admission>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "adm.AdmisionApplication",
+            "projectName": "admission",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

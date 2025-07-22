@@ -1,0 +1,225 @@
+<%@page import="java.util.List"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="adm.alumno.spring.AdmRecomienda"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmCartaSubir"%>
+
+<%@ include file= "../head.jsp"%>
+<%@ include file= "../menu.jsp"%>
+
+<head> 
+	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
+	<script src="js/jquery-1.5.1.min.js" type="text/javascript"></script>
+  	<script src='js/Globo/jquery.tinyTips2.js' type='text/javascript'></script>		
+	<style>		
+		body{
+			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");
+			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+			background-position: center center;
+			/* La imagen se fija en la ventana de visualización para que la altura de la imagen no supere a la del contenido */
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			/* La imagen de fondo se reescala automáticamente con el cambio del ancho de ventana del navegador */
+			background-size: cover;	
+		} 
+		a {text-decoration: none;} 
+		a:hover {text-decoration: underline;} 
+		.tabla td{padding:5px;}
+		
+		.tinyTip {
+			width: 325px;
+			padding: 17px 0px 0px 0px;
+			display: block;
+			background: url(js/Globo/tinyTip-top.png) 0px 0px no-repeat;
+		}
+		.tinyTip .content {
+			padding: 0px 15px 0px 15px;
+			font-size: 14px;
+			font-family: "Lucida Sans Unicode";
+			color: #010101;
+			background: url(js/Globo/tinyTip-content.png) 0px 0px repeat-y;
+		}
+		.tinyTip .bottom {
+			height: 47px;
+			background: url(js/Globo/tinyTip-bottom.png) 0px 0px no-repeat;
+			font: 0px/0px sans-serif;
+		}
+		.fa{
+			color: black;
+		}
+		a> .fa{
+			color: #337ab7;
+		}
+		
+		@media (min-width: 587px) {
+			.col-md-3{
+				float: left;
+				margin-left: 85px;
+			}
+		}
+		@media (min-width: 764px) {
+			.col-md-3{
+				float: left;
+				margin-left: 0;
+			}		
+		}
+		@media (min-width: 480px) {
+			.col-md-5{
+				float: left;
+			}
+		}	
+	</style>	
+</head>
+<%
+	String folio 				= session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	boolean grabo 				= (boolean)request.getAttribute("grabo");
+	boolean existe 				= (boolean)request.getAttribute("existe");
+	String colorGrabar			= existe?"style='color:purple'":"style='color:orange'";
+	String texto 				= (String)request.getAttribute("texto");
+	boolean cienciasSalud 		= (boolean)request.getAttribute("cienciasSalud");
+	boolean teolo 				= (boolean)request.getAttribute("teolo");
+	boolean prepa 				= (boolean)request.getAttribute("prepa");
+	boolean posgradoTeologia 	= (boolean)request.getAttribute("posgradoTeologia");
+	
+	AdmSolicitud admSolicitud 		= (AdmSolicitud) request.getAttribute("admSolicitud");	
+	AdmCartaSubir admCartaSubir 	= (AdmCartaSubir)request.getAttribute("admCartaSubir");
+	
+	HashMap<String,AdmRecomienda> mapaRecomendaciones 	= (HashMap<String,AdmRecomienda>)request.getAttribute("mapaRecomendaciones");
+%>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-1" style="background-color:rgba(255, 255, 255, 0.7);">
+				<span class="btn btn-outline-light" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/registro" style="color:black">					
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Datos usuario"><i class="fas fa-user fa-2x"></i><br>Cuenta</span>&nbsp;
+					</a>
+				</span>
+				<span class="btn btn-outline-light" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/solicitud/modalidad" style="color:black">					
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Solicitud de admisi�n"><i class="far fa-file-alt fa-2x"></i><br>Solicitud</span>&nbsp;
+					</a>
+				</span>			
+				<span class="btn btn-outline-light" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/documentos/documentos" style="color:black">					
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Documentos de ingreso"><i class="fas fa-tasks fa-2x"></i><br>Documentos</span>&nbsp;
+					</a>
+				</span>					
+				<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/directo/ingreso" style="color:black">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Ingreso directo"><i class="fas fa-door-open fa-2x"></i><br>Ingreso</span>&nbsp;
+					</a>
+				</span>					
+				<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/referencias?Folio=<%=folio%>" style="color:black">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Pago en linea"><i class="fas fa-credit-card fa-2x"></i><br>Pago</span>&nbsp;
+					</a>
+				</span>					
+				<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/cita/evento" style="color:black">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Reservar examen"><i class="far fa-calendar-alt fa-2x"></i><br>Examen</span>&nbsp;
+					</a>
+				</span>					
+				<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+					<a href="<%=request.getContextPath()%>/resultados/resultados" style="color:black">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Resultados examen"><i class="fas fa-trophy fa-2x"></i><br>Resultados</span>&nbsp;
+					</a>
+				</span>					
+				<span class="btn btn-outline-light tip" style="width: 100px; font-size: 13px;">
+<% 				String colorCarta = "black";
+				if(admCartaSubir.getCarta() != null){	
+					colorCarta = "green";										
+ 				}%>												
+				<a href="<%=request.getContextPath()%>/descargarCartaAdmision" style="color:<%=colorCarta%>">
+						<span data-bs-toggle="tooltip" data-bs-placement="right" title="Carta de admision"><i class="fas fa-envelope fa-2x"></i><br>Carta</span>&nbsp;
+					</a>
+				</span>					
+			</div>
+			<div class="col-lg-11" style="background-color:white; min-height:calc(100vh - 37px);">
+				<div class="d-flex bd-highlight page-header">
+					<div class="p-2 w-100 bd-highlight">
+<%					if(prepa || posgradoTeologia){%>
+				  		<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabar%>></i>&nbsp;<spring:message code="solicitud.recomendaciones.Omite"/></h2>
+<%					}else{%>
+				  		<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabar%>></i>&nbsp;<spring:message code="solicitud.recomendaciones.Recomendaciones"/></h2>
+<%					}%>
+				  	</div>
+				  	<div class="p-2 flex-shrink-1 bd-highlight">
+				  		<div class="d-flex align-items-center">
+				    		<a href="<%=request.getContextPath()%>/solicitud/tutor"><i class="fas fa-caret-left fa-3x"></i></a>
+				    		&nbsp;<b class="fs-5">7/8</b>&nbsp;
+<%						if(existe){%>
+							<a href="<%=request.getContextPath()%>/solicitud/confirmar"><i class="fas fa-caret-right fa-3x"></i></a>
+<% 						}else{
+							out.print("&nbsp;");
+						}%>
+						</div>
+				  	</div>
+				</div>
+<%			if(!prepa && !posgradoTeologia){%>
+				<div class="alert alert-info" role="alert">
+					<p><spring:message code="solicitud.recomendaciones.MensajeRecomendaciones"/></p>
+				</div>
+				<form id="forma" name="forma" action="grabaRecomendaciones" method="post">
+					<div class="row">
+<%						if(!texto.equals("")){ %>
+							<p><font size=3 color=red><b><%=texto%></b></font></p>
+<%						} %>
+<%						for(int i=1; i<=3; i++){ 
+							AdmRecomienda recomienda = new AdmRecomienda();
+							if (mapaRecomendaciones.containsKey(folio+String.valueOf(i))){
+								recomienda = mapaRecomendaciones.get(folio+String.valueOf(i));
+							}
+							String nombre 	= request.getParameter("Nombre"+i)==null?recomienda.getNombre():request.getParameter("Nombre"+i);
+							String puesto 	= request.getParameter("Puesto"+i)==null?recomienda.getPuesto():request.getParameter("Puesto"+i);
+							String email  	= request.getParameter("Email"+i)==null?recomienda.getEmail():request.getParameter("Email"+i);
+							String telefono = request.getParameter("Telefono"+i)==null?recomienda.getTelefono():request.getParameter("Telefono"+i);
+%>
+					  		<div class="col">
+<%							if(cienciasSalud){ %>
+					       		<strong><spring:message code="solicitud.recomendaciones.RecoProfesor"/> <%=i%>:<br></strong>
+<%							}else if(teolo){ %>
+<%								if(i == 1){ %>
+					       		<strong><spring:message code="solicitud.recomendaciones.RecoPasIglesia"/>:<br></strong>
+<%								}else if(i == 2){ %>
+					       		<strong><spring:message code="solicitud.recomendaciones.RecoPrimerAnciano"/>:<br></strong>
+<%								}else if(i == 3){%>
+					       		<strong><spring:message code="solicitud.recomendaciones.RecoPasAsociacion"/>:<br></strong>
+<%								} %>
+<%							}else { %>
+					       		<strong><spring:message code="solicitud.recomendaciones.RecoSugerido"/> <%=i%>:<br></strong>
+<%							} %>
+						  		<label for="Nombre"><spring:message code="solicitud.recomendaciones.NombreCompleto"/>:</label>
+							  	<input type="text"  id="Nombre<%=i%>" name="Nombre<%=i%>" value="<%=nombre%>"class="form-control" size="40" maxlength="70">
+							  	<label for="Puesto"><spring:message code="solicitud.recomendaciones.TituloPosicionOcupacion"/>:</label>
+							  	<input type="text"  id="Puesto<%=i%>" name="Puesto<%=i%>" value="<%=puesto%>"class="form-control" size="40" maxlength="70">
+							  	<label for="Email"><spring:message code="solicitud.recomendaciones.DireccionElectronica"/>:</label>
+							  	<input type="text"  id="mail<%=i%>" name="Email<%=i%>" value="<%=email%>"class="form-control" size="40" maxlength="70" required="required">
+							  	<label for="Email"><spring:message code="adm.Telefono"/>:</label>
+							  	<input type="text"  id="Telefono<%=i%>" name="Telefono<%=i%>" value="<%=telefono%>"class="form-control" size="40" maxlength="70" onKeypress="if (event.keyCode<48||event.keyCode>57)event.returnValue=false;">
+					  		</div>
+<%						}%>
+					</div><br>
+<%				if(admSolicitud.getEstado().equals("1")){ %>	
+					<button type="button" class="btn alert-info" onclick="document.forma.submit();">
+					 	<spring:message code="adm.Guardar"/> <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+					</button>	
+<%				}%>
+				</form>
+<%			}else{%>
+				<form id="forma" name="forma" action="grabaRecomendaciones?Prepa=1" method="post">
+					<button type="button" class="btn alert-info" onclick="document.forma.submit();">
+					 	<spring:message code="adm.Continuar"/> <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+					</button>	
+				</form>
+<%			}%>
+			</div>
+		</div>
+	</div>
+</body >
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<% if (grabo){%>
+	<table align="center"><tr><td><spring:message code="solicitud.recomendaciones.Grabo"/></td></tr></table>
+	<meta http-equiv="refresh" content="1;url=confirmar" />
+<%}%>

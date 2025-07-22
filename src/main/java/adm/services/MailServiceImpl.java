@@ -1,0 +1,30 @@
+package adm.services;
+
+import java.util.Date;
+
+import jakarta.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MailServiceImpl implements MailService{
+
+	@Autowired
+	private JavaMailSender javaMailSender;
+	
+	@Override
+	public void send(String para, String de, String subject, String mensaje) throws Exception{
+		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+		mimeMessageHelper.setFrom(de);
+		mimeMessageHelper.setTo(para);
+		mimeMessageHelper.setSubject(subject);
+		mimeMessageHelper.setText(mensaje);
+		mimeMessageHelper.setSentDate(new Date());
+		javaMailSender.send(mimeMessage);
+	}
+	
+}

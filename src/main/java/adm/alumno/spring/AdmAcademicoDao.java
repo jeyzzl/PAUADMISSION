@@ -1,0 +1,183 @@
+package adm.alumno.spring;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AdmAcademicoDao {
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	public boolean insertReg(AdmAcademico admAcademico) {
+		boolean ok = false;		
+		try{
+			String comando = "INSERT INTO SALOMON.ADM_ACADEMICO(FOLIO, MODALIDAD_ID, NIVEL_ID, CARRERA_ID, FECHA, PLAN_ID, PERIODO_ID, ENLINEA, TIPO )"
+					+ " VALUES( TO_NUMBER(?,'99999999'), TO_NUMBER(?,'99'),TO_NUMBER(?,'99'), ?, TO_DATE(?,'DD/MM/YYYY'), ?, TO_NUMBER(?,'999'), ?, ? )";
+			Object[] parametros = new Object[] {
+				admAcademico.getFolio(),admAcademico.getModalidad(),admAcademico.getNivelId(),admAcademico.getCarreraId(),
+				admAcademico.getFecha(), admAcademico.getPlanId(), admAcademico.getPeriodoId(), admAcademico.getEnlinea(), admAcademico.getTipo()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|insertReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean updateReg(AdmAcademico admAcademico ) {
+		boolean ok = false;		
+		try{
+			String comando = "UPDATE SALOMON.ADM_ACADEMICO " 
+					+ " SET MODALIDAD_ID = TO_NUMBER(?,'99'), "
+					+ " NIVEL_ID = TO_NUMBER(?,'99'), "
+					+ " CARRERA_ID = ?, "
+					+ " FECHA = TO_DATE(?,'DD/MM/YYYY'),"
+					+ " PLAN_ID = ?,"
+					+ " PERIODO_ID = TO_NUMBER(?,'999'),"
+					+ " ENLINEA = ?, "
+					+ " TIPO = ?"
+					+ " WHERE FOLIO = TO_NUMBER(?,'99999999')";			
+			Object[] parametros = new Object[] {
+				admAcademico.getModalidad(),admAcademico.getNivelId(),admAcademico.getCarreraId(),admAcademico.getFecha(), admAcademico.getPlanId(), admAcademico.getPeriodoId(),admAcademico.getEnlinea(), admAcademico.getTipo(), admAcademico.getFolio()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|updateReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean deleteReg(String folio ) {
+		boolean ok = false;
+		
+		try{
+			String comando = "DELETE FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'99999999')";			
+			if (salomonJdbc.update(comando,folio)==1){
+				ok = true;
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|deleteReg|:"+ex);
+		}
+		
+		return ok;
+	}
+	
+	public AdmAcademico mapeaRegId(String folio ) {
+		AdmAcademico objeto = new AdmAcademico();		
+		try {
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio) >= 1){
+				comando = "SELECT FOLIO, MODALIDAD_ID, NIVEL_ID, CARRERA_ID, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA, PLAN_ID, PERIODO_ID, ENLINEA, TIPO" +
+						" FROM SALOMON.ADM_ACADEMICO "+ 
+						" WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+				objeto = salomonJdbc.queryForObject(comando, new AdmAcademicoMapper(), folio);				
+			}		
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|mapeaRegId|:"+ex);
+		}
+		
+		return objeto;
+	}
+	
+	public boolean existeReg(String folio ) {
+		boolean ok = false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			Object[] parametros = new Object[] {folio};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|existeReg|:"+ex);
+		}		
+		return ok;
+	}
+	
+	public String getNivel(String folio ){
+		
+		String nivel 			= "0";		
+		try{						
+			String comando="SELECT COUNT(*) FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando="SELECT NIVEL_ID FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";
+				nivel =salomonJdbc.queryForObject(comando,String.class, folio);
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|getNivel|:"+ex);
+		}
+		
+		return nivel;
+	}
+	
+	public String getCarreraId(String folio ){			
+		String carrera 			= "0";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando="SELECT CARRERA_ID FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";
+				carrera = salomonJdbc.queryForObject(comando, String.class, folio);
+			}				
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|getCarreraId|:"+ex);
+		}
+		
+		return carrera;
+	}
+	
+	public String getPlanId(String folio ){			
+		String plan			= "0";		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";			
+			if (salomonJdbc.queryForObject(comando,Integer.class, folio)>=1){
+				comando="SELECT PLAN_ID FROM SALOMON.ADM_ACADEMICO WHERE FOLIO = TO_NUMBER(?,'9999999')";
+				plan = salomonJdbc.queryForObject(comando, String.class, folio);
+			}				
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|getPlanId|:"+ex);
+		}
+		
+		return plan;
+	}
+	
+	public List<AdmAcademico> getAll(String orden) {
+		List<AdmAcademico> lista	= new ArrayList<AdmAcademico>();		
+		try{
+			String comando = "SELECT FOLIO, MODALIDAD_ID, NIVEL_ID,CARRERA_ID, FECHA, PLAN_ID, PERIODO_ID, ENLINEA, TIPO FROM SALOMON.ADM_ACADEMICO "+ orden;			
+			lista = salomonJdbc.query(comando, new AdmAcademicoMapper());			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|getAll|:"+ex);
+		}		
+		return lista;
+	}
+	
+	public HashMap<String,AdmAcademico> mapaPorUsuario(String usuarioId){
+		HashMap<String, AdmAcademico> mapa = new HashMap<String, AdmAcademico>();
+		List<AdmAcademico> lista = new ArrayList<AdmAcademico>();
+		try {
+			String comando = "SELECT FOLIO, MODALIDAD_ID, NIVEL_ID, CARRERA_ID, TO_CHAR(FECHA,'DD/MM/YYYY') AS FECHA, PLAN_ID, PERIODO_ID , ENLINEA, TIPO "
+					+ " FROM SALOMON.ADM_ACADEMICO"
+					+ " WHERE FOLIO IN (SELECT FOLIO FROM SALOMON.ADM_SOLICITUD WHERE USUARIO_ID = TO_NUMBER(?,'99999'))";
+			lista = salomonJdbc.query(comando, new AdmAcademicoMapper(), usuarioId);
+			for (AdmAcademico objeto: lista ){
+				mapa.put(objeto.getFolio(), objeto);
+			}
+		}catch(Exception ex) {
+			System.out.println("Error - adm.alumno.spring.AdmAcademicoDao|mapaPorUsuario|:"+ex);
+		}
+		return mapa;
+	}
+}

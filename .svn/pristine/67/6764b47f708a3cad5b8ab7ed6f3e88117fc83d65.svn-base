@@ -1,0 +1,262 @@
+<%@page import="adm.util.Utilerias"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmFoto"%>
+
+<%@ include file= "head.jsp"%>
+<%@ include file= "menu.jsp"%>
+<%		
+	String folio 				= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	String error				= (String)request.getAttribute("error");
+	
+	AdmSolicitud solicitud		= (AdmSolicitud)request.getAttribute("admSolicitud");
+	AdmFoto foto				= (AdmFoto) request.getAttribute("admFoto");
+	boolean existe				= (boolean)request.getAttribute("existe");
+	String mensaje				=  request.getParameter("Mensaje")==null?"-":request.getParameter("Mensaje");		
+	String etiquetaCodigo 		= existe?"Reenviar c&oacute;digo":"Enviar c&oacute;digo";	
+	int correcto 				= 0;
+%>
+<head>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<style>			
+	@media (min-width: 320px){
+		.alert-success {
+			width: 550px;
+			margin:0 auto;
+			margin-bottom: 50px;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+	}
+		
+	body{
+		background-image: url("imagenes/Biblioteca.png");
+		/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+		background-position: center center;
+		/* La imagen se fija en la ventana de visualización para que la altura de la imagen no supere a la del contenido */
+		background-attachment: fixed;
+		background-repeat: no-repeat;
+		/* La imagen de fondo se reescala automáticamente con el cambio del ancho de ventana del navegador */
+		background-size: cover;	
+	}
+	
+	.well-white{
+		width: 80%;
+		height:530px;
+		margin: auto;
+		border:3px solid white;
+		border-radius: 60px;
+		background:white;
+		background-color:rgba(255, 255, 255, 0.7);	
+		background-attachment: fixed;
+		padding-left: 20px;
+		padding-right: 20px;
+		
+		-webkit-box-sizing:border-box;
+		   -moz-box-sizing:border-box;
+		    -ms-box-sizing:border-box;
+		        box-sizing:border-box;
+	
+		-webkit-box-shadow: 1px 2px 12px -2px rgba(0,0,0,.5);
+		   -moz-box-shadow: 1px 2px 12px -2px rgba(0,0,0,.5);
+		     -o-box-shadow: 1px 2px 12px -2px rgba(0,0,0,.5);
+			-ms-box-shadow: 1px 2px 12px -2px rgba(0,0,0,.5);
+			    box-shadow: 1px 2px 12px -2px rgba(0,0,0,.5);		   
+	}
+</style>
+<script type="text/javascript">
+	function revisa(){
+		if($("Nombre").value != "" && $("Nombre").value != " "){
+			if($("Paterno").value != "" && $("Paterno").value != " "){				
+				if($("Email").value != "" && $("Email").value != " "){
+					if($("usuario").value != "" && $("usuario").value != " "){
+						if($("clave").value != "" && $("clave").value != " "){
+							if($("confClave").value != "" && $("confClave").value != " "){
+								if($("confClave").value == $("clave").value){
+									return true;
+								}else{
+									alert("Las claves no coinciden");
+									$("clave").focus();
+								}
+							}else{
+								alert("La confirmaci&oacute;n de clave es requerida");
+								$("confClave").focus();
+							}
+						}else{
+							alert("La clave es requerida");
+							$("clave").focus();
+						}
+					}else{
+						alert("El usuario es requerido");
+						$("usuario").focus();
+					}
+				}else{
+					alert("El correo electr&oacute;nico es requerido");
+					$("Email").focus();
+				}
+			}else{
+				alert("El apellido paterno es requerido");
+				$("Paterno").focus();
+			}
+		}else{
+			alert("El nombre es requerido");
+			$("Nombre").focus();
+		}		
+		return false;
+	}
+	function revisa2(){
+		if($("Nombre").value != "" && $("Nombre").value != " "){
+			if($("Paterno").value != "" && $("Paterno").value != " "){
+				if($("Email").value != "" && $("Email").value != " "){
+					if($("usuario").value != "" && $("usuario").value != " "){
+						return true;
+					}else{
+						alert("El usuario es requerido");
+						$("usuario").focus();
+					}
+				}else{
+					alert("El correo electr&oacute;nico es requerido");
+					$("Email").focus();
+				}				
+			}else{
+				alert("El apellido paterno es requerido");
+				$("Paterno").focus();
+			}
+		}else{
+			alert("El nombre es requerido");
+			$("Nombre").focus();
+		}		
+		return false;
+	}
+
+	function revisaUsuario(){
+		//jQuery('#CiudadId').html('<option>Actualizando</option>');		
+		var usuario 	= document.forma.usuario.value;		
+		jQuery.get('verificaUsuario?Usuario='+usuario, function(data){
+			jQuery("#respuesta").html(data);
+			if (data=='Disponible'){
+				$('#guardar').removeAttr("disabled");
+			}
+		});
+	}
+	
+	function terminarRegistro(){
+		var codigo = document.getElementById("Codigo").value;		
+		document.location.href = "terminarRegistro?Codigo="+codigo;
+	}
+
+	$('#guardar').attr("disabled", true);
+</script>
+</head>
+<body>
+<div class="container-fluid">
+<%	if(!mensaje.equals("-")){%>
+	<div class="alert alert-success" role="alert"><%=mensaje%></div>	
+<%	}%>	
+<%	if(error.equals("1")){%>
+	<div class="alert alert-warning" role="alert">La clave que ingresaste no es correcta</div>	
+<%	}else if(error.equals("2")){%>
+	<script type="text/javascript">
+		window.setInterval(function() {
+			document.location.href = "login";
+		}, 3000); 
+	</script>
+<%	}%>	
+	<div class="mt-1">&nbsp;</div>
+	<form id="forma" name="forma" action="grabarRegistro" method="post">
+	<div class="well-white">	
+		<h3 style="color:blue" align="center">Registro</h3>
+		<div class="row">
+			<div class="col-12">				
+				<input type="text" class="form-control" id="Nombre" name="Nombre" value="<%=solicitud.getNombre() %>"  maxlength="70" placeholder="Nombre" required>	
+			</div>
+		</div>
+		<div class="row d-flex align-items-center">		
+			<div class="col-12">	
+				<input type="text" class="form-control" id="Paterno" name="Paterno" value="<%=solicitud.getApellidoPaterno() %>" size="40" maxlength="70"  placeholder="Paterno" required>
+			</div>
+		</div>	
+		<div class="row">		
+			<div class="col-12">		
+				<input type="text" class="form-control" required id="Materno" name="Materno" value="<%=solicitud.getApellidoMaterno()==null ? "" :solicitud.getApellidoMaterno() %>" size="40" maxlength="70" placeholder="Materno">
+			</div>
+		</div>	
+		<div class="row">	
+			<div class="col-6 col-md-6">		
+				<label  for="FechaNac">* <spring:message code='registro.FechaNac'/>:</label> (DD/MM/AAAA)
+    			<input type="text" id="FechaNac" name="FechaNac" class="form-control" placeholder="Fecha Nacimiento" value="<%=solicitud.getFechaNac()==null?"":solicitud.getFechaNac()%>" size="40" maxlength="50" required>
+			</div>
+			<div class="col-6 col-md-6">
+				<label for="Telefono">* <spring:message code='registro.Telefono'/>:</label>
+	    		<input type="text" id="Telefono" name="Telefono" class="form-control" placeholder="Tel&eacute;fono" value="<%=solicitud.getTelefono()%>" required>
+			</div>
+		</div>		
+		<div class="row">
+			<div class="col">
+	    		<label for="Email">* <spring:message code='registro.Correo'/>:</label>
+	    		<input type="email" id="Email" name="Email" class="form-control" placeholder="correo@ejemplo.com" value="<%=solicitud.getEmail()%>" required>
+	    	</div>	
+		</div>   
+    	<div class="alert alert-info mt-1 d-flex justify-content-center">
+			<div class="text-center row" style="font-size:11px;">
+				Recuerda que tu correo electr&oacute;nico ser&aacute; tu usuario para ingresar al sistema de admisi&oacute;n.<br>
+				Te pedimos ingresar un correo valido ya que al finalizar deber&aacutes confirmar tu cuenta, registrandos el c&oacute;digo que te enviar&aacute;mos a tu correo.
+			</div>
+    	</div>
+<%	
+if(!solicitud.getFolio().equals("0")){
+	if(foto.getFoto() == null){%>
+		<div class="d-flex justify-content-center">					
+		  	<a class="btn btn-warning" href="subirFoto" target="_blank" title="Subir foto">Foto</a>
+		</div><br>
+<%	}else if(foto.getFoto() != null){%>	
+		<div class="d-flex justify-content-center">					
+		  	<a class="btn btn-success" href="subirFoto" target="_blank" title="Subir foto">Foto</a>
+		</div><br>
+<%	}
+}%>	
+<%	if(!existe){ %>		
+		<div class="row">
+			<div class="col">		
+				<label for="clave"><spring:message code='registro.Password'/>*:</label>
+				<input type="password" class="form-control" id="clave" name="clave" size="40" maxlength="70" placeholder="<spring:message code='registro.Password'/>" required>
+			</div>
+			<div class="col">	
+				<label for="confClave"><spring:message code='registro.Confirme'/>*:</label>
+				<input type="password" class="form-control" id="confClave" name="confClave" size="40" maxlength="70"  placeholder="<spring:message code='registro.Password'/>" required>
+			</div>
+		</div>
+		<div class="d-flex justify-content-center mt-2">
+        	 <a href="<%=request.getContextPath()%>/AvisoDePrivacidad.pdf" target="_blank">T&eacute;rminos y condiciones</a>
+        </div>
+		<div class="d-flex justify-content-center">
+        	 <input type="checkbox" id="terms">&nbsp; Acepto los t&eacute;rminos y condiciones          
+        </div>	
+<%	}else{ %>
+		<div class="d-flex justify-content-center">					
+			<a href="restablecerContrasena"><button type="button" class="btn btn-secondary"><spring:message code='registro.Contra'/></button></a>
+		</div>
+<% 	}%>
+<%	if(solicitud.getEstado().equals("0")){%> 
+        <div class="d-flex justify-content-center">
+        	  <button id="guardar" type="button" class="btn btn-success" class="next" onclick="if(revisa()) document.forma.submit();"><%=etiquetaCodigo%></button>         
+        </div>
+<%	} %>        
+<%	if(existe && solicitud.getEstado().equals("0")){ %>
+		<div class="d-flex justify-content-center">        	 
+        	<label for="codigo">Registra el c&oacute;digo de confirmaci&oacute;n</label>
+		</div>	
+		<div class="d-flex justify-content-center">        	 
+			<input type="text" class="form-control" id="Codigo" name="Codigo" size="40" maxlength="70"  placeholder="C&oacute;digo" style="width:200px" required>
+		</div>	
+		<div class="d-flex justify-content-center">        	 
+			<a type="button" class="btn btn-danger" class="next" onclick="javascript:terminarRegistro();"><spring:message code='registro.Enviar'/></a>
+		</div>	
+<%	}%>
+	</div>
+	</form>
+</div>
+</body >
+<%	if (correcto == 1){%>
+	<div class="alert alert-danger" role="alert"><spring:message code='registro.FraseModificar'/></div>	
+	<meta http-equiv="refresh" content="1;url=inicial" />
+<%	}%>

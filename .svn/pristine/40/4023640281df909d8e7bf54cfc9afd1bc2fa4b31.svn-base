@@ -1,0 +1,294 @@
+<%@page import="java.util.List"%>
+
+<%@ include file= "../head.jsp"%>
+<%@ include file= "../menu.jsp"%>
+
+<%@page import="adm.alumno.spring.AdmEstudio"%>
+<%@page import="adm.alumno.spring.AdmAcademico"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmCartaSubir"%>
+<%@page import="adm.parametros.spring.AdmParametros"%>
+<%@page import="adm.catalogo.spring.CatPais"%>
+<%@page import="adm.catalogo.spring.CatEstado"%>
+<%@page import="adm.catalogo.spring.CatCiudad"%>
+
+<head> 
+	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
+	<style>		
+		body{
+			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");
+			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+			background-position: center center;
+			/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			/* La imagen de fondo se reescala autom�ticamente con el cambio del ancho de ventana del navegador */
+			background-size: cover;	
+		} 
+		a {text-decoration: none;} 
+		a:hover {text-decoration: underline;} 
+		.tabla td{padding:5px;}
+		
+		.tinyTip {
+			width: 325px;
+			padding: 17px 0px 0px 0px;
+			display: block;
+			background: url(js/Globo/tinyTip-top.png) 0px 0px no-repeat;
+		}
+		.tinyTip .content {
+			padding: 0px 15px 0px 15px;
+			font-size: 14px;
+			font-family: "Lucida Sans Unicode";
+			color: #010101;
+			background: url(js/Globo/tinyTip-content.png) 0px 0px repeat-y;
+		}
+		.tinyTip .bottom {
+			height: 47px;
+			background: url(js/Globo/tinyTip-bottom.png) 0px 0px no-repeat;
+			font: 0px/0px sans-serif;
+		}
+		.fa{
+			color: black;
+		}
+		a> .fa{
+			color: #337ab7;
+		}
+		
+		@media (min-width: 587px) {
+			.col-md-3{
+				float: left;
+				margin-left: 85px;
+			}
+		}
+		@media (min-width: 764px) {
+			.col-md-3{
+				float: left;
+				margin-left: 0;
+			}		
+		}
+		@media (min-width: 480px) {
+			.col-md-5{
+				float: left;
+			}
+		}	
+	</style>	
+<script type="text/javascript">
+
+	function revisa(){
+		var titulo 		= document.getElementById("titulo").value;
+		var institucion = document.getElementById("institucion").value;
+		var nacPais 	= document.getElementById("nacPais").value;
+		var fin 		= document.getElementById("fin").value;
+		var estudios 	= document.getElementById("estudios").value;
+		
+		if(titulo != "-" && titulo != ""){
+			if(institucion != "-" && institucion != ""){
+				if(nacPais != "0"){
+					if(fin != "-" && fin != ""){
+						if(estudios != "0"){
+							return true;
+						}else{
+							alert("Highest academic level attained is required");
+							$("fin").focus();
+						}
+					}else{
+						alert("Year Completed is required");
+						$("fin").focus();
+					}
+				}else{
+					alert("Country is required");
+					$("nacPais").focus();
+				}
+			}else{
+				alert("Institution is required");
+				$("institucion").focus();
+			}
+		}else{
+			alert("Name of Degree is required");
+			$("titulo").focus();
+		}
+		return false;
+	}
+	
+	function grabar(){
+		if(revisa()){
+ 			document.frmEstudio.submit();
+		}
+	}
+	
+	function modificar(){
+		if(revisa()){
+			document.frmEstudio.submit();
+		}
+	}
+
+	function refreshEstados(){	
+					
+		jQuery('#nacEdo').html('<option>Updating</option>');		
+		var paisId = jQuery('#nacPais').val();		
+		jQuery("#nacEdo").empty();		
+		jQuery.get('getEstados?paisId='+paisId, function(data){
+			jQuery("#nacEdo").html(data);			
+			refreshCuidades();
+		});		
+	}
+
+	function refreshCiudades(){
+		jQuery('#nacCiudad').html('<option>Updating</option>');				
+		var paisId 		= jQuery('#nacPais').val();
+		var estadoId 	= jQuery('#nacEdo').val();				
+		jQuery.get('getCiudades?paisId='+paisId+'&estadoId='+estadoId, function(data){
+			jQuery("#nacCiudad").html(data);
+		});
+	}
+	
+	function cambiaEstudios(){
+		var nivel 				= jQuery("#estudios").val();
+		var textoInicio 		= "Month and year of start";
+		var textoFinal 			= "Month and year of end"; 
+		var textoInstitucion 	= "Institution";
+		var texto 				= "-";
+		
+		if (nivel=="1") texto = " elementary"; 
+		if (nivel=="2") texto = " secondary";
+		if (nivel=="3") texto = " high school";
+		if (nivel=="4") texto = " college";
+		if (nivel=="5") texto = " bachelor's degree";
+		if (nivel=="6") texto = " speciality";
+		if (nivel=="7") texto = " master's degree";
+		if (nivel=="8") texto = " doctorate";
+		
+		textoInicio 		+= texto;
+		textoFinal 			+= texto;
+		textoInstitucion 	+= texto;
+		
+		jQuery("#labelInicio").html(textoInicio);
+		jQuery("#labelFinal").html(textoFinal);
+		jQuery("#labelInstitucion").html(textoInstitucion);
+	}	
+</script>
+</head>
+<% 
+	List<String> opciones	= (List<String>)session.getAttribute("Opciones");
+	String folio 		= session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	String otro			= request.getParameter("Otro")==null?"N":request.getParameter("Otro");
+	String id			= (String) request.getAttribute("id");
+	String completo		= (String) request.getAttribute("completo");
+	String convalida	= (String) request.getAttribute("convalida");
+	int registros		= (int) request.getAttribute("registros");	
+	int niv 			= (int) request.getAttribute("niv");
+	AdmEstudio estudio 	= (AdmEstudio) request.getAttribute("estudio");	
+	AdmSolicitud admSolicitud 	= (AdmSolicitud) request.getAttribute("admSolicitud");	
+	AdmCartaSubir admCartaSubir = (AdmCartaSubir)request.getAttribute("admCartaSubir");
+	AdmParametros admParametros = (AdmParametros)request.getAttribute("admParametros");
+	boolean grabo 		= (boolean) request.getAttribute("grabo");
+	boolean existe		= (boolean)request.getAttribute("existe");
+	String colorGrabar	= existe?"style='color:green'":"style='color:orange'";
+	String paisId 		= estudio.getPaisId();
+	String estadoId 	= estudio.getEstadoId().equals("0") ? "1" : estudio.getEstadoId();
+	
+	List<CatPais> lisPais		= (List<CatPais>) request.getAttribute("lisPais");
+	List<CatEstado> lisEstados	= (List<CatEstado>) request.getAttribute("lisEstados");
+	List<CatCiudad> lisCiudad	= (List<CatCiudad>) request.getAttribute("lisCiudad");	
+
+%>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<%-- <%@ include file= "../opciones.jsp"%> --%>
+			<div class="col-lg-12" style="background-color:white; min-height:calc(100vh - 37px);">
+				<div class="d-flex bd-highlight page-header">
+					<div class="p-2 w-100 bd-highlight">			
+						<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabar%>></i>&nbsp;<spring:message code="solicitud.estudios.Antecedentes"/></h2>
+					</div>	
+				</div>
+				<div class="alert alert-info" role="alert">
+					<a class="btn btn-primary text-decoration-none" href="<%=request.getContextPath()%>/solicitud/otroEstudio">Return</a>&nbsp;&nbsp; <spring:message code="solicitud.estudios.MensajeAntecedentes"/>
+				</div>
+				<div class="well">
+					<div class="row">
+						<form id="frmEstudio" name="frmEstudio" action="grabarEstudios" method="post">
+							<input name="Convalida" type="hidden" value=<%=convalida%>>
+							<input name="Id" type="hidden" value="<%=id%>">
+							<div class="col-md-6">
+								<label><spring:message code="solicitud.estudios.UltimoNivel"/></label>
+								<select id="estudios" name="estudios" class="form-select" >
+<%	if(admSolicitud.getNivelEstudio().equals("U") && admSolicitud.getTipo().equals("S")){	%>
+									<option value="0" <%=estudio.getEstudios().equals("0")?"selected":""%>> <spring:message code="solicitud.estudios.Elige"/></option>
+									<%-- <option value="1" <%=estudio.getEstudios().equals("1")?"selected":""%>><spring:message code="solicitud.estudios.Primaria"/></option> --%>
+									<option value="2" <%=estudio.getEstudios().equals("2")?"selected":""%>><spring:message code="solicitud.estudios.Secundaria"/></option>		
+									<option value="3" <%=estudio.getEstudios().equals("3")?"selected":""%>><spring:message code="solicitud.estudios.Bachillerato"/></option>
+									<%-- <option value="4" <%=estudio.getEstudios().equals("4")?"selected":""%>><spring:message code="solicitud.estudios.Certificado"/></option> --%>
+									<%-- <option value="5" <%=estudio.getEstudios().equals("4")?"selected":""%>><spring:message code="solicitud.estudios.Tecnica"/></option> --%>
+									<%-- <option value="6" <%=estudio.getEstudios().equals("5")?"selected":""%>><spring:message code="solicitud.estudios.Licenciatura"/></option> --%>
+									<%-- <option value="7" <%=estudio.getEstudios().equals("6")?"selected":""%>><spring:message code="solicitud.estudios.Especializacion"/></option> --%>
+									<%-- <option value="8" <%=estudio.getEstudios().equals("7")?"selected":""%>><spring:message code="solicitud.estudios.Maestria"/></option> --%>
+									<%-- <option value="9" <%=estudio.getEstudios().equals("8")?"selected":""%>><spring:message code="solicitud.estudios.Doctorado"/></option> --%>
+<%	}		%>
+<%	if(admSolicitud.getNivelEstudio().equals("U") && (admSolicitud.getTipo().equals("N") || admSolicitud.getTipo().equals("R"))){	%>
+									<option value="0" <%=estudio.getEstudios().equals("0")?"selected":""%>> <spring:message code="solicitud.estudios.Elige"/></option>
+									<%-- <option value="1" <%=estudio.getEstudios().equals("1")?"selected":""%>><spring:message code="solicitud.estudios.Primaria"/></option> --%>
+									<option value="2" <%=estudio.getEstudios().equals("2")?"selected":""%>><spring:message code="solicitud.estudios.Secundaria"/></option>		
+									<%-- <option value="3" <%=estudio.getEstudios().equals("3")?"selected":""%>><spring:message code="solicitud.estudios.Bachillerato"/></option> --%>
+									<option value="4" <%=estudio.getEstudios().equals("4")?"selected":""%>><spring:message code="solicitud.estudios.Certificado"/></option>
+									<option value="5" <%=estudio.getEstudios().equals("5")?"selected":""%>><spring:message code="solicitud.estudios.Tecnica"/></option>
+									<%-- <option value="6" <%=estudio.getEstudios().equals("5")?"selected":""%>><spring:message code="solicitud.estudios.Licenciatura"/></option> --%>
+									<%-- <option value="7" <%=estudio.getEstudios().equals("6")?"selected":""%>><spring:message code="solicitud.estudios.Especializacion"/></option> --%>
+									<%-- <option value="8" <%=estudio.getEstudios().equals("7")?"selected":""%>><spring:message code="solicitud.estudios.Maestria"/></option> --%>
+									<%-- <option value="9" <%=estudio.getEstudios().equals("8")?"selected":""%>><spring:message code="solicitud.estudios.Doctorado"/></option> --%>
+									<option value="10" <%=estudio.getEstudios().equals("10")?"selected":""%>><spring:message code="solicitud.estudios.Otro"/></option>
+<%	}		%>
+<%	if(admSolicitud.getNivelEstudio().equals("P")){	%>
+									<option value="0" <%=estudio.getEstudios().equals("0")?"selected":""%>> <spring:message code="solicitud.estudios.Elige"/></option>
+									<%-- <option value="1" <%=estudio.getEstudios().equals("1")?"selected":""%>><spring:message code="solicitud.estudios.Primaria"/></option> --%>
+									<%-- <option value="2" <%=estudio.getEstudios().equals("2")?"selected":""%>><spring:message code="solicitud.estudios.Secundaria"/></option>		 --%>
+									<%-- <option value="3" <%=estudio.getEstudios().equals("3")?"selected":""%>><spring:message code="solicitud.estudios.Bachillerato"/></option> --%>
+									<%-- <option value="4" <%=estudio.getEstudios().equals("4")?"selected":""%>><spring:message code="solicitud.estudios.Certificado"/></option> --%>
+									<%-- <option value="5" <%=estudio.getEstudios().equals("4")?"selected":""%>><spring:message code="solicitud.estudios.Tecnica"/></option> --%>
+									<option value="6" <%=estudio.getEstudios().equals("5")?"selected":""%>><spring:message code="solicitud.estudios.Licenciatura"/></option>
+									<option value="7" <%=estudio.getEstudios().equals("6")?"selected":""%>><spring:message code="solicitud.estudios.Especializacion"/></option>
+									<option value="8" <%=estudio.getEstudios().equals("7")?"selected":""%>><spring:message code="solicitud.estudios.Maestria"/></option>
+									<option value="9" <%=estudio.getEstudios().equals("8")?"selected":""%>><spring:message code="solicitud.estudios.Doctorado"/></option>
+									<option value="10" <%=estudio.getEstudios().equals("10")?"selected":""%>><spring:message code="solicitud.estudios.Otro"/></option>
+<%	}		%>		
+								</select>&nbsp;&nbsp;<br>
+								<label><spring:message code="solicitud.estudios.TituloAlcanzado"/></label>
+								<input class="form-control" style="size:300px;" type="text" id="titulo" name="titulo" maxlength="70" value="<%=estudio.getTitulo()%>"/><br>
+								<label id="labelInstitucion">Institution</label>
+								<input class="form-control" type="text" id="institucion" name="institucion" size="40" maxlength="70" value="<%= estudio.getInstitucion()%>"/>
+							</div>
+							<br>
+							<div class="col-md-6">		
+							   	<label><spring:message code="adm.Pais"/></label> 
+							    <select class="form-select selectpicker" id="nacPais" name="nacPais" data-live-search="true" onChange="javascript:refreshEstados();">
+									<option>SELECT</option>
+<%								for(CatPais pais : lisPais){%>
+									<option value="<%=pais.getPaisId() %>" <%=pais.getPaisId().equals(paisId)?"Selected":"" %>><%=pais.getNombrePais() %></option>
+<%								} %>
+								</select>
+								
+								<br>
+								<label id="labelFin">Year Completed</label>
+								<input class="form-control" type="text" id="fin" name="fin" size="40" maxlength="70" value="<%= estudio.getFin()%>"/>
+								<br>
+								<input type="hidden" name="OtraMateria" size="40" maxlength="70" value="No"/>
+							</div>
+							<div class="col-md-6">		
+								<button type="button" class="btn alert-info" onclick="grabar();">
+									<spring:message code="adm.Guardar"/> <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body >
+<script>
+	$('#Fecha').datepicker();	
+</script>
+<% if (grabo){%>
+	<div class="alert alert-success"><spring:message code="solicitud.estudios.Grabo"/></div>
+	<meta http-equiv="refresh" content="1;url=otroEstudio?Mensaje=1" />
+<% } %>

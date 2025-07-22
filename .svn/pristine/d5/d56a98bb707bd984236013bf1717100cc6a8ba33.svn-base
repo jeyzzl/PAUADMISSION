@@ -1,0 +1,22 @@
+package adm.alumno.spring;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+public class AdmAcomodoMapper implements RowMapper<AdmAcomodo> {
+
+	public AdmAcomodo mapRow(ResultSet rs, int arg1) throws SQLException {
+		AdmAcomodo objeto = new AdmAcomodo();
+		
+		objeto.setAcomodoId(rs.getString("ACOMODO_ID"));
+		objeto.setNombreAcomodo(rs.getString("ACOMODO_NOMBRE"));
+		objeto.setTipoAcomodo(rs.getString("ACOMODO_TIPO"));
+		objeto.setGeneroAcomodo(rs.getString("ACOMODO_GENERO"));
+		objeto.setTipoAplicanteAcomodo(rs.getString("ACOMODO_TIPO_APLICANTE"));
+		
+		return objeto;
+	}
+
+}

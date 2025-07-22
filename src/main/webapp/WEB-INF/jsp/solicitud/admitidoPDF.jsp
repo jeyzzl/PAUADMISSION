@@ -1,0 +1,314 @@
+<%@ page import = "java.awt.Color" %>
+<%@ page import = "java.util.List" %>
+<%@ page import = "java.io.FileOutputStream" %>
+<%@ page import = "java.io.File" %>
+<%@ page import = "java.io.IOException" %>
+<%@ page import = "com.itextpdf.text.*" %>
+<%@ page import = "com.itextpdf.text.pdf.*" %>
+<%@ page import = "com.itextpdf.text.pdf.events.*" %>
+
+<%@page import="java.util.List"%>-
+<%@page import="java.util.HashMap"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmUsuario"%>
+<%@page import="adm.alumno.spring.AdmAcademico"%>
+<%@page import="adm.alumno.spring.AdmProceso"%>
+<%@page import="adm.alumno.spring.AdmEvaluacion"%>
+<%@page import="adm.alumno.spring.AdmCarta"%>
+<%@page import="adm.documento.spring.AdmDocAlum" %>
+<%@page import="adm.documento.spring.AdmDocumento"%>
+
+<jsp:useBean id="Fecha" scope="page" class="adm.util.Fecha"/>
+<jsp:useBean id="DocAlumU" scope="page" class="adm.documento.DocAlumUtil"/>
+<jsp:useBean id="AdmDocumento" scope="page" class="adm.documento.AdmDocumento"/>
+<jsp:useBean id="AdmProceso" scope="page" class="adm.alumno.AdmProceso" />
+<%
+	String folio 		= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");	
+	int posX 			= 0; 
+	int posY			= 0;
+	
+	String facultadNombre				= (String) request.getAttribute("facultadNombre");
+	String carreraNombre				= (String) request.getAttribute("carreraNombre");
+	String claveInicial					= (String) request.getAttribute("claveInicial");
+
+	AdmUsuario admUsuario				= (AdmUsuario) request.getAttribute("admUsuario");
+	AdmSolicitud admSolicitud			= (AdmSolicitud) request.getAttribute("admSolicitud");
+	AdmAcademico admAcademico			= (AdmAcademico) request.getAttribute("admAcademico");
+	AdmProceso admProceso				= (AdmProceso) request.getAttribute("admProceso");
+	
+	List<AdmDocAlum> lisDocumentos		= (List<AdmDocAlum>) request.getAttribute("lisDocumentos");
+	List<AdmCarta> lisCondiciones		= (List<AdmCarta>) request.getAttribute("lisCondiciones");	
+	List<AdmEvaluacion> evaluaciones	= (List<AdmEvaluacion>)  request.getAttribute("lisEvaluaciones");
+	HashMap<String,String> mapaNotas	= (HashMap<String,String>) request.getAttribute("mapaNotas");	
+	
+	HashMap<String,AdmDocumento> mapaDocumentos	= (HashMap<String,AdmDocumento>)request.getAttribute("mapaDocumentos");
+	
+	String fechaAdmision = admProceso.getFechaAdmision().substring(0,10);
+	
+	String[] arrFecha = fechaAdmision.split("-");
+	
+	fechaAdmision = arrFecha[2]+"/"+arrFecha[1]+"/"+arrFecha[0];
+	
+// 	fechaAdmision = Fecha.getDia(admProceso.getFechaAdmision())+" de "+ Fecha.getMesNombre(admProceso.getFechaAdmision())+" de "+Fecha.getYear(admProceso.getFechaAdmision());
+	fechaAdmision = Fecha.getDia(fechaAdmision)+" de "+ Fecha.getMesNombre(fechaAdmision)+" de "+Fecha.getYear(fechaAdmision);
+
+	//Document document = new Document(PageSize.A4 ); //Crea un objeto para el documento PDF
+	Rectangle rec = new Rectangle(14.0f , 21.0f);
+	Document document = new Document(PageSize.LETTER);
+	document.setMargins(25,20,50,30);
+	String dir = "";
+	
+	try{
+		File carpeta = new File(application.getRealPath("/WEB-INF/pdf/admisionEnLinea/"));
+		if(!carpeta.exists()) carpeta.mkdirs();
+		dir = carpeta+"/carta-"+folio+".pdf";
+		PdfWriter pdf = PdfWriter.getInstance(document, new FileOutputStream(dir));
+		document.addAuthor("Sistema Admision");
+        document.addSubject("Admitido"+folio);
+		document.open();
+		
+		/*Image jpg = Image.getInstance(application.getRealPath("/imagenes/")+"/logo_small.jpg");
+	    jpg.setAlignment(Image.LEFT | Image.UNDERLYING);
+	    jpg.scaleAbsolute(90,90);
+	    jpg.setAbsolutePosition(70, 660);
+	    document.add(jpg);*/
+	    
+	    int r = 0, g = 0, b = 0;
+	    
+	    PdfPCell celda = null;
+	     
+	    PdfContentByte canvas = pdf.getDirectContentUnder();
+	    
+	    Image image = Image.getInstance(application.getRealPath("/imagenes/")+"/pdfBottom.png");
+	    image.setAbsolutePosition(100f, 0f);
+	    document.add(image);
+	    
+	    Image txtUm = Image.getInstance(application.getRealPath("/imagenes/")+"/textoUm.png");
+	    txtUm.setAbsolutePosition(200f, 15f);
+	    txtUm.scaleAbsolute(400,70);
+	    document.add(txtUm);
+	    
+	    Image image2 = Image.getInstance(application.getRealPath("/imagenes/")+"/logoColor2.png");
+	    image2.scaleAbsolute(96,96);
+	    image2.setAbsolutePosition(260f, 680f);
+	    document.add(image2);
+	    
+	    Phrase fecha = new Phrase( fechaAdmision, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(0,0,0)) );   	
+    	ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, fecha, posX+85, posY+660, 0);
+    	
+	    String nombreAlumno = admUsuario.getNombre()+" "+(admUsuario.getApellidoPaterno()==null?"":admUsuario.getApellidoPaterno())+" "+(admUsuario.getApellidoMaterno()==null?"":admUsuario.getApellidoMaterno());
+	    Phrase alumno = new Phrase( nombreAlumno.toUpperCase(),  
+	    		FontFactory.getFont(FontFactory.TIMES_ROMAN, 16, Font.BOLD, new BaseColor(0,0,0)) );   	
+    	ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, alumno, posX+85, posY+630, 0);
+	     
+	    Phrase presente = new Phrase( "Presente", FontFactory.getFont(FontFactory.TIMES_ROMAN, 14, Font.BOLD, new BaseColor(0,0,0)) );
+    	ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, presente, posX+85, posY+610, 0);
+	     
+       	//Tabla Invisible
+
+    	float w = 80f;
+    	float s = 400f;
+		PdfPTable t = new PdfPTable(1);
+		int tWidths[] = {100};
+		t.setWidths(tWidths);
+		t.setSpacingBefore(s);
+		t.setWidthPercentage(w);    	
+    	
+		celda = new PdfPCell(new Phrase(" "
+		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 8, Font.BOLD, new BaseColor(r,g,b))));
+		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
+		celda.setBorder(Rectangle.NO_BORDER);
+		celda.setColspan(12);
+		t.addCell(celda);
+		
+		document.add(t);
+
+	    //tabla hemos recibido
+	    float tablaY = 125f;
+    	float tablaX = 80f;
+		PdfPTable tab2 = new PdfPTable(1);
+		int tab2Widths[] = {100};
+		tab2.setWidths(tab2Widths);
+		tab2.setSpacingBefore(tablaY);
+		tab2.setWidthPercentage(tablaX);
+		
+		String modalidad = admAcademico.getModalidad();
+		boolean enLinea = false;
+		if(modalidad.equals("1")){enLinea = false ;}
+		else{ enLinea = true;} 
+		
+		String aceptado = "aceptado";
+		
+		if(admUsuario.getGenero().equals("F")){
+	aceptado = "aceptada";
+		}
+		
+		//prueba
+		String texto1 = " dependiente de esta universidad, y tras analizarla, hacemos de su conocimiento que, de " +
+        		"acuerdo a la puntuación obtenida en el examen de admisión, usted ha sido ";		
+		String texto2 = ", con la siguiete condición: \n";
+		String texto3 = "\nPara matricularse en el programa que ha sido "+aceptado+", utilice el número de registro ";
+		String texto4 = " que es su identificación institucional como estudiante. Recuerde que, "+
+        		"solamente después de concluir la matrícula será formalmente un estudiante "+
+        		"de la Universidad de Montemorelos.\n\n";
+		String texto5 = "\nPara realizar su proceso de matrícula deberá entregar en Archivo Escolar los siguientes documentos ";
+		String texto6 = "Nos sentiremos felices de tenerle con nosotros y deseamos que nuestro Dios le acompañe y le guíe "+
+				"en sus planes educacionales.\n\n";
+		String texto7 = "Elizabeth Domínguez Hernández\nAdmisiones UM";
+		
+		Paragraph parrafo = new Paragraph();
+        parrafo.add(new Phrase("\nHemos recibido su solicitud para ingresar a la "
+        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));  
+        parrafo.add(new Phrase(facultadNombre+",", FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+        parrafo.add(new Phrase(texto1, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+        parrafo.add(new Phrase(aceptado, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+        parrafo.add(new Phrase(" en el programa de ", FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+        parrafo.add(new Phrase(carreraNombre, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+        
+	   	if(lisCondiciones.size() >= 1){
+	   		if(lisCondiciones.size() >= 2){
+	        	parrafo.add(new Phrase(", con las siguientes condiciones: \n"
+	       		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+	   			for(AdmCarta carta : lisCondiciones){
+	   				parrafo.add(new Phrase("            - "+carta.getCondicionNombre()+"\n"
+	       			, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+		}
+	   		}else if(lisCondiciones.size() >= 1){
+	   			AdmCarta carta =  lisCondiciones.get(0);
+		        parrafo.add(new Phrase(texto2
+	        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+	    		parrafo.add(new Phrase("            - "+carta.getCondicionNombre()	
+	        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+	   		}
+	    }else {
+	        parrafo.add(new Phrase(". "         		
+	        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+	    }
+   	
+        celda = new PdfPCell(parrafo);
+		celda.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+		celda.setBorder(Rectangle.NO_BORDER);
+		celda.setColspan(4);
+		tab2.addCell(celda);       
+		
+		String claveTexto = "";
+		if (!claveInicial.equals("X") && !claveInicial.equals("-")){
+	claveTexto = "(Clave de acceso al portal:"+ claveInicial+")";
+		}
+        Paragraph parrafo2 = new Paragraph();
+        parrafo2.add(new Phrase(texto3, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+        parrafo2.add(new Phrase(admUsuario.getMatricula()+claveTexto, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+        parrafo2.add(new Phrase(texto4
+        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+        celda = new PdfPCell(parrafo2);
+		celda.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+		celda.setBorder(Rectangle.NO_BORDER);
+		celda.setColspan(4);
+		tab2.addCell(celda);       
+		
+		Paragraph parrafo3 = new Paragraph();
+       	parrafo3.add(new Phrase("Por favor tenga en cuenta las siguientes fechas importantes: \n"
+        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+       	parrafo3.add(new Phrase(admSolicitud.getFechaIngreso(), FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD, new BaseColor(r,g,b))));
+        celda = new PdfPCell(parrafo3);
+		celda.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+		celda.setBorder(Rectangle.NO_BORDER);
+		celda.setColspan(4);
+		tab2.addCell(celda);
+		
+        
+		Paragraph parrafo5 = new Paragraph();
+		parrafo5.add(new Phrase(texto5, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));     			
+		parrafo5.add(new Phrase("originales:", FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD|Font.UNDERLINE, new BaseColor(r,g,b))));     			
+		celda = new PdfPCell(parrafo5);
+		celda.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+		celda.setBorder(Rectangle.NO_BORDER);
+		celda.setColspan(4);
+		tab2.addCell(celda);		
+		
+		document.add(tab2);
+		
+	    //tabla de documentos
+	    float aa = 10f;
+	    float bb = 70f;
+		PdfPTable tab33 = new PdfPTable(1);
+		int tab33Widths[] = {100};
+		tab33.setWidths(tab33Widths);
+		tab33.setSpacingBefore(aa);
+		tab33.setWidthPercentage(bb);
+		
+		String listaDocumentos = "";
+
+		for(AdmDocAlum docAlum : lisDocumentos){
+	AdmDocumento documento = new AdmDocumento();
+	if (mapaDocumentos.containsKey(docAlum.getDocumentoId())){
+		documento = mapaDocumentos.get(docAlum.getDocumentoId());
+		listaDocumentos += "* "+documento.getDocumentoNombre()+" "+(docAlum.getComentario()==null||docAlum.getComentario().trim().equals("-") ? "" : "- "+docAlum.getComentario())+" \n";
+	}						
+		}
+	
+        Paragraph parrafo6 = new Paragraph();
+        parrafo6.add(new Phrase(listaDocumentos, FontFactory.getFont(FontFactory.TIMES_ROMAN, 10.5f, Font.ITALIC, new BaseColor(r,g,b))));
+        celda = new PdfPCell(parrafo6);
+		celda.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+		celda.setBorder(Rectangle.NO_BORDER);
+		tab33.addCell(celda);		
+		
+		document.add(tab33);
+		
+		//tabla de despedida
+	    float x = 10f;
+	    float z = 80f;
+		PdfPTable tab4 = new PdfPTable(1);
+		int tab4Widths[] = {100};
+		tab4.setWidths(tab4Widths);
+		tab4.setSpacingBefore(x);
+		tab4.setWidthPercentage(z);
+		
+		Paragraph parrafo7 = new Paragraph();
+		parrafo7.add(new Phrase(texto6
+        		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+		celda = new PdfPCell(parrafo7);
+		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
+		celda.setBorder(Rectangle.NO_BORDER);
+		tab4.addCell(celda);
+		
+		celda = new PdfPCell(new Phrase("Atentamente,"
+		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, new BaseColor(r,g,b))));
+		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
+		celda.setBorder(Rectangle.NO_BORDER);
+		tab4.addCell(celda);
+		
+		Image jpg = Image.getInstance(application.getRealPath("imagenes/firmas")+"/9800400.png");
+		jpg.scaleAbsolute(90, 62);
+		celda = new PdfPCell(jpg, false);
+		celda.setVerticalAlignment(Element.ALIGN_BOTTOM);
+		celda.setBorder(Rectangle.NO_BORDER);
+	    tab4.addCell(celda);
+	    
+		celda = new PdfPCell(new Phrase(texto7
+		, FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.ITALIC, new BaseColor(r,g,b))));
+		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
+		celda.setVerticalAlignment(Element.ALIGN_TOP);
+		celda.setBorder(Rectangle.NO_BORDER);
+		tab4.addCell(celda);
+
+		document.add(tab4);
+		
+	}catch(IOException ioe){
+		System.err.println("Error al generar la carta de admision en PDF: "+ioe.getMessage());
+	}
+	
+	document.close();
+	
+	//Cambia la diagonal inversa por diagonal normal para que se pueda ver el archivo en windows(localhost)
+	if (java.io.File.separator.equals("\\")){
+		dir = dir.replace("\\", "/");		
+	}	
+	
+// 	String nombreArchivo = "carta-"+folio+".pdf";
+// 	response.sendRedirect("../../archivo.jsp?ruta="+dir+"&nombre="+nombreArchivo);
+	
+	String nombreArchivo = "carta-"+folio+".pdf";
+	response.sendRedirect("../archivo?ruta="+dir+"&nombre="+nombreArchivo);
+%>

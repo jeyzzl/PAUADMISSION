@@ -1,0 +1,19 @@
+/* TOOLTIP */
+.tooltip{
+	font-weight:normal;
+}
+.ttip{
+	cursor:pointer;
+}
+
+.align-right{
+	text-align: right !important;	
+}
+
+.align-center{
+	text-align: center !important;
+}	
+
+.fondo{
+	background-color:rgba(255, 255, 255, 0.7);
+}

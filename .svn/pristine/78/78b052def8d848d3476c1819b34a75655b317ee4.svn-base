@@ -1,0 +1,158 @@
+package adm.alumno.spring;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AdmAcomodoDao {
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	public boolean insertReg(AdmAcomodo admAcomodo) {
+		boolean ok = false;
+		
+		try{
+			String comando = "INSERT INTO SALOMON.ADM_ACOMODO"+ 
+				"(ACOMODO_ID, ACOMODO_NOMBRE, ACOMODO_TIPO, ACOMODO_GENERO, ACOMODO_TIPO_APLICANTE) "+
+				"VALUES(?, ?, ?, ?, ?)";
+			
+			Object[] parametros = new Object[] {
+				admAcomodo.getAcomodoId(), admAcomodo.getNombreAcomodo(), admAcomodo.getTipoAcomodo(), admAcomodo.getGeneroAcomodo(), admAcomodo.getTipoAplicanteAcomodo()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}
+
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|insertReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean deleteReg(String acomodoId) {
+		boolean ok = false;
+		
+		try{
+			String comando = "DELETE FROM SALOMON.ADM_ACOMODO"+ 
+				" WHERE ACOMODO_ID = ?";
+			
+			Object[] parametros = new Object[] {acomodoId};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|deleteReg|:"+ex);
+		}
+				
+		return ok;
+	}
+	
+	public AdmAcomodo mapeaRegId(String acomodoId) {
+		AdmAcomodo objeto = new AdmAcomodo();
+		
+		try {
+			String comando = "SELECT ACOMODO_ID, ACOMODO_NOMBRE, ACOMODO_TIPO, ACOMODO_GENERO, ACOMODO_TIPO_APLICANTE"+
+					" FROM SALOMON.ADM_ACOMODO" + 
+					" WHERE ACOMODO_ID = ?";
+			
+			Object[] parametros = new Object[] {acomodoId};
+			objeto = salomonJdbc.queryForObject(comando, new AdmAcomodoMapper(), parametros);
+			
+		} catch (Exception ex) {
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|mapeaRegId|:"+ex);
+		}
+		
+		return objeto;
+	}
+	
+	public boolean existeReg(String acomodoId) {
+		boolean ok 	= false;
+		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_ACOMODO "+ 
+				"WHERE FOLIO = TO_NUMBER(?,'9999999')";
+			
+			Object[] parametros = new Object[] {acomodoId};
+			if (salomonJdbc.queryForObject(comando,Integer.class,parametros)>=1){
+				ok = true;
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|existeReg|:"+ex);
+		}
+
+		return ok;
+	}
+
+	public HashMap<String,AdmAcomodo> mapaAcomodoPorTipo(String tipo) {
+		
+		HashMap<String,AdmAcomodo> mapa	= new HashMap<String,AdmAcomodo>();
+		List<AdmAcomodo> lista 			= new ArrayList<AdmAcomodo>();
+		
+		try{
+			String comando = "SELECT "+
+					" ACOMODO_ID, ACOMODO_NOMBRE, ACOMODO_TIPO, ACOMODO_GENERO, ACOMODO_TIPO_APLICANTE"+
+					" FROM SALOMON.ADM_ACOMODO"+
+					" WHERE ACOMODO_TIPO = ?"; 			
+			lista = salomonJdbc.query(comando,new AdmAcomodoMapper(), tipo);
+			for(AdmAcomodo objeto : lista){				
+				mapa.put(objeto.getAcomodoId(), objeto);
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|mapaAcomodo|:"+ex);
+		}
+		
+		return mapa;
+	}
+
+	public List<AdmAcomodo> getListAcomodosPorTipo( String tipo, String genero) {
+		
+		List<AdmAcomodo> lisAcomodo	= new ArrayList<AdmAcomodo>();
+		String comando	= "";
+		
+		try{
+			comando = " SELECT ACOMODO_ID, ACOMODO_NOMBRE, ACOMODO_TIPO, ACOMODO_GENERO, ACOMODO_TIPO_APLICANTE"
+					+ " FROM SALOMON.ADM_ACOMODO" 
+					+ " WHERE ACOMODO_TIPO = ? AND (ACOMODO_GENERO = ? or ACOMODO_GENERO = 'B')"; 
+			Object[] parametros = new Object[] {tipo, genero};
+			
+			lisAcomodo = salomonJdbc.query(comando, new AdmAcomodoMapper(), parametros);	
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|getListAcomodosPorTipo|:"+ex);
+		}
+		return lisAcomodo;
+	}
+
+	public List<AdmAcomodo> getListAcomodosPorTipo( String tipo, String genero, String tipoAplicante ) {
+		
+		List<AdmAcomodo> lisAcomodo	= new ArrayList<AdmAcomodo>();
+		String comando	= "";
+		
+		try{
+			comando = " SELECT ACOMODO_ID, ACOMODO_NOMBRE, ACOMODO_TIPO, ACOMODO_GENERO, ACOMODO_TIPO_APLICANTE"
+					+ " FROM SALOMON.ADM_ACOMODO" 
+					+ " WHERE ACOMODO_TIPO = ? AND (ACOMODO_GENERO = ? or ACOMODO_GENERO = 'B') AND ACOMODO_TIPO_APLICANTE = ?"; 
+			Object[] parametros = new Object[] {tipo, genero, tipoAplicante};
+			
+			lisAcomodo = salomonJdbc.query(comando, new AdmAcomodoMapper(), parametros);	
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmAcomodoDao|getListAcomodosPorTipo|:"+ex);
+		}
+		return lisAcomodo;
+	}
+	
+
+}

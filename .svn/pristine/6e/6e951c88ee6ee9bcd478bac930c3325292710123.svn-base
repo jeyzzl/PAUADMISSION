@@ -1,0 +1,1811 @@
+package adm;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import adm.documento.spring.AdmDocumento;
+import adm.alumno.spring.AdmCarta;
+import adm.alumno.spring.AdmCartaDao;
+import adm.alumno.spring.AdmCartaSubir;
+import adm.alumno.spring.AdmCartaSubirDao;
+import adm.alumno.spring.AdmEvaluacion;
+import adm.alumno.spring.AdmEvaluacionDao;
+import adm.alumno.spring.AdmEvaluacionNotaDao;
+import adm.alumno.spring.AdmProceso;
+import adm.services.MailService;
+import adm.util.Encriptar;
+import adm.alumno.AdmAsesor;
+import adm.alumno.spring.AdmAcademico;
+import adm.alumno.spring.AdmAcademicoDao;
+import adm.alumno.spring.AdmAsesorDao;
+import adm.alumno.spring.AdmEstudio;
+import adm.alumno.spring.AdmEstudioDao;
+import adm.alumno.spring.AdmFamilia;
+import adm.alumno.spring.AdmFamiliaDao;
+import adm.alumno.spring.AdmIngreso;
+import adm.alumno.spring.AdmIngresoDao;
+import adm.alumno.spring.AdmIngresoPlan;
+import adm.alumno.spring.AdmIngresoPlanDao;
+import adm.alumno.spring.AdmOpcionPlanDao;
+import adm.alumno.spring.AdmPadres;
+import adm.alumno.spring.AdmPadresDao;
+import adm.alumno.spring.AdmProcesoDao;
+import adm.alumno.spring.AdmRecomienda;
+import adm.alumno.spring.AdmRecomiendaDao;
+import adm.alumno.spring.AdmSalud;
+import adm.alumno.spring.AdmSaludDao;
+import adm.alumno.spring.AdmSocioeco;
+import adm.alumno.spring.AdmSocioecoDao;
+import adm.alumno.spring.AdmSolicitud;
+import adm.alumno.spring.AdmSolicitudDao;
+import adm.alumno.spring.AdmTutor;
+import adm.alumno.spring.AdmTutorDao;
+import adm.alumno.spring.AdmUsuario;
+import adm.alumno.spring.AdmUsuarioDao;
+import adm.catalogo.spring.CatCarrera;
+import adm.catalogo.spring.CatCarreraDao;
+import adm.catalogo.spring.CatCiudad;
+import adm.catalogo.spring.CatCiudadDao;
+import adm.catalogo.spring.CatCultural;
+import adm.catalogo.spring.CatCulturalDao;
+import adm.catalogo.spring.CatEstado;
+import adm.catalogo.spring.CatEstadoDao;
+import adm.catalogo.spring.CatFacultadDao;
+import adm.catalogo.spring.CatModalidad;
+import adm.catalogo.spring.CatModalidadDao;
+import adm.catalogo.spring.CatNivelDao;
+import adm.catalogo.spring.CatPais;
+import adm.catalogo.spring.CatPaisDao;
+import adm.catalogo.spring.CatReligion;
+import adm.catalogo.spring.CatReligionDao;
+import adm.catalogo.spring.CatRegion;
+import adm.catalogo.spring.CatRegionDao;
+import adm.documento.spring.AdmDocAlum;
+import adm.documento.spring.AdmDocAlumDao;
+import adm.documento.spring.AdmDocumentoDao;
+import adm.parametros.spring.AdmParametros;
+import adm.parametros.spring.AdmParametrosDao;
+import adm.plan.spring.MapaPlan;
+import adm.plan.spring.MapaPlanDao;
+
+@Controller
+public class ControllerSolicitud {
+	
+	@Autowired
+	@Qualifier("dataSourceSalomon")
+	private DataSource salomon;
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	@Autowired
+	private MailService mailService;
+	
+	@Autowired
+	private AdmOpcionPlanDao admOpcionPlanDao;
+	
+	@Autowired
+	private AdmSolicitudDao admSolicitudDao;
+	
+	@Autowired
+	private AdmUsuarioDao admUsuarioDao;
+	
+	@Autowired
+	private AdmAcademicoDao admAcademicoDao;
+	
+	@Autowired
+	private AdmFamiliaDao admFamiliaDao;
+	
+	@Autowired
+	private AdmSocioecoDao admSocioecoDao;
+	
+	@Autowired
+	private AdmSaludDao admSaludDao;
+	
+	@Autowired
+	private AdmPadresDao admPadresDao;
+	
+	@Autowired
+	private CatCarreraDao catCarreraDao;
+	
+	@Autowired
+	private CatModalidadDao catModalidadDao;
+
+	@Autowired
+	private CatNivelDao catNivelDao;
+
+	@Autowired
+	private CatFacultadDao catFacultadDao;
+	
+	@Autowired
+	private CatPaisDao catPaisDao;
+	
+	@Autowired
+	private CatReligionDao catReligionDao;
+	
+	@Autowired
+	private CatEstadoDao catEstadoDao;
+	
+	@Autowired
+	private CatCiudadDao catCiudadDao;
+	
+	@Autowired
+	private CatCulturalDao catCulturalDao;
+
+	@Autowired
+	private CatRegionDao catRegionDao;
+	
+	@Autowired
+	private AdmEstudioDao admEstudioDao;
+	
+	@Autowired
+	private AdmTutorDao admTutorDao;
+	
+	@Autowired
+	private AdmRecomiendaDao admRecomiendaDao;
+	
+	@Autowired
+	private AdmProcesoDao admProcesoDao;
+	
+	@Autowired
+	private AdmCartaDao admCartaDao;
+	
+	@Autowired
+	private AdmEvaluacionDao admEvaluacionDao;
+	
+	@Autowired
+	private AdmEvaluacionNotaDao admEvaluacionNotaDao;
+	
+	@Autowired
+	private AdmDocAlumDao admDocAlumDao;
+	
+	@Autowired
+	private AdmDocumentoDao admDocumentoDao;
+	
+	@Autowired
+	private AdmCartaSubirDao admCartaSubirDao;
+	
+	@Autowired
+	MapaPlanDao mapaPlanDao;
+	
+	@Autowired
+	AdmIngresoDao admIngresoDao;
+	
+	@Autowired
+	AdmIngresoPlanDao admIngresoPlanDao;
+	
+	@Autowired
+	AdmAsesorDao admAsesorDao;
+
+	@Autowired
+	private AdmParametrosDao admParametrosDao;
+	
+	
+	
+	public void enviarConSalomon(HttpServletRequest request, String url){		
+		try{ 
+			request.setAttribute("conSalomon", salomon.getConnection());			
+		}catch(Exception ex){ 
+			System.out.println(url+" "+ex);
+		}
+	}
+	
+	@RequestMapping("/solicitud/modalidad")
+	public String solicitudModalidad(HttpServletRequest request, Model modelo){
+		String folio 				= "0";		
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");			 	
+		}
+		
+		boolean existeAcademico	 	= false;		
+		String periodoId 			= request.getParameter("PeriodoId")==null?"0":request.getParameter("PeriodoId");
+		String modo 				= request.getParameter("Modo")==null?"0":request.getParameter("Modo");
+		String planId 				= request.getParameter("PlanId")==null?"0":request.getParameter("PlanId");		
+		String modalidadId 			= request.getParameter("ModalidadId")==null?"0":request.getParameter("ModalidadId");		
+		String accion 				= request.getParameter("Accion")==null?"0":request.getParameter("Accion");
+		//String fecha 				= request.getParameter("Fecha")==null?"-":request.getParameter("Fecha");
+		String carreraId			= "0";
+		String mensaje 				= "0";
+		String fecha				= "0";
+		
+		String asesorActivo = admAsesorDao.getAsesorActivo();
+		
+		
+		AdmAcademico admAcademico	= new AdmAcademico();
+		AdmSolicitud admSolicitud	= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir	= new AdmCartaSubir();
+		AdmParametros admParametros = admParametrosDao.getAll(" ORDER BY ID").get(0);
+		
+		if (admAcademicoDao.existeReg(folio)){
+			admAcademico = admAcademicoDao.mapeaRegId(folio);
+			existeAcademico = true;
+		}
+		
+		List<AdmIngreso> lisPeriodos 			= admIngresoDao.lisActivos(" ORDER BY PERIODO_ID ");
+		if (periodoId.equals("0") &&  !admAcademico.getPeriodoId().equals("0")) {
+			periodoId = admAcademico.getPeriodoId();
+		}else if (periodoId.equals("0") && lisPeriodos.size() >= 1){
+			periodoId = lisPeriodos.get(0).getPeriodoId();
+		}
+		
+		List<String> opciones					= new ArrayList<String>();
+		HashMap<String, String> mapOpcionPlan 	= admOpcionPlanDao.mapaPorPlan();
+		
+		if (!modalidadId.equals("0")) admAcademico.setModalidad(modalidadId);	
+		
+		if (!planId.equals("0")) { 
+			admAcademico.setPlanId(planId);
+			carreraId = mapaPlanDao.getCarreraId(planId);
+			}else if (planId.equals("0") && !admAcademico.getPlanId().equals("0")) {
+			planId = admAcademico.getPlanId();
+			carreraId = mapaPlanDao.getCarreraId(planId);
+		}
+		
+		if (!modo.equals("0")){
+		    admAcademico.setEnlinea(modo);
+			}else if( modo.equals("0") && !admAcademico.getEnlinea().equals("0")) {
+		    modo = admAcademico.getEnlinea();
+		}
+		
+		String nivelId = "0";
+		List<MapaPlan> lisPlanes 			= mapaPlanDao.listPlanesPorPeriodoAndModo(periodoId, modo, "ORDER BY CARRERA_ID");		
+		if (planId.equals("0") && lisPlanes.size() >= 1){
+			planId = lisPlanes.get(0).getPlanId();
+		}
+		if (mapaPlanDao.existeReg(planId)) {
+			nivelId = mapaPlanDao.getNivelId(planId);
+			fecha = admIngresoDao.getFecha(periodoId);
+		}  
+		List<CatModalidad> lisModalidades 	= catModalidadDao.lisPorPeriodoAndPlan(periodoId, planId);		
+		
+		
+		admSolicitud = admSolicitudDao.mapeaRegId(folio);		
+	
+		if(accion.equals("1")){
+			admAcademico.setFolio(folio);
+			admAcademico.setModalidad(modalidadId);
+			admAcademico.setNivelId(nivelId);
+			admAcademico.setPlanId(planId);
+			admAcademico.setCarreraId(carreraId);
+			admAcademico.setFecha(fecha);
+			admAcademico.setPeriodoId(periodoId);
+			admAcademico.setEnlinea(modo);
+			
+			if (admAcademicoDao.existeReg(folio)){
+				// Modifica la informacion de la tabla AdmAcademico
+				if (admAcademicoDao.updateReg(admAcademico)){
+					mensaje	= "1";					
+				}else {
+					mensaje="2";
+				}
+			}else{
+				// Insertar un nuevo registro en AdmAcademico
+				if (admAcademicoDao.insertReg(admAcademico)){
+					mensaje	= "1";					
+				}else {
+					mensaje = "3";
+				}
+			}
+			
+			if(mensaje.equals("1")){
+				// Agrega al asesor activo 
+				admSolicitud.setAsesorId(asesorActivo);
+				
+				admSolicitudDao.updateReg(admSolicitud);	
+				
+//				// Si la modalidad es en linea (5) el asesor es Universidad Virtual
+//				if(modalidadId.equals("5")){
+//					admSolicitud.setAsesorId("9801179");
+//					admSolicitud.setAsesorSec("9801179");
+//				}else{
+//					// Si no es en linea el asesor es Admisiones
+//					admSolicitud.setAsesorId("9800400");
+//					admSolicitud.setAsesorSec("9800400");
+//				}					
+			}
+		}	
+		if(sesion != null) {
+			//planId = admAcademicoDao.getPlanId(folio);
+			for(int i = 1; i <= 8; i++) {
+				String n = Integer.toString(i);				
+				if(mapOpcionPlan.get(planId+n) != null || planId.equals("0") || planId.equals("00000000")) {
+					opciones.add(n);
+				}				
+			}
+			sesion.setAttribute("Opciones", opciones);
+		}
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("periodoId", periodoId);
+		modelo.addAttribute("planId", planId);
+		modelo.addAttribute("modo", modo);
+		modelo.addAttribute("modalidadId", modalidadId);
+		
+		modelo.addAttribute("admAcademico", admAcademico);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("admParametros", admParametros);
+
+		modelo.addAttribute("mensaje", mensaje);
+		modelo.addAttribute("existeAcademico", existeAcademico);
+		 
+		
+		modelo.addAttribute("lisPeriodos", lisPeriodos);		
+		modelo.addAttribute("lisPlanes", lisPlanes);
+		modelo.addAttribute("lisModalidades", lisModalidades);
+		
+		modelo.addAttribute("mapaNivel", catNivelDao.mapaNivel());
+		modelo.addAttribute("mapaFacultades", catFacultadDao.mapaFacultad());
+		modelo.addAttribute("mapaCarreras", catCarreraDao.mapaCarreras());
+		
+		return "solicitud/modalidad";
+	}
+	
+	
+	@RequestMapping("/solicitud/grabarModalidad")
+	public String solicitudGrabarModalidad(HttpServletRequest request){		
+		String folio 				= "0";		  
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		String modalidadId 	= request.getParameter("Modalidad")==null?"0":request.getParameter("Modalidad");
+		String mensaje 				= "0";
+		
+		AdmAcademico admAcademico	= new AdmAcademico();
+		AdmSolicitud admSolicitud	= new AdmSolicitud();
+		
+		if(!modalidadId.equals("0")){
+			admAcademico.setFolio(folio);
+			admAcademico.setModalidad(modalidadId);
+			admAcademico.setNivelId("0");
+			admAcademico.setCarreraId("00000");
+			admAcademico.setFecha(adm.fecha.Fecha.getHoy());			
+			
+			if (admAcademicoDao.existeReg(folio)){
+				// Modifica la informacion de la tabla AdmAcademico
+				if (admAcademicoDao.updateReg(admAcademico)){
+					mensaje	= "1";					
+				}else {
+					mensaje="2";
+				}
+			}else{
+				// Insertar un nuevo registro en AdmAcademico
+				if (admAcademicoDao.insertReg(admAcademico)){
+					mensaje	= "1";					
+				}else {
+					mensaje = "3";
+				}
+			}
+			
+			if(mensaje.equals("1")){
+				admSolicitud = admSolicitudDao.mapeaRegId(folio);			
+				
+				// Si la modalidad es en linea (5) el asesor es Universidad Virtual
+				if(modalidadId.equals("5")){
+					admSolicitud.setAsesorId("9801179");
+					admSolicitud.setAsesorSec("9801179");
+				}else{
+					// Si no es en linea el asesor es Admisiones
+					admSolicitud.setAsesorId("9800400");
+					admSolicitud.setAsesorSec("9800400");
+				}			
+				admSolicitudDao.updateReg(admSolicitud);			
+			}
+		}
+		
+		return "redirect:/solicitud/modalidad?Mensaje="+mensaje;
+	}
+
+	
+	@RequestMapping("/solicitud/solicitudPDF")
+	public String solicitudSolicitudPDF(HttpServletRequest request, Model modelo){		
+		
+		String usuarioId			= "0";
+		String folio 				= "0";
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			usuarioId 				= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmUsuario admUsuario	 	= admUsuarioDao.mapeaRegId(usuarioId);
+		AdmSolicitud admSolicitud 	= admSolicitudDao.mapeaRegId(folio);
+		AdmAcademico admAcademico 	= admAcademicoDao.mapeaRegId( folio);		
+		AdmSalud admSalud 			= admSaludDao.mapeaRegId(folio);
+		AdmPadres admPadres 		= admPadresDao.mapeaRegId(folio);
+		AdmTutor admTutor 			= admTutorDao.mapeaRegId(folio);
+		String edad					= admSolicitudDao.getEdad(folio);
+		
+		String estadoNacimiento 	= catEstadoDao.getNombreEstado(admSolicitud.getPaisId(),admSolicitud.getEstadoId());
+		String ciudadNacimiento		= catCiudadDao.getNombreCiudad(admSolicitud.getPaisId(),admSolicitud.getEstadoId(), admSolicitud.getCiudadId());		
+		String nacionalidad			= catPaisDao.getNacionalidad(admSolicitud.getNacionalidad());
+		String paisNombre			= catPaisDao.getNombrePais(admSolicitud.getPaisId());
+		String religionAlumno		= catReligionDao.getNombreReligion(admSolicitud.getReligionId());
+		String religionPadre		= catReligionDao.getNombreReligion(admPadres.getPadreReligion());
+		String religionMadre		= catReligionDao.getNombreReligion(admPadres.getMadreReligion());		
+		String paisDomicilio 		= admTutor.getPaisId()==null?"0":admTutor.getPaisId();
+		String estadoDomicilio 		= admTutor.getEstadoId()==null?"0":admTutor.getEstadoId();
+		String ciudadDomicilio		= admTutor.getCiudadId()==null?"0":admTutor.getCiudadId();		
+		String paisDomicilioNombre	= catPaisDao.getNombrePais(paisDomicilio);		
+		String estadoDomicilioNombre= catEstadoDao.getNombreEstado(paisDomicilio, estadoDomicilio);
+		String ciudadDomicilioNombre= catCiudadDao.getNombreCiudad(paisDomicilio, estadoDomicilio, ciudadDomicilio);
+		
+		String carreraNombre 		= catCarreraDao.getNombreCarrera(admAcademico.getCarreraId());
+		if (!admSolicitud.getPaisId().equals("91")){
+			ciudadNacimiento 	= "NA";
+		}
+		
+		if(admSolicitud.getMatricula().equals("IIIIIII")){
+			admSolicitud.setMatricula("-");
+			admSolicitudDao.updateReg(admSolicitud);
+		}
+		
+		List<AdmEstudio> lisEstudios 		= admEstudioDao.getListAFolio(folio, "ORDER BY FOLIO, ID");
+		HashMap<String,CatPais> mapaPaises	= catPaisDao.mapaPaises();
+		
+		modelo.addAttribute("edad", edad);
+		modelo.addAttribute("nacionalidad", nacionalidad);
+		modelo.addAttribute("estadoNacimiento", estadoNacimiento);
+		modelo.addAttribute("ciudadNacimiento", ciudadNacimiento);
+		modelo.addAttribute("edad", edad);
+		modelo.addAttribute("religionAlumno", religionAlumno);
+		modelo.addAttribute("religionPadre", religionPadre);
+		modelo.addAttribute("religionMadre", religionMadre);
+		modelo.addAttribute("paisDomicilio", paisDomicilioNombre);
+		modelo.addAttribute("estadoDomicilio", estadoDomicilioNombre);
+		modelo.addAttribute("ciudadDomicilio", ciudadDomicilioNombre);
+		modelo.addAttribute("carreraNombre", carreraNombre);
+		modelo.addAttribute("paisNombre", paisNombre);
+				
+		modelo.addAttribute("admUsuario", admUsuario);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admAcademico", admAcademico);
+		modelo.addAttribute("admSalud", admSalud);
+		modelo.addAttribute("admPadres", admPadres);
+		modelo.addAttribute("admTutor", admTutor);
+		modelo.addAttribute("lisEstudios", lisEstudios);
+		modelo.addAttribute("mapaPaises", mapaPaises);
+		
+		return "solicitud/solicitudPDF";
+	}
+	
+	@RequestMapping("/solicitud/admitidoPDF")
+	public String solicitudAdmitidoPDF(HttpServletRequest request, Model modelo){
+		
+		String usuarioId			= "0";
+		String folio 				= "0";		
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			usuarioId				= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		String claveInicial 		= "X";		
+		AdmUsuario admUsuario 		= admUsuarioDao.mapeaRegId(usuarioId);
+		AdmSolicitud admSolicitud 	= admSolicitudDao.mapeaRegId(folio);
+		AdmAcademico admAcademico 	= admAcademicoDao.mapeaRegId(folio);
+		AdmProceso admProceso 		= admProcesoDao.mapeaRegId( folio);
+		String facultadId	 		= catCarreraDao.getFacultadId(admAcademico.getCarreraId());
+		String facultadNombre	 	= catFacultadDao.getNombreFacultad(facultadId);
+		String carreraNombre 		= catCarreraDao.getNombreCarrera(admAcademico.getCarreraId());
+		
+		admProcesoDao.updateFecha(5, folio);
+		
+		if (admSolicitud.getMatricula().length() == 7) {
+			claveInicial = admSolicitudDao.getClaveInicial(admSolicitud.getMatricula());
+		}
+		
+		List<AdmCarta> lisCondiciones 		= admCartaDao.lisPorFolio(folio, " ORDER BY FOLIO");				
+		List<AdmDocAlum> lisDocumentos		= admDocAlumDao.lisPorFolio( folio, " AND CARTA= 'S' ORDER BY DOCUMENTO_ID");
+		List<AdmEvaluacion> lisEvaluaciones	= admEvaluacionDao.getListAll(" ORDER BY EVALUACION_ID");
+		
+		HashMap<String,String> mapaNotas			= admEvaluacionNotaDao.mapaNotaResultadosExamenes();
+		HashMap<String,AdmDocumento> mapaDocumentos	= admDocumentoDao.mapDocumentos();
+		
+		modelo.addAttribute("facultadNombre", facultadNombre);
+		modelo.addAttribute("carreraNombre", carreraNombre);
+		modelo.addAttribute("admUsuario", admUsuario);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admAcademico", admAcademico);
+		modelo.addAttribute("admProceso", admProceso);
+		modelo.addAttribute("claveInicial", claveInicial);
+
+		modelo.addAttribute("lisEvaluaciones", lisEvaluaciones);
+		modelo.addAttribute("lisCondiciones", lisCondiciones);
+		modelo.addAttribute("lisDocumentos", lisDocumentos);
+		modelo.addAttribute("mapaNotas", mapaNotas);
+		modelo.addAttribute("mapaDocumentos", mapaDocumentos);
+		
+		if(!admSolicitud.getEstado().equals("5")) {
+			return "solicitud/inicial";
+		}else {
+			return "solicitud/admitidoPDF";
+		}
+		
+	}
+	
+	@RequestMapping("/solicitud/carrera")
+	public String solicitudCarrera(HttpServletRequest request, Model modelo){
+		String folio 				= "0";
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		boolean existeAcademico		= false;
+		AdmAcademico admAcademico	= new AdmAcademico();
+		if (admAcademicoDao.existeReg(folio)){
+			admAcademico = admAcademicoDao.mapeaRegId(folio);
+			if (!admAcademico.getCarreraId().equals("0")) {
+				existeAcademico = true;
+			}
+		}
+		
+		List<CatCarrera> lisCarrera = null;
+		
+		if (admAcademico.getModalidad().equals("1")){
+			// Si la modalidad es presencial trae carreras con planes 2010
+			lisCarrera = catCarreraDao.getListPlanes(" ORDER BY FACULTAD_ID, NIVEL_ID, NOMBRE_CARRERA");
+		}else{
+			// Si la modalidad es distancia trae carreras autorizadas en linea y carreras permitidas en la modalidad (ver tabla ADM_MODCARRERA) 
+			lisCarrera = catCarreraDao.getListEnLinea(admAcademico.getModalidad(), "ORDER BY FACULTAD_ID, NIVEL_ID, NOMBRE_CARRERA");	
+		}
+				
+		modelo.addAttribute("existeAcademico", existeAcademico);
+		modelo.addAttribute("admAcademico", admAcademico);
+		modelo.addAttribute("lisCarrera", lisCarrera);
+		modelo.addAttribute("mapaNivel", catNivelDao.mapaNivel());
+		modelo.addAttribute("mapaFacultad", catFacultadDao.mapaFacultad());
+		
+		return "solicitud/carrera";
+	}
+	
+	@RequestMapping("/solicitud/grabarCarrera")
+	public String solicitudGrabarCarrera(HttpServletRequest request){		
+		String folio 				= "0";		  
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmAcademico admAcademico	= admAcademicoDao.mapeaRegId(folio);
+		AdmSolicitud admSolicitud	= admSolicitudDao.mapeaRegId(folio);			
+		
+		String carreraId 	= request.getParameter("CarreraId")==null?"0":request.getParameter("CarreraId");
+		String fecha	 	= request.getParameter("Fecha")==null?"0":request.getParameter("Fecha");
+		String mensaje 		= "0";
+	 	String facAlumno	= "";
+	 	
+	 	boolean existeCarrera 	= catCarreraDao.existeReg(carreraId); 
+	 	
+		if( existeCarrera && fecha != null){
+			admAcademico.setFolio(folio);
+			admAcademico.setCarreraId(carreraId);
+			admAcademico.setFecha(fecha);
+			
+			if (admAcademicoDao.existeReg(folio)){
+				// Modifica la informacion de la tabla AdmAcademico
+				if (admAcademicoDao.updateReg(admAcademico)){
+					mensaje	= "1";						
+				}else {
+					mensaje = "2";
+				}
+			}else{
+				// Insertar un nuevo registro en AdmAcademico
+				if (admAcademicoDao.insertReg(admAcademico)){
+					mensaje	= "1";					
+				}else {
+					mensaje = "3";
+				}
+			}
+		}else if (existeCarrera== false) {
+			mensaje = "4";
+		}
+		
+		if(mensaje.equals("1")){
+			// Facultad del alumno
+			facAlumno = catCarreraDao.getFacultadId(admAcademico.getCarreraId());
+			// Valida si la modalidad del alumno es en línea
+			//esLinea = adm.catalogo.CatModalidad.esLinea(conSalomon, Academico.getModalidad());
+			
+			// Si es de salud o ciencias estomatológicas el asesor es "Deisy Ble" 
+			if( facAlumno.equals("103") || facAlumno.equals("114") ){
+				admSolicitud.setAsesorId("9800110");
+				admSolicitud.setAsesorSec("9800400");
+			}else if (admAcademico.getModalidad().equals("5")){
+				// Nancy Liliana Herrera Villamizar 
+				admSolicitud.setAsesorId("9801179");
+				admSolicitud.setAsesorSec("9800889");
+			}else{
+				// Elizabeth Dominguez
+				admSolicitud.setAsesorId("9800400");
+				admSolicitud.setAsesorSec("9800400");
+			}			
+			admSolicitudDao.updateReg(admSolicitud);	
+		}
+			
+		return "redirect:/solicitud/carrera?Mensaje="+mensaje;
+	}
+	
+	@RequestMapping("/solicitud/confirmar")
+	public String solicitudConfirmar(HttpServletRequest request, Model modelo){
+		
+		String usuarioId 	= "0";
+		String folio 		= "0";		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			usuarioId 		= (String)sesion.getAttribute("UsuarioId") == null ? "0" : (String)sesion.getAttribute("UsuarioId");
+			folio 			= (String)sesion.getAttribute("Folio") == null ? "0" : (String)sesion.getAttribute("Folio");
+		}
+		
+		AdmUsuario admUsuario 			= new AdmUsuario();
+		AdmSolicitud admSolicitud 		= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir 	= new AdmCartaSubir();
+		AdmParametros admParametros		= admParametrosDao.getAll("ORDER BY ID").get(0);
+		
+		if(admUsuarioDao.existeReg(usuarioId)) {
+			admUsuario = admUsuarioDao.mapeaRegId(usuarioId);
+		}
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		}
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}	
+		
+		AdmAcademico admAcademico 	= admAcademicoDao.mapeaRegId(folio);	
+		AdmTutor admTutor 			= admTutorDao.mapeaRegId(folio);
+		AdmSalud admSalud 			= admSaludDao.mapeaRegId(folio);
+		AdmPadres admPadres 		= admPadresDao.mapeaRegId(folio);	
+
+		String padreReligion 	= "";
+		String padreNac			= "0";
+		String madreReligion 	= "";
+		String madreNac		 	= "0";
+		
+		String ciudad 			= catCiudadDao.getNombreCiudad(admUsuario.getPaisId(),admUsuario.getEstadoId(),admUsuario.getCiudadId());
+		String estadoId    		= catEstadoDao.getNombreEstado(admUsuario.getPaisId(),admUsuario.getEstadoId());
+	    String paisId   		= catPaisDao.getNombrePais(admUsuario.getPaisId());
+	    String nacionalidad 	= catPaisDao.getNacionalidad(admUsuario.getNacionalidad());
+	    String religion			= catReligionDao.getNombreReligion(admUsuario.getReligionId());
+		String cdUb 			= catCiudadDao.getNombreCiudad(admSolicitud.getResPaisId(), admSolicitud.getResEstadoId(),admSolicitud.getResCiudadId());
+		String edoUb 			= catEstadoDao.getNombreEstado(admSolicitud.getResPaisId(), admSolicitud.getResEstadoId());
+		String paisUb 			= catPaisDao.getNombrePais(admSolicitud.getResPaisId());
+		String nombreCarrera 	= catCarreraDao.getNombreCarrera(admAcademico.getCarreraId());
+		
+		if(catReligionDao.existeReg(admPadres.getPadreReligion())) {
+			padreReligion = catReligionDao.getNombreReligion(admPadres.getPadreReligion());
+		}
+		if(catPaisDao.existeReg(admPadres.getPadreNacionalidad())) {
+			padreNac = catPaisDao.getNacionalidad(admPadres.getPadreNacionalidad());
+		}
+		if(catReligionDao.existeReg(admPadres.getMadreReligion())) {
+			madreReligion = catReligionDao.getNombreReligion(admPadres.getMadreReligion());
+		}
+		if(catPaisDao.existeReg(admPadres.getMadreNacionalidad())) {
+			madreNac = catPaisDao.getNacionalidad(admPadres.getMadreNacionalidad());
+		}
+		
+		List<AdmEstudio> lista = admEstudioDao.getListAFolio(folio, "ORDER BY FOLIO, ID");
+		List<AdmRecomienda> listaR = admRecomiendaDao.getListFolio(folio, "ORDER BY RECOMENDACION_ID");
+		
+		HashMap<String,CatPais> mapaPaises = catPaisDao.mapaPaises();
+		
+		String edad = admSolicitudDao.getEdad(folio);
+		
+		modelo.addAttribute("admUsuario", admUsuario);	
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);	
+		modelo.addAttribute("admParametros", admParametros);	
+		modelo.addAttribute("edad", edad);		
+		modelo.addAttribute("admAcademico", admAcademico);		
+		modelo.addAttribute("admTutor", admTutor);		
+		modelo.addAttribute("admSalud", admSalud);		
+		modelo.addAttribute("admPadres", admPadres);		
+		modelo.addAttribute("lista", lista);		
+		modelo.addAttribute("listaR", listaR);		
+		modelo.addAttribute("ciudad", ciudad);		
+		modelo.addAttribute("estadoId", estadoId);		
+		modelo.addAttribute("paisId", paisId);		
+		modelo.addAttribute("nacionalidad", nacionalidad);		
+		modelo.addAttribute("religion", religion);		
+		modelo.addAttribute("cdUb", cdUb);		
+		modelo.addAttribute("edoUb", edoUb);		
+		modelo.addAttribute("paisUb", paisUb);		
+		modelo.addAttribute("nombreCarrera", nombreCarrera);		
+		modelo.addAttribute("padreReligion", padreReligion);		
+		modelo.addAttribute("padreNac", padreNac);		
+		modelo.addAttribute("madreReligion", madreReligion);
+		modelo.addAttribute("madreNac", madreNac);		
+		modelo.addAttribute("mapaPaises", mapaPaises);
+		
+		return "solicitud/confirmar";
+	}
+	
+	@RequestMapping("/solicitud/datos")
+	public String solicitudDatosNew(HttpServletRequest request, Model modelo){	
+		String folio = "";
+		String usuarioId = "";
+		String culturalId = request.getParameter("CulturalId")==null?"1":request.getParameter("CulturalId");
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 		= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+			usuarioId 	= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+		}	
+		boolean existePersonal 		= false;	
+		AdmUsuario admUsuario		= new AdmUsuario();
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir = new AdmCartaSubir();
+		AdmParametros admParametros = admParametrosDao.getAll(" ORDER BY ID").get(0);
+		
+		if(admUsuarioDao.existeReg(usuarioId)) {
+			admUsuario 		= admUsuarioDao.mapeaRegId(usuarioId);
+			admSolicitud 	= admSolicitudDao.mapeaRegId(folio);
+			
+			if(admUsuario.getPaisId().equals("0")) {
+				admUsuario.setPaisId(admParametrosDao.getAll(" ORDER BY ID").get(0).getPaisId()); 
+			}
+			if(admUsuario.getEstadoId().equals("0")) {
+				admUsuario.setEstadoId("1");
+			}
+			if (!admUsuario.getReligionId().equals("0")) existePersonal = true;
+		}	
+		 
+		List<CatPais> lisPais 				= catPaisDao.getListAll(" ORDER BY NOMBRE_PAIS");
+		List<CatEstado> lisEstados			= catEstadoDao.getLista(admUsuario.getPaisId(), " ORDER BY NOMBRE_ESTADO");
+		List<CatEstado> lisEstadoRes 		= catEstadoDao.getLista(admSolicitud.getResPaisId()," ORDER BY NOMBRE_ESTADO");
+		List<CatCiudad> lisCiudades			= catCiudadDao.getLista(admUsuario.getPaisId(), admUsuario.getEstadoId(), " ORDER BY NOMBRE_CIUDAD");
+		List<CatCiudad> lisCiudadRes		= catCiudadDao.getLista(admSolicitud.getResPaisId(), admSolicitud.getResEstadoId(), " ORDER BY NOMBRE_CIUDAD");
+		List<CatReligion> lisReligion		= catReligionDao.getListAll("ORDER BY NOMBRE_RELIGION");
+		List<CatCultural> lisCultural 		= catCulturalDao.getListAll(" ORDER BY NOMBRE_CULTURAL");
+		List<CatRegion> lisRegion 			= catRegionDao.getLista(admSolicitud.getCulturalId(), " ORDER BY NOMBRE_REGION");
+		if(lisRegion.size()<1){
+			lisRegion = catRegionDao.getLista(culturalId, " ORDER BY NOMBRE_REGION");
+		}
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		
+		modelo.addAttribute("existePersonal", existePersonal);
+		modelo.addAttribute("admUsuario", admUsuario);		
+		modelo.addAttribute("admCartaSubir", admCartaSubir);	
+		modelo.addAttribute("admParametros", admParametros);	
+		modelo.addAttribute("lisPais", lisPais);
+		modelo.addAttribute("lisEstados", lisEstados);
+		modelo.addAttribute("lisEstadoRes", lisEstadoRes);
+		modelo.addAttribute("lisCiudades", lisCiudades);
+		modelo.addAttribute("lisCiudadRes", lisCiudadRes);
+		modelo.addAttribute("lisReligion", lisReligion);
+		modelo.addAttribute("lisCultural", lisCultural);
+		modelo.addAttribute("lisRegion", lisRegion);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		
+		return "solicitud/datos";
+	}
+	
+	@RequestMapping("/solicitud/ayudacalendario")
+	public String solicitudPasos(HttpServletRequest request){
+			
+		return "solicitud/ayudacalendario";
+	}
+
+	@RequestMapping("/solicitud/graboDatos")
+	public String solicitudGraboDatos(HttpServletRequest request){
+		String folio 		= "0";
+		String usuario 		= "";
+		String usuarioId	= "0";
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 		= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+			usuarioId 	= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+			usuario		= (String)sesion.getAttribute("Usuario");
+		}
+		
+		String nombre 		= request.getParameter("Nombre") == null ? "-" : request.getParameter("Nombre").trim().toUpperCase();
+		String paterno 		= request.getParameter("Paterno") == null ? "-" : request.getParameter("Paterno").trim().toUpperCase();
+		String materno 		= request.getParameter("Materno") == null ? "-" : request.getParameter("Materno").trim().toUpperCase();
+		String pais 		= request.getParameter("nacPais") == null ? "0" : request.getParameter("nacPais");
+		String estado 		= request.getParameter("nacEdo") == null ? "0" : request.getParameter("nacEdo");
+		String ciudad 		= request.getParameter("nacCiudad") == null ? "0" : request.getParameter("nacCiudad");
+		String nacionalidad = request.getParameter("Nacionalidad") == null ? "0" : request.getParameter("Nacionalidad");
+		String fecha 		= request.getParameter("Fecha") == null ? "0" : request.getParameter("Fecha");
+		String estCivil 	= request.getParameter("EdoCivil") == null ? "0" : request.getParameter("EdoCivil");
+		String religion 	= request.getParameter("Religion") == null ? "0" : request.getParameter("Religion");
+		String curp 		= request.getParameter("Curp") == null ? "0" : request.getParameter("Curp");
+		String redSocial 	= request.getParameter("RedSocial") == null ? "-" : request.getParameter("RedSocial");
+		String feligresia 	= request.getParameter("Feligresia") == null ? "0" : request.getParameter("Feligresia");
+		String bautizado 	= request.getParameter("Bautizado") == null ? "-" : request.getParameter("Bautizado");
+		String genero 		= request.getParameter("Genero") == null ? "0" : request.getParameter("Genero");
+		String fechaBautizo = request.getParameter("FechaBaut") == null ? "0" : request.getParameter("FechaBaut");
+		String lugarBautizo = request.getParameter("LugarBaut") == null ? "0" : request.getParameter("LugarBaut");
+		String culturalId 	= request.getParameter("CulturalId") == null ? "0" : request.getParameter("CulturalId");
+		String regionId 	= request.getParameter("RegionId") == null ? "0" : request.getParameter("RegionId");
+		String resPaisId 	= request.getParameter("ResPaisId") == null ? "0" : request.getParameter("ResPaisId");
+		String resEstadoId 	= request.getParameter("ResEstadoId") == null ? "0" : request.getParameter("ResEstadoId");
+		String resCiudadId 	= request.getParameter("ResCiudadId") == null ? "0" : request.getParameter("ResCiudadId");
+		
+		System.out.println(resCiudadId);
+
+		boolean existeUser 	= false;
+		AdmUsuario admUsuario	= new AdmUsuario();
+		if (admUsuarioDao.existeReg(usuarioId)){			
+			admUsuario 		= admUsuarioDao.mapeaRegId(usuarioId);
+			existeUser		= true;
+		}
+		
+		String grabo 		= "-";
+		boolean existeSol	= false;
+		AdmSolicitud admSolicitud = new AdmSolicitud();
+		if (admSolicitudDao.existeReg(folio)){			
+			admSolicitud 	= admSolicitudDao.mapeaRegId(folio);	
+			existeSol 			= true;
+		}
+		if(bautizado.equals("N")){ 
+			fechaBautizo = "-"; 
+		}
+
+		admSolicitud.setFolio(folio);
+		admSolicitud.setApellidoPaterno(paterno);
+		admSolicitud.setApellidoMaterno(materno);
+		admSolicitud.setNombre(nombre);
+		admSolicitud.setPaisId(pais);
+		admSolicitud.setEstadoId(estado);
+		admSolicitud.setCiudadId(ciudad);
+		admSolicitud.setNacionalidad(nacionalidad);
+		admSolicitud.setFechaNac(fecha);
+		admSolicitud.setGenero(genero);
+		admSolicitud.setEstadoCivil(estCivil);
+		admSolicitud.setReligionId(religion);
+		admSolicitud.setCurp(curp);
+		admSolicitud.setRedSocial(redSocial);
+		admSolicitud.setFeligresia(feligresia);
+		admSolicitud.setBautizado(bautizado);
+		admSolicitud.setGenero(genero);		
+		admSolicitud.setMatricula("-");
+		admSolicitud.setAgente("0");
+		admSolicitud.setFechaBautizo(fechaBautizo);
+		admSolicitud.setLugarBautizo(lugarBautizo);
+		admSolicitud.setCulturalId(culturalId);
+		admSolicitud.setRegionId(regionId);
+		admSolicitud.setResPaisId(resPaisId);
+		admSolicitud.setResEstadoId(resEstadoId);
+		admSolicitud.setResCiudadId(resCiudadId);
+		if (existeSol == true){			
+			if (admSolicitudDao.updateReg(admSolicitud)){
+				grabo	= "SI";				
+			}else {
+				grabo = "NO";
+			}
+		}
+		if (grabo.equals("SI")){
+			admUsuario.setApellidoPaterno(paterno);
+			admUsuario.setApellidoMaterno(materno);
+			admUsuario.setNombre(nombre);
+			admUsuario.setPaisId(pais);
+			admUsuario.setEstadoId(estado);
+			admUsuario.setCiudadId(ciudad);
+			admUsuario.setNacionalidad(nacionalidad);
+			admUsuario.setFechaNac(fecha);
+			admUsuario.setGenero(genero);
+			admUsuario.setEstadoCivil(estCivil);
+			admUsuario.setReligionId(religion);
+			if (existeUser) {
+				if (admUsuarioDao.updateReg(admUsuario)) {
+					grabo = "SI";
+				}else {
+					grabo = "NO";
+				}
+			}
+		}
+		
+		return "redirect:/solicitud/datos?Grabo="+grabo;
+	}
+
+	@RequestMapping("/solicitud/estudios")
+	public String solicitudEstudios(HttpServletRequest request, Model modelo){		
+		String folio 		= "";
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion != null){		
+			folio 	= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		String otro			= request.getParameter("Otro")==null?"N":request.getParameter("Otro");
+		String id			= request.getParameter("Id")==null?"0":request.getParameter("Id");
+		String completo		= request.getParameter("completo")==null?"S":request.getParameter("completo");
+		String convalida	= request.getParameter("Convalida")==null?"N":request.getParameter("Convalida");
+		int niv 			= 0;
+		int registros		= admEstudioDao.totReg(folio);
+		String mensajeGrabo = request.getParameter("Grabo") == null ? "N" : request.getParameter("Grabo");
+		
+		AdmEstudio estudio 			= new AdmEstudio();
+		AdmAcademico academico 		= new AdmAcademico();
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir = new AdmCartaSubir();
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);	
+		}
+		
+		if(otro.equals("O")){
+			estudio = admEstudioDao.mapeaRegId(folio, id);
+		}else if(!otro.equals("S")){		
+			if(admEstudioDao.maximoReg(folio) != null){
+				estudio = admEstudioDao.mapeaRegId(folio, String.valueOf(Integer.parseInt(admEstudioDao.maximoReg(folio))-1));
+			}
+		}
+		
+		if (admAcademicoDao.existeReg(folio)){ 
+			academico = admAcademicoDao.mapeaRegId(folio);
+			niv = Integer.valueOf(academico.getNivelId());
+		}
+		
+		boolean existe		= false;
+		if (admEstudioDao.existeReg(folio)) {
+			existe = true;
+		}
+
+		String paisId 	= estudio.getPaisId().equals("0") ? "91" : estudio.getPaisId();
+		String estadoId = estudio.getEstadoId().equals("0") ? "19" : estudio.getEstadoId();
+		
+		List<CatPais> lisPais	= catPaisDao.getListAll(" ORDER BY NOMBRE_PAIS");
+		List<CatEstado> lisEstados	= catEstadoDao.getLista(paisId, " ORDER BY NOMBRE_ESTADO");
+		List<CatCiudad> lisCiudad	= catCiudadDao.getLista(paisId, estadoId, "ORDER BY NOMBRE_CIUDAD");	
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("existe", existe);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("estudio", estudio);
+		modelo.addAttribute("registros", registros);
+		modelo.addAttribute("niv", niv);
+		modelo.addAttribute("lisPais", lisPais);
+		modelo.addAttribute("lisEstados", lisEstados);
+		modelo.addAttribute("lisCiudad", lisCiudad);
+		modelo.addAttribute("id", id);
+		modelo.addAttribute("completo", completo);
+		modelo.addAttribute("convalida", convalida);
+		modelo.addAttribute("grabo", mensajeGrabo.equals("S") ? true : false);
+		
+		return "solicitud/estudios";
+	}
+
+	@RequestMapping("/solicitud/grabarEstudios")
+	public String solicitudGrabarEstudios(HttpServletRequest request){
+		String folio = "";
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 	= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}	
+		
+		String id			= request.getParameter("Id")==null?"0":request.getParameter("Id");
+		String completo		= request.getParameter("completo")==null?"S":request.getParameter("completo");
+		String convalida	= request.getParameter("Convalida")==null?"N":request.getParameter("Convalida");
+		String estudios		= request.getParameter("estudios")==null?"N":request.getParameter("estudios");
+		
+		AdmEstudio estudio = new AdmEstudio();
+		
+		String grabo = "N"; 
+		
+		estudio.setFolio(folio);	
+		estudio.setId(admEstudioDao.maximoReg(folio)==null ? "1" : admEstudioDao.maximoReg(folio));
+		estudio.setTitulo(request.getParameter("titulo")==null?"-":request.getParameter("titulo"));
+		estudio.setInstitucion(request.getParameter("institucion")==null?"-":request.getParameter("institucion"));
+		estudio.setPaisId(request.getParameter("nacPais"));
+		estudio.setEstadoId(request.getParameter("nacEdo"));
+		estudio.setCiudadId(request.getParameter("nacCiudad"));
+		estudio.setCompleto(completo);		
+		estudio.setInicio(request.getParameter("inicio"));
+		estudio.setFin(request.getParameter("fin"));
+		estudio.setDependencia(request.getParameter("dependencia"));		
+		estudio.setConvalida(convalida);
+		estudio.setEstudios(estudios);
+		estudio.setOtraMateria(request.getParameter("OtraMateria"));
+		
+		
+		if (admEstudioDao.existeReg(folio,id)){
+			if (admEstudioDao.updateReg(estudio)){
+				grabo = "S";
+			}
+		}else if (!admEstudioDao.existeReg(folio,id)){
+			if (admEstudioDao.insertReg(estudio)){
+				grabo = "S";
+			}
+		}
+		
+		return "redirect:/solicitud/estudios?Grabo="+grabo;
+	}
+	
+	@RequestMapping("/solicitud/imprimirSolicitud")
+	public String solicitudImprimirSolicitud(HttpServletRequest request){
+		enviarConSalomon(request,"Error-adm.ControllerSolicitud|solicitudImprimirSolicitud:");
+		return "solicitud/imprimirSolicitud";
+	}
+	
+	@RequestMapping("/solicitud/mandarCorreos")
+	public String solicitudMandarCorreos(HttpServletRequest request){
+		String folio = "";
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 	= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmSolicitud solicitud 	= admSolicitudDao.mapeaRegId(folio);
+		solicitud.setFolio(folio);
+		solicitud.setEstado("2");
+		solicitud.setMatricula("-");
+		if (admSolicitudDao.updateReg(solicitud)){
+			admSolicitudDao.updateFecha(folio);
+			admProcesoDao.updateFecha(2, folio);
+		}	
+		
+		AdmAcademico academico = new AdmAcademico();
+		
+		if(admAcademicoDao.existeReg(folio)){
+			academico = admAcademicoDao.mapeaRegId(folio);
+		}
+		
+		if(!academico.getNivelId().equals("1")) {
+			for(int i=1; i<=3; i++){
+				AdmRecomienda recomienda 	= admRecomiendaDao.mapeaRegId(folio, i+"");
+				String solicitante 			= solicitud.getNombre()+" "+solicitud.getApellidoPaterno()+" "+solicitud.getApellidoMaterno();
+				String clave 				= Encriptar.sha256ConBase64(folio+String.valueOf(i));			
+				try{
+					String texto = "Gracias por aceptar ayudarnos en el proceso de admisión de "+solicitante+"."+
+							"\n\nPor favor evalúe al aspirante seleccionando, para cada cualidad, la alternativa que mejor describa su realidad."+
+							"\n\nSi considera que no tiene el conocimiento suficiente del candidato en alguna de las caracterésticas mencionadas, elija la opción: No dispongo de información suficiente"+
+							"\n\nAgradecemos su colaboración en contestar y enviar esta información lo antes posible. Si no lo puede hacer en este momento, por favor vuelva a esta página haciendo clic en la liga del mensaje del correo."+
+							"https://admision.um.edu.mx/admision/encuesta?Folio="+folio+"&Clave="+clave+"&Id="+i+
+							"\n\nEsta información tendrá carácter de reservada, anónima, y para uso exclusivo en el proceso de admisión."+
+							"\n\nMuchas gracias por su colaboración."+
+							"\nOficina de Admisión \nUniversidad de Montemorelos";
+					mailService.send(recomienda.getEmail(), "admisionenlinea@um.edu.mx", "U.M. Admisiones/"+recomienda.getNombre() , texto);
+				}catch(Exception ex){
+					System.out.println("Error:"+ex);
+				}
+			}
+		}
+		
+		return "redirect:/solicitud/confirmar?estado=F";
+	}
+	
+	@RequestMapping("/solicitud/nivel")
+	public String solicitudNivel(HttpServletRequest request, Model modelo){
+		
+		String folio 		= "0";		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		boolean existeAcademico		= false;
+		AdmAcademico admAcademico 	= new AdmAcademico();
+		
+		if (admAcademicoDao.existeReg(folio)){
+			admAcademico 		= admAcademicoDao.mapeaRegId(folio);
+			existeAcademico		= true;
+		}
+		
+		modelo.addAttribute("admAcademico", admAcademico);
+		modelo.addAttribute("existeAcademico", existeAcademico);
+		
+		return "solicitud/nivel";
+	}
+	
+	@RequestMapping("/solicitud/grabarNivel")
+	public String solicitudGrabarNivel(HttpServletRequest request, Model modelo){
+		String folio 		= "0";		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		String nivelId 		= request.getParameter("Nivel")==null?"0":request.getParameter("Nivel");
+		String mensaje 		= "0"; 
+		
+		AdmAcademico admAcademico = new AdmAcademico();
+		if (admAcademicoDao.existeReg(folio)){
+			admAcademico = admAcademicoDao.mapeaRegId(folio);
+			admAcademico.setNivelId(nivelId);
+			if (!nivelId.equals(catCarreraDao.getNivel(admAcademico.getCarreraId()))){
+				admAcademico.setCarreraId("00000");
+			}
+			if (admAcademicoDao.updateReg(admAcademico)) {
+				mensaje = "1";
+			}else {
+				mensaje = "2";
+			}
+		}
+		
+		return "redirect:/solicitud/nivel?Mensaje="+mensaje;
+	}
+	
+	@RequestMapping("/solicitud/opcion")
+	public String solicitudOpcion(HttpServletRequest request){
+		enviarConSalomon(request,"Error-adm.ControllerSolicitud|solicitudOpcion:");
+		return "solicitud/opcion";
+	}
+	
+	@RequestMapping("/solicitud/otroEstudio")
+	public String solicitudOtroEstudio(HttpServletRequest request, Model modelo){
+		
+		String folio		= "0";
+		String id			= "0";
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		boolean existe 		= false;
+		if (admEstudioDao.existeReg(folio)){
+			existe 			= true; 
+		}
+
+		AdmParametros admParametros = admParametrosDao.getAll(" ORDER BY ID").get(0);
+
+		String nivelId 		= admAcademicoDao.getNivel(folio);		
+		AdmCartaSubir admCartaSubir 	= new AdmCartaSubir();		
+		
+		AdmEstudio admEstudio = new AdmEstudio();
+		if (admEstudioDao.existeReg(folio, id)) {
+			admEstudio = admEstudioDao.mapeaRegId(folio, id);
+		}
+		
+		List<AdmEstudio> lisEstudio = admEstudioDao.getListAFolio( folio, " ORDER BY FOLIO, ID");	
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("existe", existe);		
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("admParametros", admParametros);
+		modelo.addAttribute("folio", folio);
+		modelo.addAttribute("id", id);
+		modelo.addAttribute("admEstudio", admEstudio);
+		modelo.addAttribute("lisEstudio", lisEstudio);
+		modelo.addAttribute("nivelId", nivelId);
+		
+		return "solicitud/otroEstudio";
+	}
+	
+	@RequestMapping("/solicitud/borrarEstudio")
+	public String solicitudBorrarEstudio(HttpServletRequest request, Model modelo){
+		String folio	= "0";
+		String id		= request.getParameter("Id")==null?"0":request.getParameter("Id");
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		if (admEstudioDao.existeReg(folio, id)) {
+			admEstudioDao.deleteReg(folio, id);
+		}
+		
+		return "redirect:/solicitud/otroEstudio";
+	}
+	
+	@RequestMapping("/solicitud/padres")
+	public String solicitudPadres(HttpServletRequest request, Model modelo){
+		
+		boolean existe 		= false;		
+		String folio 		= "0";
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir = new AdmCartaSubir();
+		AdmParametros admParametros = admParametrosDao.getAll(" ORDER BY ID").get(0);
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);	
+		}
+		
+		AdmPadres admPadres = new AdmPadres();		
+		if (admPadresDao.existeReg(folio)){
+			admPadres = admPadresDao.mapeaRegId(folio);
+			existe = true;
+		}
+		
+		List<CatPais> lisPais			= catPaisDao.getListAll("ORDER BY NOMBRE_PAIS");
+		List<CatReligion> lisReligion	= catReligionDao.getListAll("ORDER BY NOMBRE_RELIGION");
+		List<CatEstado> lisEstadoPadre		= catEstadoDao.getLista(admPadres.getPadrePaisId(),"ORDER BY NOMBRE_ESTADO");
+		List<CatCiudad> lisCiudadPadre		= catCiudadDao.getLista(admPadres.getPadrePaisId(), admPadres.getPadreEstadoId(),"ORDER BY NOMBRE_CIUDAD");
+		List<CatEstado> lisEstadoMadre		= catEstadoDao.getLista(admPadres.getMadrePaisId(),"ORDER BY NOMBRE_ESTADO");
+		List<CatCiudad> lisCiudadMadre		= catCiudadDao.getLista(admPadres.getMadrePaisId(), admPadres.getMadreEstadoId(),"ORDER BY NOMBRE_CIUDAD");
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("existe", existe);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("admPadres", admPadres);
+		modelo.addAttribute("admParametros", admParametros);
+		modelo.addAttribute("lisPais", lisPais);
+		modelo.addAttribute("lisReligion", lisReligion);
+		modelo.addAttribute("lisEstadoPadre", lisEstadoPadre);
+		modelo.addAttribute("lisCiudadPadre", lisCiudadPadre);
+		modelo.addAttribute("lisEstadoMadre", lisEstadoMadre);
+		modelo.addAttribute("lisCiudadMadre", lisCiudadMadre);
+		
+		return "solicitud/padres";
+	}
+
+	@RequestMapping("/solicitud/grabarPadres")
+	public String solicitudGrabarPadres(HttpServletRequest request, Model modelo){
+		String mensaje 		= "0";
+		String folio 		= "0";
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmPadres admPadres = new AdmPadres();
+		admPadres.setFolio(folio);
+		admPadres.setVivePadre(request.getParameter("VivePadre")==null?"N":request.getParameter("VivePadre").trim().toUpperCase());
+		admPadres.setPadreNombre(request.getParameter("nombrePadre")==null?"":request.getParameter("nombrePadre").trim().toUpperCase());
+		admPadres.setPadreApellido(request.getParameter("apellidoPadre")==null?"":request.getParameter("apellidoPadre").trim().toUpperCase());
+		admPadres.setPadreReligion(request.getParameter("religionPadre")==null?"0":request.getParameter("religionPadre"));
+		admPadres.setPadreNacionalidad(request.getParameter("nacionalidadPadre")==null?"0":request.getParameter("nacionalidadPadre"));
+		admPadres.setPadrePaisId(request.getParameter("paisHogarPadre")==null?"0":request.getParameter("paisHogarPadre"));
+		admPadres.setPadreEstadoId(request.getParameter("estadoHogarPadre")==null?"0":request.getParameter("estadoHogarPadre"));
+		admPadres.setPadreCiudadId(request.getParameter("ciudadHogarPadre")==null?"0":request.getParameter("ciudadHogarPadre"));
+		admPadres.setPadreOcupacion(request.getParameter("ocupacionPadre")==null?"":request.getParameter("ocupacionPadre"));
+		admPadres.setPadreTipo(request.getParameter("padreTipo")==null?"B":request.getParameter("padreTipo"));
+		admPadres.setPadreResponsable(request.getParameter("padreResponsable")==null?"N":request.getParameter("padreResponsable"));
+		admPadres.setPadreTelefono(request.getParameter("telefonoPadre")==null?"":request.getParameter("telefonoPadre"));
+		
+		admPadres.setViveMadre(request.getParameter("ViveMadre")==null?"N":request.getParameter("ViveMadre").trim().toUpperCase());
+		admPadres.setMadreNombre(request.getParameter("nombreMadre")==null?"":request.getParameter("nombreMadre").trim().toUpperCase());
+		admPadres.setMadreApellido(request.getParameter("apellidoMadre")==null?"":request.getParameter("apellidoMadre").trim().toUpperCase());
+		admPadres.setMadreReligion(request.getParameter("religionMadre")==null?"0":request.getParameter("religionMadre"));
+		admPadres.setMadreNacionalidad(request.getParameter("nacionalidadMadre")==null?"0":request.getParameter("nacionalidadMadre"));
+		admPadres.setMadrePaisId(request.getParameter("paisHogarMadre")==null?"0":request.getParameter("paisHogarMadre"));
+		admPadres.setMadreEstadoId(request.getParameter("estadoHogarMadre")==null?"0":request.getParameter("estadoHogarMadre"));
+		admPadres.setMadreCiudadId(request.getParameter("ciudadHogarMadre")==null?"0":request.getParameter("ciudadHogarMadre"));
+		admPadres.setMadreOcupacion(request.getParameter("ocupacionMadre")==null?"":request.getParameter("ocupacionMadre"));
+		admPadres.setMadreTipo(request.getParameter("madreTipo")==null?"B":request.getParameter("madreTipo"));
+		admPadres.setMadreResponsable(request.getParameter("madreResponsable")==null?"N":request.getParameter("madreResponsable"));
+		admPadres.setMadreTelefono(request.getParameter("telefonoMadre")==null?"":request.getParameter("telefonoMadre"));
+		
+		if(!admPadresDao.existeReg(folio)){
+			if (admPadresDao.insertReg(admPadres)) mensaje = "1"; else mensaje = "2";
+		}else{
+			if (admPadresDao.updateReg(admPadres)) mensaje = "1"; else mensaje = "2";
+		}
+		
+		return "redirect:/solicitud/padres?Mensaje="+mensaje;
+	}
+	
+	@RequestMapping("/solicitud/familia")
+	public String solicitudFamilia(HttpServletRequest request, Model modelo){
+		String folio 				= "0";
+		boolean existeFamilia	 	= false;  
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		AdmFamilia admFamilia	= new AdmFamilia();
+		if (admFamiliaDao.existeReg(folio)){
+			admFamilia = admFamiliaDao.mapeaRegId(folio);
+			existeFamilia	 	= true;  
+		}
+		
+		modelo.addAttribute("admFamilia", admFamilia);
+		modelo.addAttribute("existeFamilia", existeFamilia);
+		
+		return "solicitud/familia";
+	}	
+	
+	@RequestMapping("/solicitud/grabarFamilia")
+	public String solicitudGrabarFamilia(HttpServletRequest request){		
+		String folio 				= "0";		  
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmFamilia admFamilia		= admFamiliaDao.mapeaRegId(folio);
+		
+		String hermanos	 	= request.getParameter("Hermanos")==null?"0":request.getParameter("Hermanos");
+		String ubiHermanos	= request.getParameter("UbiHermanos")==null?"0":request.getParameter("UbiHermanos");
+		String numFamilia 	= request.getParameter("NumFamilia")==null?"0":request.getParameter("NumFamilia");
+		String mensaje 		= "0";
+	 	
+		if(hermanos !=null && ubiHermanos !=null && numFamilia !=null){
+			admFamilia.setCodigo(folio);
+			admFamilia.setUbicacion(ubiHermanos);
+			admFamilia.setHermanos(hermanos);
+			admFamilia.setPersonas(numFamilia);
+			
+			if (admFamiliaDao.existeReg(folio)){
+				if (admFamiliaDao.updateReg(admFamilia)){
+					mensaje	= "1";						
+				}else {
+					mensaje = "2";
+				}
+			}else{
+				if (admFamiliaDao.insertReg(admFamilia)){
+					mensaje	= "1";					
+				}else {
+					mensaje = "3";
+				}
+			}
+		}
+		
+		return "redirect:/solicitud/familia?Mensaje="+mensaje;
+	}
+	
+	@RequestMapping("/solicitud/socioeconomico")
+	public String solicitudSocioeco(HttpServletRequest request, Model modelo){
+		String folio 				= "0";
+		boolean existeSocioeco	 	= false;  
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){		
+			folio 					= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		AdmSocioeco admSocio	= new AdmSocioeco();
+		if (admSocioecoDao.existeReg(folio)){
+			admSocio = admSocioecoDao.mapeaRegId(folio);
+			existeSocioeco	 	= true;  
+		}
+		
+		modelo.addAttribute("admSocio", admSocio);
+		modelo.addAttribute("existeSocioeco", existeSocioeco);
+		
+		return "solicitud/socioeconomico";
+	}
+	
+	@RequestMapping("/solicitud/grabarSocio")
+	public String solicitudGrabarSocio(HttpServletRequest request){
+		String mensaje 		= "0";
+		String folio 		= "0";
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		String banos 		= request.getParameter("Banos")==null?"0":request.getParameter("Banos");
+		String autos		= request.getParameter("Autos")==null?"0":request.getParameter("Autos");
+		String internet		= request.getParameter("Internet")==null?"N":request.getParameter("Internet");
+		String personas 	= request.getParameter("Personas")==null?"0":request.getParameter("Personas");
+		String cuartos		= request.getParameter("Cuartos")==null?"0":request.getParameter("Cuartos");
+		String ingreso 		= request.getParameter("Ingreso")==null?"0":request.getParameter("Ingreso");
+		
+		AdmSocioeco admSocio = new AdmSocioeco();
+		admSocio.setCodigo(folio);
+		admSocio.setBanos(banos);
+		admSocio.setAutos(autos);
+		admSocio.setInternet(internet);
+		admSocio.setPersonas(personas);
+		admSocio.setCuartos(cuartos);
+		admSocio.setIngreso(ingreso);
+		
+		if(!admSocioecoDao.existeReg(folio)){
+			if (admSocioecoDao.insertReg(admSocio)) mensaje = "1"; else mensaje = "2";
+		}else{
+			if (admSocioecoDao.updateReg(admSocio)) mensaje = "1"; else mensaje = "2";
+		}
+		
+		return "redirect:/solicitud/socioeconomico?Mensaje="+mensaje;
+	}
+	
+	@RequestMapping("/solicitud/recomendaciones")
+	public String solicitudRecomendaciones(HttpServletRequest request, Model modelo){
+		String folio = "0";		
+		HttpSession sesion		= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio 				= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}		
+		
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		AdmAcademico admAcademico	= new AdmAcademico();
+		AdmCartaSubir admCartaSubir	= new AdmCartaSubir();
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+
+		if (admAcademicoDao.existeReg(folio)){
+			admAcademico = admAcademicoDao.mapeaRegId(folio);
+		}
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		}
+		
+		String mensajeGrabo		= request.getParameter("Grabo") == null ? "N" : request.getParameter("Grabo");
+		String texto			= request.getParameter("Texto") == null ? "" : request.getParameter("Texto");
+		boolean existe 			= false;		
+		HashMap<String,AdmRecomienda> mapaRecomendaciones = admRecomiendaDao.mapaRecomendaciones(folio);
+		if (mapaRecomendaciones.size() >= 2) {
+			existe = true;
+		}
+		
+		
+		modelo.addAttribute("existe", existe);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("grabo", mensajeGrabo.equals("S") ? true : false);
+		modelo.addAttribute("texto", texto);
+		modelo.addAttribute("mapaRecomendaciones", mapaRecomendaciones);
+		
+		return "solicitud/recomendaciones";
+	}
+
+	@RequestMapping("/solicitud/grabaRecomendaciones")
+	public String solicitudGrabaRecomendaciones(HttpServletRequest request){
+		String prepa	= request.getParameter("Prepa")==null?"0":request.getParameter("Prepa");		
+		String folio 	= "0";
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		String texto = "";	
+		String grabo = "N";	
+		
+		boolean formCompleto 	= true;
+		boolean errorEmail		= false;
+		boolean errorTelefono	= false;
+		
+		AdmRecomienda recomienda = new AdmRecomienda();
+		
+		if(prepa.equals("0")) {
+			for(int i=1; i<=2; i++){
+				if(request.getParameter("Nombre"+i).equals("") || request.getParameter("Puesto"+i).equals("")
+						|| request.getParameter("Email"+i).equals("") || request.getParameter("Telefono"+i).equals("") || request.getParameter("Direccion"+i).equals("")){
+					formCompleto=false;
+					break;
+				}
+				
+				String email = request.getParameter("Email"+i);
+				if(!email.contains("@") || !email.substring(email.indexOf("@")).contains(".")){
+					errorEmail=true;
+					break;
+				}
+				
+				if(request.getParameter("Telefono"+i).length()<10){
+					errorTelefono=true;
+					break;
+				}
+			}
+			
+			if(formCompleto && !errorEmail){
+				recomienda.setFolio(folio);
+				
+				for(int i=1; i<=2; i++){
+					recomienda.setRecomendacionId(i+"");
+					recomienda.setNombre(request.getParameter("Nombre"+i));
+					recomienda.setPuesto(request.getParameter("Puesto"+i));
+					recomienda.setEmail(request.getParameter("Email"+i).toLowerCase());
+					recomienda.setTelefono(request.getParameter("Telefono"+i));
+					recomienda.setEstado("A");
+					recomienda.setDireccion(request.getParameter("Direccion"+i));
+					
+					if (admRecomiendaDao.existeReg(folio,i+"")){
+						if (admRecomiendaDao.updateReg(recomienda)){
+							grabo = "S";
+						}
+					}else{
+						if (admRecomiendaDao.insertReg(recomienda)){
+							grabo = "S";
+						}
+					}
+				}
+			} else{
+				if(formCompleto){
+					texto = "Invalid email, verify that your email is valid";	
+				} else if(errorTelefono){
+					texto = "Phone number not valid, it should be at least 10 characters";
+				} else{
+					texto = "Fill out all the fields of the referees before you continue";
+				}
+			}
+		}else {
+			for(int i=1; i<=2; i++){
+				recomienda.setFolio(folio);
+				recomienda.setRecomendacionId(i+"");
+				recomienda.setEmail("-");
+				
+				if (admRecomiendaDao.existeReg(folio,i+"")){
+					if (admRecomiendaDao.updateReg(recomienda)){
+						grabo = "S";
+					}
+				}else{
+					if (admRecomiendaDao.insertReg(recomienda)){
+						grabo = "S";
+					}
+				}
+			}
+		}
+		
+		return "redirect:/solicitud/recomendaciones?Grabo="+grabo+"&Texto="+texto;
+	}
+	
+	@RequestMapping("/solicitud/salud")
+	public String solicitudSalud(HttpServletRequest request, Model modelo){
+		
+		String folio 		= "0";
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();		
+		if (sesion!=null){
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		boolean existe		= false;
+		
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir = new AdmCartaSubir();
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);	
+		}
+		
+		AdmSalud admSalud = new AdmSalud();
+		
+		if(admSaludDao.existeReg(folio)){
+			admSalud = admSaludDao.mapeaRegId(folio);
+			existe = true;
+		}
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("admSalud", admSalud);
+		modelo.addAttribute("existe", existe);
+		
+		return "solicitud/salud";
+	}
+	
+	@RequestMapping("/solicitud/grabarSalud")
+	public String solicitudGrabarSalud(HttpServletRequest request){
+		
+		String folio 		= "0";
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		
+		if (sesion!=null){
+			folio 			= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		String grabo 		= "-";
+		
+		AdmSalud admSalud = new AdmSalud();	
+		admSalud.setFolio(folio);
+		admSalud.setEnfermedad(request.getParameter("Enfermedad")==null?"N":request.getParameter("Enfermedad"));
+		admSalud.setEnfermedadDato(request.getParameter("EnfermedadDato")==null?"-":request.getParameter("EnfermedadDato"));
+		admSalud.setImpedimento(request.getParameter("Impedimento")==null?"N":request.getParameter("Impedimento"));
+		admSalud.setImpedimentoDato(request.getParameter("ImpedimentoDato")==null?"-":request.getParameter("ImpedimentoDato"));
+			
+			if(admSaludDao.existeReg(folio)){
+				if(admSaludDao.updateReg(admSalud)){
+					grabo= "S";
+				}else {
+					grabo= "N";
+				}
+			}else{
+				if(admSaludDao.insertReg(admSalud)){
+					grabo= "S";
+				}else {
+					grabo= "N";
+				}
+			}
+
+		return "redirect:/solicitud/salud?Grabo="+grabo;
+	}
+	
+	@RequestMapping("/solicitud/solicitudAccion")
+	@ResponseBody
+	public String solicitudSolicitudAccion(HttpServletRequest request){
+		
+		int accion 			= Integer.parseInt(request.getParameter("Accion")==null?"0":request.getParameter("Accion"));		
+		String paisId 		= request.getParameter("paisId")==null?"0":request.getParameter("paisId");
+		String estadoId		= request.getParameter("estadoId")==null?"0":request.getParameter("estadoId");
+		String mensaje 		= "<option value='0' selected>Select...</option>";
+		
+		switch(accion){
+			case 5:{// Muestra los estados							
+				List<CatEstado> lisEstados	= catEstadoDao.getLista( paisId, " ORDER BY NOMBRE_ESTADO");				
+				if (lisEstados.size()>0){					
+					for(CatEstado catEstado : lisEstados){						
+						mensaje += "<option value='"+catEstado.getEstadoId()+"'>"+catEstado.getNombreEstado()+"</option>";
+					}	
+				}else{
+					mensaje = "<option value='0'>Not recorded...</option>";
+				}			
+			}break;
+			case 6:{//Muestra las ciudades				
+				List<CatCiudad> lisCiudades	= catCiudadDao.getLista(paisId, estadoId, " ORDER BY NOMBRE_CIUDAD");
+				if (lisCiudades.size()>0){					
+					for(CatCiudad catCiudad : lisCiudades){						
+						mensaje += "<option value='"+catCiudad.getCiudadId()+"'>"+catCiudad.getNombreCiudad()+"</option>";
+					}				
+				}else{
+					mensaje = "<option value='0'>Not recorded...</option>";
+				}
+			}break;
+		}				
+		return mensaje;
+	}
+	
+	@RequestMapping("/solicitud/getEstados")
+	@ResponseBody
+	public String solicitudGetEstados(HttpServletRequest request){
+		String paisId 					= request.getParameter("paisId")==null?"0":request.getParameter("paisId");	
+		String mensaje					= "<option value='0' selected>Select...</option>";		
+		List<CatEstado> lisEstados 		= catEstadoDao.getLista(paisId," ORDER BY 1,3");		
+		for(CatEstado edo: lisEstados){
+			mensaje+= "<option value='"+edo.getEstadoId()+"'>"+ edo.getNombreEstado()+"</option>";
+		}	
+		return mensaje;
+	}
+	
+	@RequestMapping("/solicitud/getCiudades")
+	@ResponseBody
+	public String solicitudGetCiudades(HttpServletRequest request){
+		String paisId 				= request.getParameter("paisId")==null?"0":request.getParameter("paisId");	
+		String estadoId 			= request.getParameter("estadoId")==null?"0":request.getParameter("estadoId");
+		String mensaje 				= "<option value='0' selected>Select...</option>"; 
+		List<CatCiudad> lisCiudades = catCiudadDao.getLista(paisId, estadoId," ORDER BY 4");
+		
+		for(CatCiudad ciudad: lisCiudades){
+			mensaje +=" <option value='"+ciudad.getCiudadId()+"'>"+ ciudad.getNombreCiudad()+"</option>";
+		}		
+		return mensaje;
+	}
+
+	@RequestMapping("/solicitud/getRegiones")
+	@ResponseBody
+	public String solicitudGetRegiones(HttpServletRequest request){
+		String CulturalId 				= request.getParameter("CulturalId")==null?"0":request.getParameter("CulturalId");	
+		List<CatRegion> lisRegiones 	= catRegionDao.getLista(CulturalId," ORDER BY NOMBRE_REGION");
+		String mensaje 					= "<option value='0' selected>Select...</option>"; 
+		
+		for(CatRegion region: lisRegiones){
+			mensaje +=" <option value='"+region.getRegionId()+"'>"+ region.getNombreRegion()+"</option>";
+		}		
+		return mensaje;
+	}
+	
+	@RequestMapping("/solicitud/tutor")
+	public String solicitudTutor(HttpServletRequest request, Model modelo){
+		
+		String usuarioId 			= "0";	
+		String folio 				= "0";
+		HttpSession sesion			= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			usuarioId 	= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+			folio 		= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		AdmTutor tutor 				= new AdmTutor();
+		AdmAcademico academico 		= admAcademicoDao.mapeaRegId(folio);
+		AdmPadres padres			= admPadresDao.mapeaRegId(folio);
+		AdmUsuario admUsuario		= admUsuarioDao.mapeaRegId(usuarioId);
+		AdmSolicitud admSolicitud		= admSolicitudDao.mapeaRegId(folio);
+		AdmCartaSubir admCartaSubir	= new AdmCartaSubir();
+		AdmParametros admParametros = admParametrosDao.getAll(" ORDER BY ID").get(0);
+		
+		boolean existeTutor = false;		
+		if(admTutorDao.existeReg(folio)) {
+			tutor 					= admTutorDao.mapeaRegId(folio);
+			existeTutor 			= true;
+		}
+		
+		String paisId = tutor.getPaisId().equals("0") ? admParametros.getPaisId() : tutor.getPaisId();
+		String estadoId = tutor.getEstadoId() == null ? "1" : tutor.getEstadoId();
+		
+		List<CatPais> lisPais		= catPaisDao.getListAll(" ORDER BY NOMBRE_PAIS");
+		List<CatEstado> lisEstados	= catEstadoDao.getLista(paisId, " ORDER BY NOMBRE_ESTADO");
+		List<CatCiudad> lisCiudades	= catCiudadDao.getLista(paisId, estadoId, " ORDER BY NOMBRE_CIUDAD");
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("tutor", tutor);
+		modelo.addAttribute("academico", academico);
+		modelo.addAttribute("admCartaSubir", admCartaSubir);
+		modelo.addAttribute("padres", padres);
+		modelo.addAttribute("admUsuario", admUsuario);
+		modelo.addAttribute("admSolicitud", admSolicitud);
+		modelo.addAttribute("admParametros", admParametros);
+		modelo.addAttribute("lisPais", lisPais);
+		modelo.addAttribute("lisEstados", lisEstados);
+		modelo.addAttribute("lisCiudades", lisCiudades);
+		modelo.addAttribute("existeTutor", existeTutor);
+		
+		return "solicitud/tutor";
+	}
+
+	@RequestMapping("/solicitud/grabaTutor")
+	public String solicitudGrabaTutor(HttpServletRequest request){
+		String folio = "0";
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio 	= (String)sesion.getAttribute("Folio")==null?"0":(String)sesion.getAttribute("Folio");
+		}
+		
+		String grabo = "-";
+		String tutor = request.getParameter("tutor")==null?"0":request.getParameter("tutor");
+		
+		AdmTutor admTutor 	= new AdmTutor();
+		
+		admTutor.setFolio(folio);
+		admTutor.setTutor(tutor);
+		if(tutor.equals("2")){
+			admTutor.setNombre(request.getParameter("nombreTutor").trim().toUpperCase());
+		}
+		admTutor.setCalle(request.getParameter("calleTutor"));
+		admTutor.setNumero(request.getParameter("numeroTutor").trim().toUpperCase());
+		admTutor.setColonia(request.getParameter("coloniaTutor"));
+		admTutor.setCodigoPostal(request.getParameter("codigoPostalTutor"));
+		admTutor.setPaisId(request.getParameter("nacPais"));
+		
+		// if(!request.getParameter("nacPais").equals(admParametrosDao.getAll(" ORDER BY ID").get(0).getPaisId())){
+		// 	admTutor.setEstado(request.getParameter("Estado")==null?"-":request.getParameter("Estado"));
+		// 	admTutor.setCiudad(request.getParameter("Ciudad")==null?"-":request.getParameter("Ciudad"));
+		// }else{
+			admTutor.setEstadoId(request.getParameter("nacEdo"));
+			// admTutor.setEstado(request.getParameter("Estado"));
+			admTutor.setCiudadId(request.getParameter("nacCiudad"));
+			// admTutor.setCiudad(request.getParameter("Ciudad"));
+		// }
+		
+		admTutor.setTelefono(request.getParameter("telefonoTutor"));
+		
+		if(!admTutorDao.existeReg(folio)){
+			if (admTutorDao.insertReg(admTutor)) {
+				grabo = "S";
+			}else {
+				grabo = "N";
+			}
+		}else if(admTutorDao.updateReg(admTutor)) {
+			grabo = "S";
+		}else {
+			grabo = "N";
+		}
+		
+		return "redirect:/solicitud/tutor?Grabo="+grabo;
+	}
+	
+	@RequestMapping("/solicitud/ubicacion")
+	public String solicitudUbicacion(HttpServletRequest request){
+		enviarConSalomon(request,"Error-adm.ControllerSolicitud|solicitudUbicacion:");
+		return "solicitud/ubicacion";
+	}
+	
+}

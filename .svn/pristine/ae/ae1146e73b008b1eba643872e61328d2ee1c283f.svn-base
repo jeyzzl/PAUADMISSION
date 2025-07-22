@@ -1,0 +1,20 @@
+<head>
+<title>Sistema de Admisi&oacute;n</title>
+<link rel="SHORTCUT ICON" href="imagenes/iconAd.ico">
+<style type="text/css">
+	body{
+		margin-left: 0px;
+		margin-top: 0px;
+		margin-right: 0px;
+		margin-bottom: 0px;
+		scroll: no;
+	}
+	
+	html{
+		overflow: hidden;
+	}
+</style>
+</head>
+<body>
+	<iframe name="principal" src="principal" height="100%" width="100%" frameborder="no"></iframe>
+</body>

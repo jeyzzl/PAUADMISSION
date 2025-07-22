@@ -1,0 +1,605 @@
+package adm;
+
+import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import adm.alumno.spring.*;
+import adm.catalogo.spring.CatCarreraDao;
+import adm.catalogo.spring.CatNivelDao;
+import adm.documento.spring.AdmArchivo;
+import adm.documento.spring.AdmArchivoDao;
+import adm.documento.spring.AdmDocAlum;
+import adm.documento.spring.AdmDocAlumDao;
+import adm.documento.spring.AdmDocumento;
+import adm.documento.spring.AdmDocumentoDao;
+import adm.documento.spring.AdmFormato;
+import adm.documento.spring.AdmFormatoDao;
+import adm.documento.spring.AdmImagen;
+import adm.documento.spring.AdmImagenDao;
+import adm.documento.spring.AdmRequisito;
+import adm.documento.spring.AdmRequisitoDao;
+import adm.parametros.spring.AdmParametros;
+import adm.parametros.spring.AdmParametrosDao;
+
+@Controller
+public class ControllerDocumentos {
+
+    // private final AdmAcomodoDao admAcomodoDao;
+	
+	@Autowired
+	@Qualifier("dataSourceSalomon")
+	private DataSource salomon;
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	@Autowired
+	private AdmArchivoDao admArchivoDao;
+	
+	@Autowired
+	private AdmImagenDao admImagenDao;
+	
+	@Autowired
+	private AdmDocAlumDao admDocAlumDao;
+	
+	@Autowired	
+	private AdmSolicitudDao admSolicitudDao;
+	
+	@Autowired	
+	private AdmAcademicoDao admAcademicoDao;
+	
+	@Autowired	
+	private AdmRequisitoDao admRequisitoDao;
+	
+	@Autowired	
+	private AdmFormatoDao admFormatoDao;
+	
+	@Autowired	
+	private AdmDocumentoDao admDocumentoDao;
+
+	@Autowired
+	private AdmProcesoDao admProcesoDao;
+	
+	@Autowired	
+	private CatNivelDao catNivelDao;
+	
+	@Autowired	
+	private CatCarreraDao catCarreraDao;
+	
+	@Autowired	
+	private AdmCartaSubirDao admCartaSubirDao;
+
+	@Autowired
+	private AdmParametrosDao admParametrosDao;
+
+	@Autowired
+	private AdmUsuarioDao admUsuarioDao;
+
+	
+	
+	public void enviarConSalomon(HttpServletRequest request, String url){
+		// Enviar de la conexión
+		try{ 
+			request.setAttribute("conSalomon", salomon.getConnection());
+		}catch(Exception ex){ 
+			System.out.println(url+" "+ex);
+		}
+	}
+	
+	@RequestMapping("/documentos/documentos")
+	public String documentosDocumentos(HttpServletRequest request, Model model){
+		String usuarioId 	= "";
+		String folio 		= "";			
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			usuarioId 				= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+			folio			= (String) sesion.getAttribute("Folio");
+		}
+
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		if (admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		}
+
+		AdmUsuario admUsuario 			= admUsuarioDao.mapeaRegId(usuarioId);
+		AdmAcademico admAcademico 		= new AdmAcademico();
+		AdmCartaSubir admCartaSubir 	= new AdmCartaSubir();
+		AdmParametros admParametros 	= admParametrosDao.mapeaRegId("1");
+
+		String nivelNombre		= "-";
+		String carreraNombre	= "-";
+		if (admAcademicoDao.existeReg(folio)) {
+			admAcademico 		= admAcademicoDao.mapeaRegId(folio);
+			nivelNombre 		= catNivelDao.getNivelNombre(admAcademico.getNivelId());
+			carreraNombre 		= catCarreraDao.getNombreCarrera(admAcademico.getCarreraId());
+		}
+		
+		List<AdmRequisito> lisRequisitos = admRequisitoDao.getLista( admAcademico.getCarreraId(), "ORDER BY SALOMON.DOCUMENTO_NOMBRE(DOCUMENTO_ID),SALOMON.ADM_DOCTIPO(DOCUMENTO_ID)");		
+		
+		HashMap<String, AdmDocumento> mapDocumentos			= admDocumentoDao.mapDocumentos();
+		HashMap<String, AdmFormato> mapFormatos				= admFormatoDao.mapFormatos();
+		HashMap<String, String> mapImagen					= admImagenDao.mapImagen(folio);
+		HashMap<String, String> mapArchivo					= admArchivoDao.mapArchivo(folio);
+		HashMap<String, AdmDocAlum> mapDocAlum				= admDocAlumDao.mapDocumentosAlumno(folio);
+
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+
+		boolean esEmpleado = admUsuario.getEmpleado().equals("S") ? true : false;
+		boolean esOtros = admUsuario.getInstitucionId().equals("1") ? true : false;
+		
+		model.addAttribute("admSolicitud",admSolicitud);
+		model.addAttribute("admAcademico",admAcademico);
+		model.addAttribute("admUsuario",admUsuario);
+		model.addAttribute("admParametros", admParametros);
+		model.addAttribute("admCartaSubir",admCartaSubir);
+		model.addAttribute("nivelNombre",nivelNombre);
+		model.addAttribute("carreraNombre",carreraNombre);
+		model.addAttribute("lisRequisitos",lisRequisitos);				
+		model.addAttribute("mapImagen",mapImagen);		
+		model.addAttribute("mapArchivo",mapArchivo);		
+		model.addAttribute("mapDocumentos",mapDocumentos);
+		model.addAttribute("mapDocAlum",mapDocAlum);
+		model.addAttribute("mapFormatos",mapFormatos);
+		model.addAttribute("esEmpleado",esEmpleado);
+		model.addAttribute("esOtros",esOtros);
+		
+		return "documentos/documentos";
+	}
+
+	@RequestMapping("/documentos/archivo")
+	public String documentosArchivo(HttpServletRequest request, Model modelo){
+		
+		adm.documento.spring.AdmArchivo archivo = new adm.documento.spring.AdmArchivo();
+		String folio 			= ""; 
+		String documentoId		= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");		
+		String esImagen			= request.getParameter("esImagen")==null?"0":request.getParameter("esImagen");		
+		String vacio			= request.getParameter("Vacio")==null?"0":request.getParameter("Vacio");		
+		boolean existeArchivo	= false;
+		String nombreArchivo	= "X";
+		String nombreDocumento	= admDocumentoDao.getNombreDocumento(documentoId);
+		AdmParametros admParametros = admParametrosDao.mapeaRegId("1");
+
+		HttpSession sesion		= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio				= (String) sesion.getAttribute("Folio");
+		}		
+		AdmDocAlum docAlum 			= new AdmDocAlum();				
+		AdmCartaSubir admCartaSubir = new AdmCartaSubir();	
+		
+		String estado 			= "X";
+		
+		if (admDocAlumDao.existeReg(folio, documentoId)){
+			docAlum = admDocAlumDao.mapeaRegId(folio, documentoId);
+			estado = docAlum.getEstado();			
+		}
+		
+		AdmSolicitud admSolicitud = new AdmSolicitud();
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		}
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		try {						
+			if(admArchivoDao.existeReg(folio, documentoId)){
+				archivo = admArchivoDao.mapeaRegId(folio, documentoId);
+				existeArchivo = true;
+				nombreArchivo = archivo.getNombre();
+			}
+		}catch(Exception ex){
+			System.out.println("Error:documentosArchivo:"+ex);
+		}		
+		modelo.addAttribute("existeArchivo",existeArchivo);
+		modelo.addAttribute("admCartaSubir",admCartaSubir);
+		modelo.addAttribute("admParametros", admParametros);
+		modelo.addAttribute("estado",estado);
+		modelo.addAttribute("nombreArchivo",nombreArchivo);
+		modelo.addAttribute("nombreDocumento",nombreDocumento);
+		modelo.addAttribute("esImagen",esImagen);
+		modelo.addAttribute("vacio",vacio);
+		modelo.addAttribute("admSolicitud",admSolicitud);
+		
+		return "documentos/archivo";
+	}
+	
+	@PostMapping("/documentos/guardararchivo")
+	public String documentosGuardarArchivo(@RequestParam("archivo") MultipartFile file, HttpServletRequest request){
+		adm.documento.spring.AdmArchivo archivo = new adm.documento.spring.AdmArchivo();
+		String folio 			= ""; 
+		String mensajeImagen 	= "0";
+		boolean esPdf 			= false; 
+		boolean esImagen		= false;
+		boolean esDoc 			= false;
+		String vacio 			= "0"; 
+		String documentoId		= request.getParameter("documentoId");				
+		HttpSession sesion		= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}
+		boolean grabo 		= false;
+		AdmDocAlum docAlum = new AdmDocAlum();
+		AdmAcademico admAcademico = admAcademicoDao.mapeaRegId(folio);
+		AdmSolicitud admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		try {
+			archivo.setFolio(folio);
+			archivo.setDocumentoId(documentoId);
+			archivo.setNombre( file.getOriginalFilename() );
+			archivo.setArchivo(file.getBytes());
+			archivo.setFecha(adm.util.Fecha.getHoy());
+			
+			if (file.getOriginalFilename().toLowerCase().contains(".pdf")) esPdf = true;
+			if (file.getOriginalFilename().toLowerCase().contains(".doc") || file.getOriginalFilename().toLowerCase().contains(".docx") || file.getOriginalFilename().toLowerCase().contains(".rtf") ) esDoc = true;
+			if (file.getOriginalFilename().toLowerCase().contains(".png") || file.getOriginalFilename().toLowerCase().contains(".jpg") || file.getOriginalFilename().toLowerCase().contains(".jpeg") || file.getOriginalFilename().toLowerCase().contains(".tiff")) esImagen = true;
+			
+			if(esPdf || esDoc || esImagen) {
+				if(admArchivoDao.existeReg(folio, documentoId)){
+					admArchivoDao.updateReg(archivo);
+					grabo = true;
+				}else{
+					admArchivoDao.insertReg(archivo);
+					grabo = true;
+				}
+				
+				if (grabo){
+					// Actualiza la fecha que refleja la actividad del alumno 
+					admSolicitudDao.updateFecha(folio);
+					docAlum.setFolio(folio);
+					docAlum.setDocumentoId(documentoId);
+					docAlum.setEstado("E");
+					docAlum.setCarta("S");
+					docAlum.setComentario("-");
+					docAlum.setUsuario("-");
+					if (admDocAlumDao.existeReg(folio, documentoId)){
+						admDocAlumDao.updateReg(docAlum);
+					}else{
+						admDocAlumDao.insertReg(docAlum);
+					}
+				}
+			} else {
+				mensajeImagen = "1";
+				vacio = "1";
+			}
+
+		}catch(Exception ex){
+			System.out.println("Error uploading documents.");
+		}
+		
+		return "redirect:/documentos/archivo?documentoId="+documentoId+"&esImagen="+mensajeImagen+"&Vacio="+vacio;
+	}
+
+	@RequestMapping("/documentos/confirmardocumentos")
+	public String documentosConfirmarDocumentos(HttpServletRequest request, Model modelo){
+		String folio 			= "";
+		String usuarioId 		= ""; 
+		// System.out.println("ENTRE");
+
+		HttpSession sesion		= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+			usuarioId 				= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
+
+		}
+
+		AdmAcademico admAcademico = admAcademicoDao.mapeaRegId(folio);
+		AdmSolicitud admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		AdmUsuario admUsuario  	  = admUsuarioDao.mapeaRegId(usuarioId);
+		
+		List<AdmRequisito> lisRequisitos = admRequisitoDao.getListaRequisitos(admAcademico.getCarreraId(), admAcademico.getModalidad(), admSolicitud.getNivelEstudio(), admSolicitud.getTipo(), admSolicitud.getTipoAplicante(), admSolicitud.getEstadoCivil(), "");
+		HashMap<String,AdmDocAlum> mapDocumentosAlumno = admDocAlumDao.mapDocumentosAlumno(folio);
+		boolean docCompletos = false;
+
+		if(lisRequisitos.size() <= mapDocumentosAlumno.size()){
+			for(AdmRequisito req : lisRequisitos){
+				if(mapDocumentosAlumno.containsKey(folio+req.getDocumentoId())){
+					docCompletos = true;
+				}else{
+					docCompletos = false;
+				}
+			}				
+		}
+
+		if(admUsuario.getEmpleado().equals("S")){
+			if(admUsuario.getInstitucionId().equals("1")){
+				if(!mapDocumentosAlumno.containsKey(folio+"23")){
+					docCompletos = false;
+				}
+			}else{
+				if(!mapDocumentosAlumno.containsKey(folio+"22")){
+					docCompletos = false;
+				}
+				if(!mapDocumentosAlumno.containsKey(folio+"23")){
+					docCompletos = false;
+				}
+			}	
+		}
+
+		// System.out.println(lisRequisitos.size()+":"+mapDocumentosAlumno.size()+":"+docCompletos);
+		
+		String completos = "N"; 
+		String grabo = "N";
+
+		if(docCompletos){
+			completos = "S";
+			grabo = "S";
+			if(admSolicitudDao.updateEstadoAndFecha(folio, "3")){
+				if(admProcesoDao.updateFecha(3,folio)){
+					return "redirect:/documentos/documentos?Completos="+completos+"&Grabo="+grabo;
+				}
+			}
+		}
+
+		return "redirect:/documentos/documentos?Completos="+completos;
+	}		
+
+	@RequestMapping("/documentos/apostilla")
+	public String documentosApostilla(HttpServletRequest request, Model model){
+		//enviarConSalomon(request,"Error-adm.ControllerDocumentos|documentosApostilla:");
+		return "documentos/apostilla";
+	}
+	
+	@RequestMapping("/documentos/bajar")
+	public String documentosBajar(HttpServletRequest request, Model model){		
+		return "documentos/bajar";
+	}
+	
+	@RequestMapping("/documentos/enviar")
+	public String documentosEnviar(HttpServletRequest request, Model model){
+		//enviarConSalomon(request,"Error-adm.ControllerDocumentos|documentosApostilla:");
+		return "documentos/enviar";
+	}
+	
+	@RequestMapping("/documentos/guardar")
+	public String documentosGuardar(HttpServletRequest request, Model model){
+		//enviarConSalomon(request,"Error-adm.ControllerDocumentos|documentosApostilla:");
+		return "documentos/guardar";
+	}	
+	
+	@RequestMapping("/documentos/reglamento")
+	public String documentosReglamento(HttpServletRequest request, Model model){
+		//enviarConSalomon(request,"Error-adm.ControllerDocumentos|documentosApostilla:");
+		return "documentos/reglamento";
+	}
+	
+	@RequestMapping("/documentos/subir")
+	public String documentosSubir(HttpServletRequest request, Model modelo){
+		
+		String documentoId 	= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");
+		String documentoNombre = admDocumentoDao.getNombreDocumento(documentoId);
+		modelo.addAttribute("documentoNombre", documentoNombre);
+		
+		return "documentos/subir";
+	}
+	
+	@RequestMapping("/documentos/subirArchivo")
+	public String documentosSubirArchivo(HttpServletRequest request, Model modelo){
+		
+		String documentoId 	= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");
+		String documentoNombre = admDocumentoDao.getNombreDocumento(documentoId);
+		modelo.addAttribute("documentoNombre", documentoNombre);
+		
+		return "documentos/subirArchivo";
+	}	
+	
+	@RequestMapping("/documentos/imagen")
+	public String documentosImagen(HttpServletRequest request, Model modelo){		
+		String folio 			= ""; 
+		String documentoId		= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");
+		String hoja				= request.getParameter("hoja")==null?"0":request.getParameter("hoja");
+		String esImagen			= request.getParameter("esImagen")==null?"0":request.getParameter("esImagen");
+		String documentoNombre	= admDocumentoDao.getNombreDocumento(documentoId);
+		boolean existeImagen= false;		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}	
+		
+		AdmSolicitud admSolicitud 	= new AdmSolicitud();
+		AdmCartaSubir admCartaSubir = new AdmCartaSubir();
+		
+		if(admSolicitudDao.existeReg(folio)) {
+			admSolicitud = admSolicitudDao.mapeaRegId(folio);
+		}
+		
+		AdmDocAlum docAlum 	= new AdmDocAlum();
+		AdmImagen imagen 	= new AdmImagen();
+		byte imagenByte[] = null;
+		String estado 		= "X";
+		
+		if (admDocAlumDao.existeReg(folio, documentoId)){
+			docAlum = admDocAlumDao.mapeaRegId(folio, documentoId);
+			estado = docAlum.getEstado();
+		}
+		try {						
+			if(admImagenDao.existeReg(folio, documentoId, hoja)){
+				imagen = admImagenDao.mapeaRegId(folio, documentoId, hoja);
+				imagenByte = imagen.getImagen();
+				existeImagen = true;
+			}else{
+				imagen = admImagenDao.mapeaRegId("0", "0", "0");
+				imagenByte = imagen.getImagen();
+			}	
+		}catch(Exception ex){
+			System.out.println("Error:documentosImagen:"+ex);
+		}
+		
+		if (admCartaSubirDao.existeReg(folio)){
+			admCartaSubir = admCartaSubirDao.mapeaRegId(folio);
+		}
+		
+		modelo.addAttribute("imagenByte",imagenByte);
+		modelo.addAttribute("admCartaSubir",admCartaSubir);
+		modelo.addAttribute("existeImagen",existeImagen);
+		modelo.addAttribute("estado",estado);
+		modelo.addAttribute("documentoNombre",documentoNombre);
+		modelo.addAttribute("esImagen",esImagen);
+		modelo.addAttribute("admSolicitud",admSolicitud);
+		
+		return "documentos/imagen";
+	}
+	
+	@PostMapping("/documentos/guardarimagen")
+	public String documentosGuardarImagen(@RequestParam("imagen") MultipartFile file, HttpServletRequest request){
+		adm.documento.spring.AdmImagen imagen = new adm.documento.spring.AdmImagen();
+		String folio 			= ""; 
+		String documentoId		= request.getParameter("documentoId");
+		String hoja				= request.getParameter("hoja");
+		String mensajeImagen	= "";
+		boolean esImagen		= false;
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}
+		boolean grabo 		= false;
+		AdmDocAlum docAlum = new AdmDocAlum();		
+		try {			
+			imagen.setFolio(folio);
+			imagen.setDocumentoId(documentoId);
+			imagen.setHoja(hoja);
+			imagen.setImagen(file.getBytes());
+			imagen.setFecha(adm.util.Fecha.getHoy());
+			
+			// Verifica que el archivo sea una imagen con extension jgp o png
+			if (file.getOriginalFilename().toLowerCase().contains(".jpg")||file.getOriginalFilename().toLowerCase().contains(".png")||file.getOriginalFilename().toLowerCase().contains(".jepg")) esImagen = true;
+			
+			if (esImagen){
+				if(admImagenDao.existeReg(folio, documentoId, hoja) && esImagen){
+					admImagenDao.updateReg(imagen);
+					grabo = true;
+				}else if (esImagen){
+					admImagenDao.insertReg(imagen);
+					grabo = true;
+				}
+				
+				if (grabo){
+					
+					// Actualiza la fecha que refleja la actividad del alumno 
+					admSolicitudDao.updateFecha(folio);
+					
+					docAlum.setFolio(folio);
+					docAlum.setDocumentoId(documentoId);
+					docAlum.setEstado("E");
+					docAlum.setCarta("S");
+					docAlum.setComentario("-");
+					docAlum.setUsuario("-");
+					if (admDocAlumDao.existeReg(folio, documentoId)){
+						admDocAlumDao.updateReg(docAlum);
+					}else{
+						admDocAlumDao.insertReg(docAlum);
+					}
+				}
+			}else {
+				mensajeImagen = "1";
+			}
+		}catch(Exception ex){
+			
+		}
+		
+		return "redirect:/documentos/imagen?documentoId="+documentoId+"&hoja="+hoja+"&esImagen="+mensajeImagen;
+	}	
+	
+	@RequestMapping("/documentos/borrarimagen")
+	public String documentosBorrarImagen(HttpServletRequest request, Model modelo){		
+		String folio 		= ""; 
+		String documentoId	= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");
+		String hoja			= request.getParameter("hoja")==null?"0":request.getParameter("hoja");
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}	
+		try {			
+			if(admImagenDao.existeReg(folio, documentoId, hoja)){
+				admImagenDao.deleteReg(folio, documentoId, hoja);
+			}
+			// Verificar si ya no hay imagenes o archivos
+			if (admImagenDao.tieneImagenes(folio, documentoId)==false && admArchivoDao.tieneArchivos(folio, documentoId)==false){
+				admDocAlumDao.updateEstado(folio, documentoId, "N");
+			}
+		}catch(Exception ex){
+			System.out.println("Error:documentosBorrarImagen:"+ex);
+		}
+		
+		return "redirect:/documentos/imagen?documentoId="+documentoId+"&hoja="+hoja;
+	}
+	
+	@RequestMapping("/documentos/borrararchivo")
+	public String documentosBorrarArchivo(HttpServletRequest request, Model modelo){		
+		String folio 		= ""; 
+		String documentoId	= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}	
+		try {			
+			if(admArchivoDao.existeReg(folio, documentoId)){
+				admArchivoDao.deleteReg(folio, documentoId);
+				admDocAlumDao.deleteReg(folio, documentoId);
+			}
+			
+			// Verificar si ya no hay imagenes o archivos
+			if (admImagenDao.tieneImagenes(folio, documentoId)==false && admArchivoDao.tieneArchivos(folio, documentoId)==false){
+				// admDocAlumDao.updateEstado(folio, documentoId, "E");
+			}
+		}catch(Exception ex){
+			System.out.println("Error:documentosBorrarArchivo:"+ex);
+		}
+		
+		return "redirect:/documentos/archivo?documentoId="+documentoId;		
+	}
+	
+	@RequestMapping("/documentos/ayudaescaner")
+	public String documentosAyudaEscaner(HttpServletRequest request, Model model){		
+		return "documentos/ayudaescaner";
+	}	
+	
+	@RequestMapping("/documentos/descargarPDF")
+	public void documentosDescargarPdf(HttpServletResponse response, HttpServletRequest request){
+		String folio 		= ""; 
+		String documentoId	= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");
+		
+		HttpSession sesion	= ((HttpServletRequest)request).getSession();
+		if (sesion!=null){
+			folio			= (String) sesion.getAttribute("Folio");
+		}	
+		
+		AdmArchivo admArchivo = new AdmArchivo();
+		
+		if(admArchivoDao.existeReg(folio, documentoId)){
+			admArchivo = admArchivoDao.mapeaRegId(folio, documentoId);
+		}
+		
+		try {
+			response.setContentType("application/octet-stream");
+			response.setHeader("Content-Disposition","attachment; filename=\""+admArchivo.getNombre()+ "\"");
+			response.getOutputStream().write(admArchivo.getArchivo());
+			response.flushBuffer();
+		} catch (IOException e) {
+			System.out.println("ERROR");
+			e.printStackTrace();
+		}
+	}
+	
+}

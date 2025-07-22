@@ -1,0 +1,590 @@
+<%@page import="java.util.List"%>
+
+<%@page import="adm.alumno.spring.AdmUsuario"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmAcademico"%>
+<%@page import="adm.catalogo.spring.CatPais"%>
+<%@page import="adm.catalogo.spring.CatEstado"%>
+<%@page import="adm.catalogo.spring.CatCiudad"%>
+<%@page import="adm.catalogo.spring.CatReligion"%>
+<%@page import="adm.catalogo.spring.CatCultural"%>
+<%@page import="adm.catalogo.spring.CatRegion"%>
+<%@page import="adm.catalogo.spring.CatInstitucion"%>
+<%@page import="adm.alumno.spring.AdmCartaSubir"%>
+<%@page import="adm.parametros.spring.AdmParametros"%>
+
+<%@ include file= "../head.jsp"%>
+<%@ include file= "../menu.jsp"%>
+
+<link rel="stylesheet" href="<%=request.getContextPath()%>/js/datepicker/datepicker.css" />
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/datepicker/datepicker.js"></script>
+
+<head> 
+	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
+	<script src="../../js/jquery-1.5.1.min.js" type="text/javascript"></script>
+  	<script src='../../js/Globo/jquery.tinyTips2.js' type='text/javascript'></script>		
+	<style>		
+		body{
+			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");
+			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+			background-position: center center;
+			/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			/* La imagen de fondo se reescala autom�icamente con el cambio del ancho de ventana del navegador */
+			background-size: cover;	
+		} 
+		a {text-decoration: none;} 
+		a:hover {text-decoration: underline;} 
+		.tabla td{padding:5px;}
+		
+		.tinyTip {
+			width: 325px;
+			padding: 17px 0px 0px 0px;
+			display: block;
+			background: url(js/Globo/tinyTip-top.png) 0px 0px no-repeat;
+		}
+		.tinyTip .content {
+			padding: 0px 15px 0px 15px;
+			font-size: 14px;
+			font-family: "Lucida Sans Unicode";
+			color: #010101;
+			background: url(js/Globo/tinyTip-content.png) 0px 0px repeat-y;
+		}
+		.tinyTip .bottom {
+			height: 47px;
+			background: url(js/Globo/tinyTip-bottom.png) 0px 0px no-repeat;
+			font: 0px/0px sans-serif;
+		}
+		.fa{
+			color: black;
+		}
+		a> .fa{
+			color: #337ab7;
+		}
+		
+		@media (min-width: 587px) {
+			.col-md-3{
+				float: left;
+				margin-left: 85px;
+			}
+		}
+		@media (min-width: 764px) {
+			.col-md-3{
+				float: left;
+				margin-left: 0;
+			}		
+		}
+		@media (min-width: 480px) {
+			.col-md-5{
+				float: left;
+			}
+		}	
+	</style>
+			
+	<script type="text/javascript">
+	
+		window.onload = function() {
+			document.getElementById("divMexico").style.display = "block";
+			document.getElementById("divNoMexico").style.display = "none";
+		};
+
+		function revisa(){
+			var nombre          = document.getElementById("Nombre");
+			var paterno         = document.getElementById("Paterno");
+			var materno         = document.getElementById("Materno");
+			var fecha           = document.getElementById("Fecha");
+
+			var nacPais         = document.getElementById("nacPais");
+			var nacEdo          = document.getElementById("nacEdo");
+			var nacCiudad       = document.getElementById("nacCiudad");
+			var resPais         = document.getElementById("ResPaisId");
+			var resEdo          = document.getElementById("ResEstadoId");
+			var resCiudad       = document.getElementById("ResCiudadId");
+			var cultural        = document.getElementById("CulturalId");
+			var regional        = document.getElementById("RegionId");
+			var nacionalidad    = document.getElementById("Nacionalidad");
+
+			var religion        = document.getElementById("Religion");
+			var genero          = document.getElementById("Genero");
+			var edoCivil        = document.getElementById("EdoCivil");
+			var bautizo         = document.getElementById("Bautizado");
+			
+			var empleoS         = document.getElementById("EmpleoS");
+			var empleoN         = document.getElementById("EmpleoN");
+
+			var institucionId   = document.getElementById("InstitucionId");
+
+			var institucionPaisId = $('#institucionPaisId').val();  
+			
+			if(nombre.value != ""){
+				if(paterno.value != ""){
+					if(fecha.value != ""){
+						if(nacPais.value != "0" && nacPais.value != ""){
+							if(nacEdo.value != "0" && nacEdo.value != ""){
+								if(nacCiudad.value != "0" && nacCiudad.value != ""){
+									if(resPais.value != "0" && resPais.value != ""){
+										if(resEdo.value != "0" && resEdo.value != ""){
+											if(resCiudad.value != "0" && resCiudad.value != ""){
+												if(cultural.value != "0" && cultural.value != ""){
+													if(regional.value != "0"){
+														if(nacionalidad.value != "0" && nacionalidad.value != ""){
+															if(religion.value != "0" && religion.value != ""){
+																if(genero.value != "0" && genero.value != ""){
+																	if(edoCivil.value != "0" && edoCivil.value != ""){
+																		// Check if employment section is required (Tipo = 'N')
+																		if(document.getElementById("Empleo")) {
+																			if(!empleoS.checked && !empleoN.checked) {
+																				alert("Please select if you are currently employed");
+																				return false;
+																			}
+																			
+																			if(empleoS.checked && (institucionId.value == "0" || institucionId.value == "")) {
+																				alert("Please select an Employment Endorser");
+																				institucionId.focus();
+																				return false;
+																			}
+																		}
+																		return true;
+																	}else{
+																		alert("Marital Status is required");
+																		$("EdoCivil").focus();
+																	}
+																}else{
+																	alert("Gender is required");
+																	$("Genero").focus();
+																}
+															}else{
+																alert("Denomination is required");
+																$("Religion").focus();
+															}
+														}else{
+															alert("Nationality is required");
+															$("Nacionalidad").focus();
+														}
+													}else{
+														alert("Regional Group is required");
+														$("RegionId").focus();
+													}
+												}else{
+													alert("Cultural Group is required");
+													$("CulturalId").focus();
+												}
+											}else{
+												alert("Home District is required");
+												$("ResCiudadId").focus();
+											}
+										}else{
+											alert("Home Province is required");
+											$("ResEstadoId").focus();
+										}
+									}else{
+										alert("Home Country is required");
+										$("ResPaisId").focus();
+									}
+								}else{
+									alert("District is required");
+									$("nacCiudad").focus();
+								}
+							}else{
+								alert("Province is required");
+								$("nacEstado").focus();
+							}
+						}else{
+							alert("Country of birth is required");
+							$("nacPais").focus();
+						}
+					}else{
+						alert("Birth Date is required");
+						$("Fecha").focus();                  
+					}
+				}else{
+					alert("Surname is required");
+					$("Paterno").focus();
+				}
+			}else{
+				alert("Name is required");
+				$("Nombre").focus();
+			}
+
+			return false;
+		}		
+		
+		function continua(){
+			if(revisa()){
+				document.frmDatos.submit();
+			}
+		}
+		
+		function validaFechaDDMMAAAA(fecha){
+			return /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/.test(fecha);
+		}
+
+		function refreshEstados(){				
+			jQuery('#nacEdo').html('<option>Updating</option>');		
+			var paisId = $('#nacPais').val();
+			var institucionPaisId = $('#institucionPaisId').val();		
+			
+			$("#nacEdo").empty();
+			jQuery.get('getEstados?paisId='+paisId, function(data){
+				jQuery("#nacEdo").html(data);			
+				refreshCuidades();
+			});		
+		}
+
+		function refreshCiudades(){
+			jQuery('#nacCiudad').html('<option>Updating</option>');				
+			var paisId 		= $('#nacPais').val();
+			var estadoId 	= $('#nacEdo').val();				
+			jQuery.get('getCiudades?paisId='+paisId+'&estadoId='+estadoId, function(data){
+				jQuery("#nacCiudad").html(data);
+			});
+		}
+
+		function refreshResEstados(){				
+			jQuery('#ResEstadoId').html('<option>Updating</option>');		
+			var paisId = $('#ResPaisId').val();
+			
+			$("#ResEstadoId").empty();
+			jQuery.get('getEstados?paisId='+paisId, function(data){
+				jQuery("#ResEstadoId").html(data);			
+				refreshResCiudades();
+			});		
+		}
+
+		function refreshResCiudades(){
+			jQuery('#ResCiudadId').html('<option>Updating</option>');				
+			var paisId 		= $('#ResPaisId').val();
+			var estadoId 	= $('#ResEstadoId').val();				
+			jQuery.get('getCiudades?paisId='+paisId+'&estadoId='+estadoId, function(data){
+				jQuery("#ResCiudadId").html(data);
+			});
+		}
+
+		function refreshRegiones(){
+			jQuery('#RegionId').html('<option>Updating</option>');	
+			var CulturalId	= $('#CulturalId').val();
+			jQuery.get('getRegiones?CulturalId='+CulturalId, function(data){
+				jQuery("#RegionId").html(data);
+			});
+		}
+		
+	</script>
+</head>
+<% 	
+	String folio 			= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	List<String> opciones	= (List<String>)session.getAttribute("Opciones");
+	String grabo 			= request.getParameter("Grabo") == null ? "-" : request.getParameter("Grabo");
+	String usuario			= (String)session.getAttribute("Usuario");
+	boolean existePersonal	= (boolean)request.getAttribute("existePersonal");
+	String colorGrabar		= existePersonal?"style='color:green'":"style='color:orange'";
+	boolean curp			= false;
+	boolean esNacional		= false;	
+
+	AdmUsuario admUsuario 			= (AdmUsuario) request.getAttribute("admUsuario");
+	AdmSolicitud admSolicitud		= (AdmSolicitud) request.getAttribute("admSolicitud");
+	AdmCartaSubir admCartaSubir 	= (AdmCartaSubir)request.getAttribute("admCartaSubir");
+	AdmParametros admParametros 	= (AdmParametros)request.getAttribute("admParametros");
+	AdmAcademico admAcademico 		= (AdmAcademico)request.getAttribute("admAcademico");
+	
+	// Valida la nacionalidad
+	if (admUsuario.getPaisId().equals(admParametros.getPaisId()) || admUsuario.getPaisId().equals("0")){
+		esNacional = true;
+	}
+	
+	List<CatPais> lisPais				= (List<CatPais>) request.getAttribute("lisPais");
+	List<CatEstado> lisEstados			= (List<CatEstado>) request.getAttribute("lisEstados");
+	List<CatEstado> lisEstadoRes		= (List<CatEstado>) request.getAttribute("lisEstadoRes");
+	List<CatCiudad> lisCiudades			= (List<CatCiudad>) request.getAttribute("lisCiudades");
+	List<CatCiudad> lisCiudadRes		= (List<CatCiudad>) request.getAttribute("lisCiudadRes");
+	List<CatReligion> lisReligion		= (List<CatReligion>) request.getAttribute("lisReligion");
+	List<CatCultural> lisCultural		= (List<CatCultural>)request.getAttribute("lisCultural");
+	List<CatRegion> lisRegion			= (List<CatRegion>)request.getAttribute("lisRegion");
+	List<CatInstitucion> lisInstitucion	= (List<CatInstitucion>)request.getAttribute("lisInstitucion");
+
+	CatPais paisCero = new CatPais();
+	paisCero.setPaisId("0");
+	paisCero.setNombrePais("SELECT");
+	
+	lisPais.add(0, paisCero);
+	
+	CatEstado estadoCero = new CatEstado();
+	estadoCero.setEstadoId("0");
+	estadoCero.setNombreEstado("SELECT");
+	
+	lisEstados.add(0, estadoCero);
+	
+	CatCiudad ciudadCero = new CatCiudad();
+	ciudadCero.setCiudadId("0");
+	ciudadCero.setNombreCiudad("SELECT");
+	
+	lisCiudades.add(0, ciudadCero);
+	
+	CatReligion religionCero = new CatReligion();
+	religionCero.setReligionId("0");
+	religionCero.setNombreReligion("SELECT");
+	
+	lisReligion.add(0, religionCero);
+%>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<%-- <%@ include file= "../opciones.jsp"%> --%>
+			<div class="col-lg-12" style="background-color:white; min-height:calc(100vh - 37px);">
+				<div class="d-flex bd-highlight page-header">
+					<div class="p-2 w-100 bd-highlight">
+						<h2><i class="fas fa-check-circle" aria-hidden="true" <%=colorGrabar%>></i>&nbsp;<spring:message code="solicitud.datos.DatosPersonales"/></h2>
+					</div>
+			  		<div class="p-2 flex-shrink-1 bd-highlight">
+						<div class="d-flex align-items-center">
+				    		<a href="<%=request.getContextPath()%>/solicitud/modalidad" style="color:black"><i class="fas fa-caret-left fa-3x"></i></a>
+				    		&nbsp;<b class="fs-5">2/12</b>&nbsp;
+<%				if(  existePersonal ){%>
+				    		<a href="<%=request.getContextPath()%>/solicitud/padres"><i class="fas fa-caret-right fa-3x"></i></a>
+<%				}else{out.print("&nbsp;");}%>
+						</div>
+					</div>
+				</div>
+				<div class="alert alert-info" role="alert">
+					<spring:message code="solicitud.datos.Precision"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				</div>
+				<div>
+					<form id="frmDatos" name="frmDatos" action="graboDatos" method="post">
+						<input type="hidden" value="<%=admParametros.getPaisId()%>" name="institucionPaisId" id="institucionPaisId" />
+						<div class="row">	
+							<div class="col-md-4 mt-3">
+								<label><spring:message code="adm.Nombre"/></label>																						<!-- NOMBRE-->
+								<input  class= "form-control" type="text" id="Nombre" name="Nombre" value="<%= admUsuario.getNombre()%>" size="40" maxlength="70" /><br>
+			  					<label><spring:message code="solicitud.datos.PrimerApellido"/></label> 																	<!-- APELLIDO -->
+			    		 		<input  class= "form-control" type="text" id="Paterno" name="Paterno" value="<%= admUsuario.getApellidoPaterno()%>" size="40" maxlength="70" /><br>
+<% 						if(admParametros.getInstitucion().equals("Sonoma")){	%>
+			    				<label><spring:message code="solicitud.datos.SegundoApellido.Sonoma"/></label><br><font size="1"><spring:message code="solicitud.datos.figuraCertificado.Sonoma"/></font></td>
+<% 						}else {	%>
+								<label><spring:message code="solicitud.datos.SegundoApellido"/></label><br></td>
+<%						}		%>
+<% 							String materno="";
+							if(admUsuario.getApellidoMaterno()!=null){
+								materno = admUsuario.getApellidoMaterno();
+							} %>       
+								<input  class= "form-control" type="text" id="Materno" name="Materno" value="<%=materno%>" size="40" maxlength="70" /><br> 				<!-- APELLIDO MATERNO -->
+											       				<label><spring:message code="adm.Nacionalidad"/></label>
+			       				<select class="form-select selectpicker" id="Nacionalidad" name="Nacionalidad" data-live-search="true">									<!-- NACIONALIDAD -->
+<%								String nacionalidadId = admParametros.getPaisId();
+								if(admUsuario.getNacionalidad()!=null && !admUsuario.getNacionalidad().equals("")){
+									nacionalidadId = admUsuario.getNacionalidad();
+								}
+								for(CatPais pais : lisPais){%>
+				         			<option value="<%=pais.getPaisId() %>" <%= pais.getPaisId().equals(nacionalidadId)?"Selected":"" %>><%=pais.getNacionalidad() %></option>
+<%								} %>
+			       				</select><br>
+			    				<label><spring:message code="solicitud.datos.PaisNacimiento"/></label>	    		
+			      				<select class="form-select selectpicker" id="nacPais" name="nacPais" onChange="javascript:refreshEstados();" data-live-search="true"> 	<!-- PAIS -->
+<%								for(CatPais pais : lisPais){%>
+			         				<option value="<%=pais.getPaisId()%>" <%=admUsuario.getPaisId().equals(pais.getPaisId()) ? "selected" : ""%>><%=pais.getNombrePais() %></option>
+<%								} %>
+			      				</select><br>
+								<div id="divMexico">
+				      				<label><spring:message code="solicitud.datos.EstadoNacimiento"/></label>
+				      				<select class="form-select" id="nacEdo" name="nacEdo" onChange="javascript:refreshCiudades();"> 									<!-- ESTADO -->
+	<%								      				
+									if (lisEstados.size()>0){						
+										for(CatEstado estado : lisEstados){
+	%>
+				         				<option value="<%=estado.getEstadoId()%>" <%=admUsuario.getEstadoId().equals(estado.getEstadoId()) ? "selected" : ""%>><%=estado.getNombreEstado()%></option>
+	<%								      				
+										}	
+									}else{
+										out.print("<option value='0'>Unregistered</option>");
+									}
+	%>					
+				      				</select><br>
+				      				<label>
+										<% if(admParametros.getInstitucion().equals("Sonoma")){%><spring:message code="solicitud.datos.CiudadNacimiento.Sonoma"/><% }%>
+										<% if(admParametros.getInstitucion().equals("Pacific Adventist University")){%><spring:message code="solicitud.datos.CiudadNacimiento.Pau"/><% }%>
+										<% if(admParametros.getInstitucion().equals("Fulton")){%><spring:message code="solicitud.datos.CiudadNacimiento.Fulton"/><% }%>
+									</label>
+				       				<select class="form-select" id="nacCiudad" name="nacCiudad"> 																		<!-- CIUDAD -->
+	<%												      			
+									if (lisCiudades.size()>0){
+										for(CatCiudad ciudad : lisCiudades){
+	%>					
+				         				<option value="<%=ciudad.getCiudadId()%>" <%=admUsuario.getCiudadId().equals(ciudad.getCiudadId()) ? "selected" : ""%>><%=ciudad.getNombreCiudad()%></option>
+	<%												      			
+										}	
+									}else{
+										out.print("<option value='0'>Unregistered</option>");
+									}%>					
+				       				</select>
+									<label></label>
+								</div>
+								<label><spring:message code="solicitud.datos.GrupoCultural"/></label>
+								<select class="form-select" id="CulturalId" name="CulturalId" onChange="javascript:refreshRegiones();"> 								<!-- GRUPO CULTURAL -->
+									<option value="0">SELECT</option>
+<%
+								for(CatCultural cultural : lisCultural){
+%>
+									<option value="<%=cultural.getCulturalId()%>" <%=cultural.getCulturalId().equals(admSolicitud.getCulturalId())?"Selected":"" %>><%=cultural.getNombreCultural()%> - <%=cultural.getPrincipal()%></option>
+<%
+								}
+%>
+								</select>
+								<br>
+								<label><spring:message code="solicitud.datos.GrupoRegional"/> </label> 																	<!-- GRUPO REGIONAL -->
+								<select class="form-select" id="RegionId" name="RegionId">
+									<option value="0">SELECT</option>
+<%
+								for(CatRegion region : lisRegion){
+%>
+									<option value="<%=region.getRegionId()%>" <%=admSolicitud.getRegionId().equals(region.getRegionId())?"Selected":""%>><%=region.getNombreRegion()%></option>
+<%
+								}
+%>
+								</select>
+							</div>
+							<div class="col-md-4 mt-3">
+			       				<label><spring:message code="solicitud.datos.FechaNacimiento"/></label>
+				   				<input class="form-control" id="Fecha"  name="Fecha" type="text" data-date-format="dd/mm/yyyy" maxlength="10" value="<% if(admUsuario.getFechaNac()!=null) out.print(admUsuario.getFechaNac());%>" required> <!-- FECHA NACIMIENTO-->
+								<br>
+			     				<label><spring:message code="solicitud.datos.EstadoCivil"/></label>
+			       				<select class="form-select" id="EdoCivil" name="EdoCivil"> 																				<!-- ESTADO CIVIL -->
+<%								String estadoCivil = admUsuario.getEstadoCivil()==null || admUsuario.getEstadoCivil().equals("")?"S":admUsuario.getEstadoCivil(); %>
+						         	<option value="C" <%=estadoCivil.equals("C")?"Selected":"" %>>Married</option>
+							        <option value="S" <%=estadoCivil.equals("S")?"Selected":"" %>>Single / Never Married</option>
+							        <option value="V" <%=estadoCivil.equals("V")?"Selected":"" %>>Widowed</option>
+							        <option value="D" <%=estadoCivil.equals("D")?"Selected":"" %>>Divorced</option>
+			       				</select><br>
+			       				<label><spring:message code="adm.Sexo"/></label><br>
+			       				<select class="form-select" id="Genero" name="Genero"> 																					<!-- GENERO -->
+						         	<option value="0" <%=admUsuario.getGenero().equals("0")?"Selected":"" %>>SELECT ...</option>
+						         	<option value="M" <%=admUsuario.getGenero().equals("M")?"Selected":"" %>><spring:message code="adm.Masculino"/></option>
+						         	<option value="F" <%=admUsuario.getGenero().equals("F")?"Selected":"" %>><spring:message code="adm.Femenino"/></option>
+			       				</select><br>
+				     			<label><spring:message code="adm.Religion"/> </label><br> 
+				       			<select class="form-select" id="Religion" name="Religion"> 																				<!-- RELIGION -->
+<%								for(CatReligion religion : lisReligion){%>
+				         			<option value="<%=religion.getReligionId()%>" <%= admUsuario.getReligionId().equals(religion.getReligionId())?"Selected":"" %>><%=religion.getNombreReligion()%></option>
+<%								} %>
+			        			</select><br>
+								<label><spring:message code="adm.Bautizado"/> </label><br>
+								<select class="form-select" id="Bautizado" name="Bautizado" onchange="showAdditionalObject()"> 											<!-- BAUTIZADO -->
+<% 
+										String bautizado = admSolicitud.getBautizado() == null || admSolicitud.getBautizado().equals("") ? "N" : admSolicitud.getBautizado(); 
+										for (int i = 0; i < 2; i++) {
+											String value = i == 0 ? "S" : "N";
+											String selected = bautizado.equals(value) ? "selected" : "";
+%>
+										<option value="<%= value %>" <%= selected %>><%= i == 0 ? "Yes" : "No" %></option>
+<% 									} %>
+								</select>
+								<br>
+								<div class="col-md-4" id="fechaBautizo" style="<%= bautizado.equals("S") ? "display:block;" : "display:none;" %>"> 						<!-- FECHA DE BAUTIZO SI MARCA COMO BAUTIZADO -->
+									<label class=""><spring:message code="solicitud.datos.FechaBautizo"/></label>
+									<input class="form-control" id="FechaBaut"  name="FechaBaut" type="text" data-date-format="dd/mm/yyyy" maxlength="10" value="<% if(admSolicitud.getFechaBautizo()!=null) out.print(admSolicitud.getFechaBautizo());%>" required><br>
+								</div>
+								<label><spring:message code="solicitud.datos.Residencia.Pais"/> </label><br>															<!-- RES PAIS -->
+								<select class="form-select" id="ResPaisId" name="ResPaisId" onChange="javascript:refreshResEstados();">
+<% 									String resPaisId = admSolicitud.getResPaisId();
+									if(admSolicitud.getResPaisId().equals("1") && admSolicitud.getRegionId().equals("0")) resPaisId = "0";
+									for(CatPais pais : lisPais){	%>
+									<option value="<%=pais.getPaisId()%>" <%=pais.getPaisId().equals(resPaisId)?"Selected":"" %>><%=pais.getNombrePais()%></option>
+<% 									} %>
+								</select>
+								<br>
+								<label><spring:message code="solicitud.datos.Residencia.Estado"/> </label><br>															<!-- RES ESTADO -->							
+								<select class="form-select" id="ResEstadoId" name="ResEstadoId" onChange="javascript:refreshResCiudades();">
+<% 									for(CatEstado estado : lisEstadoRes){	%>	
+									<option value="<%=estado.getEstadoId()%>" <%=estado.getEstadoId().equals(admSolicitud.getResEstadoId())?"Selected":"" %>><%=estado.getNombreEstado()%></option>
+<% 									} %>
+								</select>
+								<br>
+								<label><spring:message code="solicitud.datos.Residencia.Ciudad"/> </label><br>															<!-- RES CIUDAD -->
+								<select class="form-select" id="ResCiudadId" name="ResCiudadId">
+<% 									for(CatCiudad ciudad : lisCiudadRes){	%>	
+									<option value="<%=ciudad.getCiudadId()%>" <%=ciudad.getCiudadId().equals(admSolicitud.getResCiudadId())?"Selected":"" %>><%=ciudad.getNombreCiudad()%></option>
+<% 									} %>
+								</select>
+							</div>	
+							<div class="col-md-4 mt-3"> 	
+<%	if(admSolicitud.getTipo().equals("N") && (admSolicitud.getNivelEstudio().equals("U") || admSolicitud.getNivelEstudio().equals("P") )){%>																													<!-- TRABJAO -->
+								<label>Are you currently employed?</label>
+								<div id="Empleo" name="empleo" class="d-flex align-items-center mb-2">
+									<div class="form-check me-4">
+										<input class="form-check-input" type="radio" name="Empleado" id="EmpleoS" value="S" <%=admUsuario.getEmpleado().equals("S")?"checked":""%>>
+										<label class="form-check-label" for="EmpleoS">
+											Yes
+										</label>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="Empleado" id="EmpleoN" value="N" <%=admUsuario.getEmpleado().equals("N")?"checked":""%>>
+										<label class="form-check-label" for="EmpleoN">
+											No
+										</label>
+									</div>
+								</div>
+								<br>
+								<div name="InstitutionData" id="InstitutionData">
+								<label>Employment Endorser</label>
+								<select class="form-select" id="InstitucionId" name="InstitucionId">
+									<option value="0" <%=admUsuario.getInstitucionId().equals("0")?"selected":""%>>SELECT</option>
+<%								for(CatInstitucion institucion : lisInstitucion){%>
+									<option value="<%=institucion.getInstitucionId()%>" <%=admUsuario.getInstitucionId().equals(institucion.getInstitucionId())?"selected":""%>><%=institucion.getNombreInstitucion()%></option>
+<%								}%>
+								</select>
+								</div>
+<%	}%>
+							</div>
+						</div><br>
+<%		if(admSolicitud.getEstado().equals("1") ){ %>
+						<button type="button" class="btn alert-info mb-3" onclick="continua()">
+							<spring:message code="adm.Guardar"/> <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>&nbsp;
+						</button> 
+<%		} %>
+					</form>	
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<%	if (grabo.equals("SI") && ( (esNacional) || (!esNacional) ) ){%>	
+	<div class="alert alert-success"><spring:message code="solicitud.datos.GraboDatos"/></div>
+	<meta http-equiv="refresh" content="1;url=padres" />
+<%	}else if(grabo.equals("NO")){%>	
+		<div class="alert alert-warning"><spring:message code="solicitud.datos.NoGraboDatos"/></div>
+<%	}%>
+<script>	
+	jQuery('#Fecha').datepicker();
+	jQuery('#FechaBaut').datepicker();
+</script>
+<script>
+    function showAdditionalObject() {
+        var selectElement = document.getElementById("Bautizado");
+        var selectedValue = selectElement.options[selectElement.selectedIndex].value;
+        if (selectedValue === "S") {
+            document.getElementById("fechaBautizo").style.display = "block";
+        } else {
+            document.getElementById("fechaBautizo").style.display = "none";
+        }
+    }
+</script>
+<script>
+	// Function to handle employment radio button change
+	function handleEmploymentChange() {
+		const empleoS = document.getElementById("EmpleoS");
+		const institutionData = document.getElementById("InstitutionData");
+		
+		// Show/hide institution data based on selection
+		institutionData.style.display = empleoS.checked ? "block" : "none";
+	}
+
+	// Add event listeners to radio buttons
+	document.getElementById("EmpleoS").addEventListener("change", handleEmploymentChange);
+	document.getElementById("EmpleoN").addEventListener("change", handleEmploymentChange);
+
+	// Initialize the display on page load
+	document.addEventListener("DOMContentLoaded", function() {
+		handleEmploymentChange();
+		
+		// Also initialize the bautizo display (from your existing code)
+		showAdditionalObject();
+	});
+</script>

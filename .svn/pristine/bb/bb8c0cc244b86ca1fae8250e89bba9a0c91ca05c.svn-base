@@ -1,0 +1,198 @@
+package adm.alumno.spring;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AdmIngresoDao {
+	
+	@Autowired
+	@Qualifier("jdbcSalomon")
+	private JdbcTemplate salomonJdbc;
+	
+	public boolean insertReg(AdmIngreso admIngreso) {
+		boolean ok = false;
+		
+		try{
+			String comando = "INSERT INTO SALOMON.ADM_INGRESO "+ 
+				"(PERIODO_ID, PERIODO_NOMBRE, ESTADO, FECHA ) "+
+				"VALUES( TO_NUMBER(?,'999'),? ,? ,  TO_DATE(?,'DD/MM/YYYY') )";
+			
+			Object[] parametros = new Object[] {
+					admIngreso.getPeriodoId(), admIngreso.getPeriodoNombre(), admIngreso.getEstado(),admIngreso.getFecha()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}
+
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|insertReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean updateReg(AdmIngreso admIngreso) {
+		boolean ok = false;
+		
+		try{
+			String comando = "UPDATE SALOMON.ADM_INGRESO " + 
+					"SET PERIODO_NOMBRE = ?, ESTADO = ?, FECHA = TO_DATE(?, 'DD/MM/YYYY') " +				
+					"WHERE PERIOD_ID = TO_NUMBER(?,'999')";
+			
+			Object[] parametros = new Object[] {
+					admIngreso.getPeriodoNombre(),admIngreso.getEstado(),admIngreso.getFecha(),admIngreso.getPeriodoId()
+ 		 	};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}
+
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|updateReg|:"+ex);
+		}
+
+		return ok;
+	}
+	
+	public boolean deleteReg(String periodoId) {
+		boolean ok = false;
+		
+		try{
+			String comando = "DELETE FROM SALOMON.ADM_INGRESO "+ 
+					"WHERE INGRESO_ID = TO_NUMBER(?,'999') ";
+			
+			Object[] parametros = new Object[] {periodoId};
+			if (salomonJdbc.update(comando,parametros)==1){
+				ok = true;
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|deleteReg|:"+ex);
+		}
+		
+		return ok;
+	}
+	
+	public AdmIngreso mapeaRegId(String periodoId) {
+		AdmIngreso objeto = new AdmIngreso();
+		
+		try {
+			String comando = "SELECT PERIODO_ID, PERIODO_NOMBRE, ESTADO, FECHA "+
+					"FROM SALOMON.ADM_INGRESO "+ 
+					"WHERE PERIODO_ID = TO_NUMBER(?,'999') ";
+			
+			Object[] parametros = new Object[] {periodoId};
+			objeto = salomonJdbc.queryForObject(comando, new AdmIngresoMapper(), parametros);
+			
+		} catch (Exception ex) {
+			System.out.println("Error - adm.alumno.AdmIngresoDao|mapeaRegId|:"+ex);
+		}
+
+		return objeto;
+	}
+	
+	public boolean existeReg(String periodoId) {
+		boolean ok 		= false;
+		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_INGRESO "+ 
+					"WHERE PERIODO_ID = TO_NUMBER(?,'999')";
+			
+			Object[] parametros = new Object[] {periodoId};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|existeReg|:"+ex);
+		}
+		
+		return ok;
+	}
+
+	public AdmIngreso periodoActivo(String fecha) {
+		AdmIngreso objeto = new AdmIngreso();
+		
+		try {
+			String comando = "SELECT PERIODO_ID, PERIODO_NOMBRE, ESTADO, FECHA "+
+					"FROM SALOMON.ADM_INGRESO "+ 
+					"WHERE ESTADO = 'A' AND TO_DATE(?, 'DD/MM/YYYY') >= FECHA";
+			objeto = salomonJdbc.queryForObject(comando, new AdmIngresoMapper(), fecha);
+			
+		} catch (Exception ex) {
+			System.out.println("Error - adm.alumno.AdmIngresoDao|periodoActivo|:"+ex);
+		}
+
+		return objeto;
+	}
+	
+	public String maximoReg(String periodoId) {
+		String maximo		= "1";
+		
+		try{
+			String comando = "SELECT COALESCE(MAX(PERIODO_ID)+1,1) AS MAXIMO FROM SALOMON.ADM_INGRESO "+ 
+					"WHERE PERIODO_ID = ?";		
+			
+			Object[] parametros = new Object[] {periodoId};
+			maximo = salomonJdbc.queryForObject(comando,String.class, parametros);
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|maximoReg|:"+ex);
+		}
+		
+		return maximo;
+	}
+	
+	public List<AdmIngreso> lisTodos(String orden) {
+		List<AdmIngreso> lista	= new ArrayList<AdmIngreso>();
+		
+		try{
+			String comando = "SELECT PERIODO_ID, PERIODO_NOMBRE, ESTADO, FECHA " +
+					" FROM SALOMON.ADM_INGRESO "+ orden; 
+
+			lista = salomonJdbc.query(comando, new AdmIngresoMapper());
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|getAll|:"+ex);
+		}
+		
+		return lista;
+	}
+	
+	public List<AdmIngreso> lisActivos(String orden) {
+		List<AdmIngreso> lista	= new ArrayList<AdmIngreso>();
+		
+		try{
+			String comando = "SELECT PERIODO_ID, PERIODO_NOMBRE, ESTADO, FECHA " +
+					" FROM SALOMON.ADM_INGRESO WHERE ESTADO = 'A' "+ orden; 
+
+			lista = salomonJdbc.query(comando, new AdmIngresoMapper());
+			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|getAll|:"+ex);
+		}
+		
+		return lista;
+	}
+	public String getFecha(String periodoId ){
+		
+		String fecha 	= "0";		
+		try{						
+			String comando="SELECT COUNT(*) FROM SALOMON.ADM_INGRESO WHERE PERIODO_ID  = TO_NUMBER(? ,'999')";
+			if (salomonJdbc.queryForObject(comando,Integer.class, periodoId)>=1){
+				comando="SELECT TO_CHAR(FECHA,'DD/MM/YYYY') FROM SALOMON.ADM_INGRESO WHERE PERIODO_ID  = TO_NUMBER(? ,'999')";
+				fecha = salomonJdbc.queryForObject(comando,String.class, periodoId);
+			}
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.AdmIngresoDao|getFecha|:"+ex);
+		}
+		
+		return fecha;
+	}
+	
+}

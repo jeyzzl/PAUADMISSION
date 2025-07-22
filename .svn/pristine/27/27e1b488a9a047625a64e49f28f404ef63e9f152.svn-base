@@ -1,0 +1,36 @@
+package adm.alumno.spring;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+public class AdmPadresMapper implements RowMapper<AdmPadres> {
+
+	public AdmPadres mapRow(ResultSet rs, int arg1) throws SQLException {
+		AdmPadres objeto = new AdmPadres();
+		
+		objeto.setFolio(rs.getString("FOLIO"));
+		objeto.setPadreNombre(rs.getString("PADRE_NOMBRE"));
+		objeto.setPadreApellido(rs.getString("PADRE_APELLIDO"));
+		objeto.setPadreReligion(rs.getString("PADRE_RELIGION"));
+		objeto.setPadreNacionalidad(rs.getString("PADRE_NACIONALIDAD"));
+		objeto.setPadrePaisId(rs.getString("PADRE_PAIS_ID"));
+		objeto.setPadreEstadoId(rs.getString("PADRE_ESTADO_ID"));
+		objeto.setPadreCiudadId(rs.getString("PADRE_CIUDAD_ID"));
+		objeto.setPadreOcupacion(rs.getString("PADRE_OCUPACION"));
+		objeto.setMadreNombre(rs.getString("MADRE_NOMBRE"));
+		objeto.setMadreApellido(rs.getString("MADRE_APELLIDO"));
+		objeto.setMadreReligion(rs.getString("MADRE_RELIGION"));
+		objeto.setMadreNacionalidad(rs.getString("MADRE_NACIONALIDAD"));
+		objeto.setMadrePaisId(rs.getString("MADRE_PAIS_ID"));
+		objeto.setMadreEstadoId(rs.getString("MADRE_ESTADO_ID"));
+		objeto.setMadreCiudadId(rs.getString("MADRE_CIUDAD_ID"));
+		objeto.setMadreOcupacion(rs.getString("MADRE_OCUPACION"));
+		objeto.setVivePadre(rs.getString("VIVE_PADRE"));
+		objeto.setViveMadre(rs.getString("VIVE_MADRE"));
+		
+		return objeto;
+	}
+
+}

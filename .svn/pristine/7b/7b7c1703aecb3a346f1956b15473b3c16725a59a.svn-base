@@ -1,0 +1,248 @@
+<%@page import="adm.util.Utilerias"%>
+<%@page import="adm.alumno.spring.AdmSolicitud"%>
+<%@page import="adm.alumno.spring.AdmUsuario"%>
+<%@page import="adm.alumno.spring.AdmFoto"%>
+<%@page import="adm.parametros.spring.AdmParametros"%>
+
+<%@ include file= "head.jsp"%>
+<%@ include file= "menu.jsp"%>
+
+<link rel="stylesheet" href="<%=request.getContextPath()%>/js/datepicker/datepicker.css" />
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/datepicker/datepicker.js"></script>
+<script>
+	window.__cfRLUnblockHandlers = true;
+</script>
+<%		
+	String folio 				= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
+	String error				= (String)request.getAttribute("error");
+	
+	AdmUsuario 	admUsuario		= (AdmUsuario)request.getAttribute("admUsuario");
+	AdmFoto foto				= (AdmFoto) request.getAttribute("admFoto");
+	AdmParametros admParametros = (AdmParametros)request.getAttribute("admParametros");
+	boolean existe				= (boolean)request.getAttribute("existe");
+	String mensaje				=  request.getParameter("Mensaje")==null?"-":request.getParameter("Mensaje");		
+	String etiquetaCodigo 		= existe?"Re-send code":"Send code";	
+	int correcto 				= 0;
+%>
+
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<style>			
+	@media (min-width: 320px){
+		.alert-success {
+			width: 550px;
+			margin:0 auto;
+			margin-bottom: 50px;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+	}
+		
+	body{
+		background-image: url("imagenes/Biblioteca.png");
+		/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
+		background-position: center center;
+		/* La imagen se fija en la ventana de visualizaci�n para que la altura de la imagen no supere a la del contenido */
+		background-attachment: fixed;
+		background-repeat: no-repeat;
+		/* La imagen de fondo se reescala autom�ticamente con el cambio del ancho de ventana del navegador */
+		background-size: cover;	
+	}
+</style>
+<script type="text/javascript">
+	function revisa(){
+		var today = new Date();
+    	var birthDate = new Date(document.getElementById("FechaNac").value);
+    	var age = today.getFullYear() - birthDate.getFullYear();
+    	var m = today.getMonth() - birthDate.getMonth();
+    	if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        	age--;
+    	}
+
+		if (age < 18) {
+        	alert("You must be at least 18 years old to register.");
+        	document.getElementById("FechaNac").focus();
+        	return false;
+    	}
+
+		if($("Nombre").value != "" && $("Nombre").value != " "){
+			if($("Paterno").value != "" && $("Paterno").value != " "){
+				if($("Email").value != "" && $("Email").value != " "){
+					if($("Telefono").value != "" && $("Telefono").value != " "){
+						if($("usuario").value != "" && $("usuario").value != " "){
+							if($("clave").value != "" && $("clave").value != " "){
+								if($("confClave").value != "" && $("confClave").value != " "){
+									if($("confClave").value == $("clave").value){
+										return true;
+									}else{
+										alert("The passwords do not match");
+										$("clave").focus();
+									}
+								}else{
+									alert("Password confirmation required");
+									$("confClave").focus();
+								}
+							}else{
+								alert("The password is required");
+								$("clave").focus();
+							}
+						}else{
+							alert("Username is required");
+							$("usuario").focus();
+						}
+					}else{
+						alert("Phone number is required");
+						$("Telefono").focus();
+					}
+				}else{
+					alert("Email address is required");
+					$("Email").focus();
+				}
+			}else{
+				alert("The surname is required");
+				$("Paterno").focus();
+			}
+		}else{
+			alert("The name is required");
+			$("Nombre").focus();
+		}		
+		return false;
+	}
+	
+	function revisa2(){
+		if($("Nombre").value != "" && $("Nombre").value != " "){
+			if($("Paterno").value != "" && $("Paterno").value != " "){
+				if($("Email").value != "" && $("Email").value != " "){
+					if($("usuario").value != "" && $("usuario").value != " "){
+						return true;
+					}else{
+						alert("Username is required");
+						$("usuario").focus();
+					}
+				}else{
+					alert("Email address is required");
+					$("Email").focus();
+				}				
+			}else{
+				alert("The surname is required");
+				$("Paterno").focus();
+			}
+		}else{
+			alert("The name is required");
+			$("Nombre").focus();
+		}		
+		return false;
+	}
+	
+	function terminarRegistro(){
+		var codigo = document.getElementById("Codigo").value;		
+		document.location.href = "terminarRegistro?Codigo="+codigo;
+	}
+
+	$('#guardar').attr("disabled", true);
+</script>
+<div class="container-fluid">
+<%	if(!mensaje.equals("-")){ %>
+	<div class="alert alert-success" role="alert"><%=mensaje%></div>	
+<%	} %>
+<%	if(error.equals("1")){ %>
+	<div class="alert alert-warning" role="alert">The password you entered is not correct</div>	
+<%	}else if(error.equals("2")){ %>
+	<script type="text/javascript">
+		window.setInterval(function() {
+			document.location.href = "login";
+		}, 3000); 
+	</script>
+	<div class="alert alert-success" role="alert">Saved! Redirecting to login...</div>	
+<%	} %>
+	<form id="forma" name="forma" action="grabarRegistro" method="post">
+	<div class="container bg-white bg-opacity-75 mt-5 p-2 border rounded-3">	
+		<h3 class="text-center text-primary">Register</h3>
+		<div class="row">
+			<div class="col-12">				
+				<input type="text" class="form-control mb-1" id="Nombre" name="Nombre" value="<%=admUsuario.getNombre() %>"  maxlength="70" placeholder="* Name" required>	
+			</div>
+		</div>
+		<div class="row d-flex align-items-center">		
+			<div class="col-12">	
+				<input type="text" class="form-control" id="Paterno" name="Paterno" value="<%=admUsuario.getApellidoPaterno() %>" size="40" maxlength="70"  placeholder="* Surname" required>
+			</div>
+		</div>	
+		<div class="row mt-1">		
+			<div class="col-12">
+<% if(admParametros.getInstitucion().equals("Sonoma") || admParametros.getInstitucion().equals("Pacific Adventist Univesity")){ %><label  for="Materno"> ** Married Women </label><% } %>	
+				<input type="text" class="form-control" required id="Materno" name="Materno" value="<%=admUsuario.getApellidoMaterno()==null ? "" :admUsuario.getApellidoMaterno() %>" size="40" maxlength="70" placeholder="Maiden Name">
+			</div>
+		</div>	
+		<br>
+		<div class="row">	
+			<div class="col-6 col-md-6">		
+				<label  for="FechaNac">* <spring:message code='registro.FechaNac'/>:</label>
+    			<input type="text" id="FechaNac" name="FechaNac" class="form-control" placeholder="(DD/MM/AAAA)" value="<%=admUsuario.getFechaNac()==null?"":admUsuario.getFechaNac()%>"  data-date-format="dd/mm/yyyy" size="40" maxlength="50" required>
+			</div>
+			<div class="col-6 col-md-6">
+				<label for="Telefono">* <spring:message code='registro.Telefono'/>:</label>
+	    		<input type="text" id="Telefono" name="Telefono" class="form-control" placeholder="Phone Number" value="<%=admUsuario.getTelefono()%>" required>
+			</div>
+		</div>		
+		<div class="row">
+			<div class="col">
+	    		<label for="Email">* <spring:message code='registro.Correo'/>:</label>
+	    		<input type="email" id="Email" name="Email" class="form-control mb-2" placeholder="email@example.com" value="<%=admUsuario.getEmail()%>" required>
+	    	</div>	
+		</div>   
+<%	if(!existe){ %>	
+    	<div class="alert alert-info mt-1 d-flex justify-content-center">
+			<div class="text-center row" style="font-size:11px;">
+				Your email address will be your username when you login<br>
+				A valid email address is required as it will receive the confirmation code. 
+			</div>
+    	</div>
+<% }%>
+<%	if(!existe){ %>		
+		<div class="row">
+			<div class="col">		
+				<label for="clave">* <spring:message code='registro.Password'/>:</label>
+				<input type="password" class="form-control" id="clave" name="clave" size="40" maxlength="70" placeholder="<spring:message code='registro.Password'/>" required>
+			</div>
+			<div class="col">	
+				<label for="confClave">* <spring:message code='registro.Confirme'/>:</label>
+				<input type="password" class="form-control" id="confClave" name="confClave" size="40" maxlength="70"  placeholder="<spring:message code='registro.Password'/>" required>
+			</div>
+		</div>
+		<div class="d-flex justify-content-center mt-2">
+        	 <a href="<%=request.getContextPath()%>/PrivacyNotice.pdf" target="_blank">Terms and Conditions</a>
+        </div>
+		<div class="d-flex justify-content-center">
+        	 <input type="checkbox" id="terms">&nbsp; I accept the Terms and Conditions
+        </div>	
+<%	}else{ %>
+		<div class="d-flex justify-content-center">					
+			<a href="restablecerContrasena"><button type="button" class="btn btn-secondary"><spring:message code='registro.Contra'/></button></a>
+		</div>
+<% 	}%>
+<%	if(admUsuario.getEstado().equals("0")){%> 
+        <div class="d-flex justify-content-center mt-3">
+        	  <button id="guardar" type="button" class="btn btn-success" class="next" onclick="if(revisa()) document.forma.submit();">Send Code</button>         
+        </div>
+<%	} %>        
+<%	if(existe && admUsuario.getEstado().equals("0")){ %>
+		<div class="d-flex justify-content-center mt-2">        	 
+        	<label for="codigo">Enter the Confirmation Code</label>
+		</div>	
+		<div class="d-flex justify-content-center">        	 
+			<input type="text" class="form-control" id="Codigo" name="Codigo" size="40" maxlength="70"  placeholder="Code" style="width:200px" required>
+		</div>	
+		<div class="d-flex justify-content-center mt-1">        	 
+			<a type="button" class="btn btn-danger" class="next" onclick="javascript:terminarRegistro();">Send</a>
+		</div>	
+<%	}%>
+	</div>
+	</form>
+</div>
+<%	if (correcto == 1){%>
+	<div class="alert alert-danger" role="alert"><spring:message code='registro.FraseModificar'/></div>	
+	<meta http-equiv="refresh" content="1;url=inicial" />
+<%	}%>
+<script>
+	$('#FechaNac').datepicker();
+</script>
