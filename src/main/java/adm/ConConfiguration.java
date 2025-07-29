@@ -29,9 +29,9 @@ public class ConConfiguration implements WebMvcConfigurer{
 	public DataSource dataSourceSalomon() {
 		
 		HikariDataSource hikariDataSource = new HikariDataSource();
-		//  hikariDataSource.setJdbcUrl("jdbc:oracle:thin:@74.208.80.211:1521:xe");
+		 hikariDataSource.setJdbcUrl("jdbc:oracle:thin:@74.208.80.211:1521:xe");
 		// hikariDataSource.setJdbcUrl("jdbc:oracle:thin:@172.16.203.160:1521:xe");
-		 hikariDataSource.setJdbcUrl("jdbc:oracle:thin:@172.16.209.247:1521:xe");
+		//  hikariDataSource.setJdbcUrl("jdbc:oracle:thin:@172.16.209.247:1521:xe");
 		//  hikariDataSource.setJdbcUrl("jdbc:oracle:thin:@172.16.209.245:1521:xe");
 		hikariDataSource.setUsername("enoc");
 		hikariDataSource.setPassword("caminacondios");
@@ -55,9 +55,9 @@ public class ConConfiguration implements WebMvcConfigurer{
 	public DataSource dataSourceAdm() {
 		
 		HikariDataSource hikariDataSource = new HikariDataSource();
-		// hikariDataSource.setJdbcUrl("jdbc:postgresql://127.0.0.1:5432/academico");
+		hikariDataSource.setJdbcUrl("jdbc:postgresql://74.208.80.211:5432/academico");
 		// hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.203.160:5432/academico");
-		hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.209.247:5432/academico");
+		// hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.209.247:5432/academico");
 		// hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.209.245:5432/academico");
 		hikariDataSource.setUsername("postgres");
 		hikariDataSource.setPassword("ptstann69");
@@ -81,9 +81,9 @@ public class ConConfiguration implements WebMvcConfigurer{
 	public DataSource dataSourceExa() {
 		
 		HikariDataSource hikariDataSource = new HikariDataSource();
-		// hikariDataSource.setJdbcUrl("jdbc:postgresql://127.0.0.1:5432/examen_um");
+		hikariDataSource.setJdbcUrl("jdbc:postgresql://74.208.80.211:5432/examen_um");
 		// hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.203.160:5432/examen_um");
-		hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.209.247:5432/examen_um");
+		// hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.209.247:5432/examen_um");
 		// hikariDataSource.setJdbcUrl("jdbc:postgresql://172.16.209.245:5432/examen_um");
 		hikariDataSource.setUsername("postgres");
 		hikariDataSource.setPassword("ptstann69");

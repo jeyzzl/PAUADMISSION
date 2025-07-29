@@ -1166,7 +1166,7 @@ public class ControllerSolicitud {
 
 		AdmParametros parametros = admParametrosDao.mapeaRegId("1");
 		if(parametros.getInstitucion().equals("Pacific Adventist University")){ 
-			ruta 		= "https://admissions.pau.ac.pg/admission"; 
+			ruta 		= "https://academic.pau.ac.pg/admission"; 
 			institucion = "Pacific Adventist University";
 			remitente 	= "PAU";
 		} 

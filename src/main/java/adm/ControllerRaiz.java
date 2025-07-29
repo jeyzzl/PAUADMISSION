@@ -1034,7 +1034,7 @@ public class ControllerRaiz{
 		AdmSolicitud admSolicitud = new AdmSolicitud();
 		AdmUsuario admUsuario = new AdmUsuario(); 
 		AdmParametros admParametros	= admParametrosDao.mapeaRegId("1");
-		if(admParametros.getInstitucion().equals("Pacific Adventist University")){ url = "https://admissions.pau.ac.pg/admission"; }
+		if(admParametros.getInstitucion().equals("Pacific Adventist University")){ url = "https://academic.pau.ac.pg/admission"; }
 		if(admParametros.getInstitucion().equals("Sonoma")){ url = "https://admissions.sonoma.ac.pg/admission"; }
 		if(admParametros.getInstitucion().equals("Fulton")){ url = "https://fulton.um.edu.mx/admission"; }
 
