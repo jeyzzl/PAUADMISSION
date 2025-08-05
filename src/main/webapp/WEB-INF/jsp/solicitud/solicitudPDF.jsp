@@ -17,7 +17,7 @@
 <%@ page import = "adm.alumno.spring.AdmEstudio"%>
 <%@ page import = "adm.catalogo.spring.CatPais"%>
 
-<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 <%
 	
 	String folio 					= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");

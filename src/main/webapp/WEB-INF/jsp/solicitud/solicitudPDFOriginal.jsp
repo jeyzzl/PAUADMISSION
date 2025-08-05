@@ -15,7 +15,7 @@
 <jsp:useBean id="Padres" scope="page" class="adm.alumno.AdmPadres" />
 <jsp:useBean id="Tutor" scope="page" class="adm.alumno.AdmTutor" />
 <jsp:useBean id="EstudioUtil" scope="page" class="adm.alumno.AdmEstudioUtil" />
-<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 <%
 	
 	String folio 			= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
@@ -72,7 +72,7 @@
         int r = 0, g = 0, b = 0;
         
         Paragraph parrafo = new Paragraph();
-        parrafo.add(new Phrase("Pegue una fotografía\nreciente en este\nespacio\n\n"
+        parrafo.add(new Phrase("Pegue una fotografï¿½a\nreciente en este\nespacio\n\n"
         		, FontFactory.getFont(FontFactory.HELVETICA, 8, Font.NORMAL, new BaseColor(r,g,b))));
         parrafo.add(new Phrase("Pase a recent\nphotograph in this\nspace"
         		, FontFactory.getFont(FontFactory.HELVETICA, 8, Font.NORMAL, new BaseColor(r,g,b))));
@@ -145,7 +145,7 @@
 		celda.setBorder(Rectangle.NO_BORDER);;
 		table.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("Solicitud de Admisión/ Admision Form"
+		celda = new PdfPCell(new Phrase("Solicitud de Admisiï¿½n/ Admision Form"
 				, FontFactory.getFont(FontFactory.HELVETICA, 12, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBorder(Rectangle.NO_BORDER);
@@ -161,7 +161,7 @@
 		table2.setSpacingBefore(70f);
 		table2.setWidthPercentage(200f);    	
 		
-		celda = new PdfPCell(new Phrase("Información Personal/ Personal Information"
+		celda = new PdfPCell(new Phrase("Informaciï¿½n Personal/ Personal Information"
 				, FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBorder(Rectangle.NO_BORDER);
@@ -369,7 +369,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table5.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("DIA/ DAY       MES/ MONTH       AÑO/ YEAR"
+		celda = new PdfPCell(new Phrase("DIA/ DAY       MES/ MONTH       Aï¿½O/ YEAR"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -468,7 +468,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table6.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("NÚMERO/ NUMBER"
+		celda = new PdfPCell(new Phrase("Nï¿½MERO/ NUMBER"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -525,7 +525,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table7.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("PAÍS/ COUNTRY"
+		celda = new PdfPCell(new Phrase("PAï¿½S/ COUNTRY"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -550,7 +550,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table7.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("CÓDIGO POSTAL/ ZIP CODE"
+		celda = new PdfPCell(new Phrase("Cï¿½DIGO POSTAL/ ZIP CODE"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -564,7 +564,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table7.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("CORREO ELECTRÓNICO/ E-MAIL"
+		celda = new PdfPCell(new Phrase("CORREO ELECTRï¿½NICO/ E-MAIL"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -581,7 +581,7 @@
 		table8.setSpacingBefore(20f);
 		table8.setWidthPercentage(80f);    	
 		
-		celda = new PdfPCell(new Phrase("Información Académica/ Academia Information"
+		celda = new PdfPCell(new Phrase("Informaciï¿½n Acadï¿½mica/ Academia Information"
 				, FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBorder(Rectangle.NO_BORDER);
@@ -621,7 +621,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table8.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("AÑO Y PERIODO/ YEAR AND TERM"
+		celda = new PdfPCell(new Phrase("Aï¿½O Y PERIODO/ YEAR AND TERM"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -638,7 +638,7 @@
 		table9.setSpacingBefore(5f);
 		table9.setWidthPercentage(80f);    	
 		
-		celda = new PdfPCell(new Phrase("6. Antecedentes Académicos/ Academic Background"
+		celda = new PdfPCell(new Phrase("6. Antecedentes Acadï¿½micos/ Academic Background"
 				, FontFactory.getFont(FontFactory.HELVETICA, 8, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
 		celda.setBorder(Rectangle.NO_BORDER);
@@ -660,7 +660,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table9.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("PAÍS/ COUNTRY"
+		celda = new PdfPCell(new Phrase("PAï¿½S/ COUNTRY"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -713,7 +713,7 @@
 		table12.setSpacingBefore(5f);
 		table12.setWidthPercentage(80f);    	
 		
-		celda = new PdfPCell(new Phrase("8. Información sobre su salud/ Health Information"
+		celda = new PdfPCell(new Phrase("8. Informaciï¿½n sobre su salud/ Health Information"
 				, FontFactory.getFont(FontFactory.HELVETICA, 8, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
 		celda.setBorder(Rectangle.NO_BORDER);
@@ -733,7 +733,7 @@
 		table12.addCell(celda);
 		
 		
-		celda = new PdfPCell(new Phrase("ENFERMEDAD CRÓNICA/ CHRONIC AILMENT"
+		celda = new PdfPCell(new Phrase("ENFERMEDAD CRï¿½NICA/ CHRONIC AILMENT"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -785,7 +785,7 @@
 		table13.setSpacingBefore(20f);
 		table13.setWidthPercentage(80f);
 		
-		celda = new PdfPCell(new Phrase("Información sobre sus padres/ Information About Your Parents"
+		celda = new PdfPCell(new Phrase("Informaciï¿½n sobre sus padres/ Information About Your Parents"
 				, FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBorder(Rectangle.NO_BORDER);
@@ -843,7 +843,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table13.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase(" RELIGIÓN "
+		celda = new PdfPCell(new Phrase(" RELIGIï¿½N "
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -939,7 +939,7 @@
 		celda.setBorder(Rectangle.BOX);
 		table14.addCell(celda);
 		
-		celda = new PdfPCell(new Phrase("OCUPACIÓN/ OCCUPATION"
+		celda = new PdfPCell(new Phrase("OCUPACIï¿½N/ OCCUPATION"
 				, FontFactory.getFont(FontFactory.HELVETICA, 6, Font.BOLD, new BaseColor(255,255,255))));
 		celda.setHorizontalAlignment(Element.ALIGN_CENTER);
 		celda.setBackgroundColor(new BaseColor(0,0,0));
@@ -956,7 +956,7 @@
 		table15.setSpacingBefore(5f);
 		table15.setWidthPercentage(80f);
 		
-		celda = new PdfPCell(new Phrase("11. Persona que paga la colegiatura (proveer dirección solo si difiere de la anterior)/ "+
+		celda = new PdfPCell(new Phrase("11. Persona que paga la colegiatura (proveer direcciï¿½n solo si difiere de la anterior)/ "+
 				"Person Who Pays the Tuition\n(provide address if diferent from above) "
 				, FontFactory.getFont(FontFactory.HELVETICA, 8, Font.BOLD, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -1171,11 +1171,11 @@
 		table10.addCell(celda);
 		
 		celda = new PdfPCell(new Phrase("Hago constar que los datos sometidos en esta solicitud son verdaderos."+
-				" Entiendo que es mi responsabilidad entregar toda la documentación oficial original debidamente legalizada/ auténtificada al momento de inscribirme."+
+				" Entiendo que es mi responsabilidad entregar toda la documentaciï¿½n oficial original debidamente legalizada/ autï¿½ntificada al momento de inscribirme."+
 				" Estoy de acuerdo en que la Universidad de Montemorelos no me expida documento oficial alguno en tanto que no haya hecho entrega de la"+
-				" documentación estipulada y haber cumplido con todos mis compromisos financieros. Me comprometo a cumplir con cada uno de los reglamentos"+
-				" establecidos en cuanto a disciplina y estudios. Además, por este medio autorizo a la Universidad de Montemorelos a informar a mis padres/ tutor oficial"+
-				" sobre mi avance académico, situación financiera y de conducta, según lo amerite el caso."
+				" documentaciï¿½n estipulada y haber cumplido con todos mis compromisos financieros. Me comprometo a cumplir con cada uno de los reglamentos"+
+				" establecidos en cuanto a disciplina y estudios. Ademï¿½s, por este medio autorizo a la Universidad de Montemorelos a informar a mis padres/ tutor oficial"+
+				" sobre mi avance acadï¿½mico, situaciï¿½n financiera y de conducta, segï¿½n lo amerite el caso."
 				, FontFactory.getFont(FontFactory.HELVETICA, 8, Font.NORMAL, new BaseColor(r,g,b))));
 		celda.setHorizontalAlignment(Element.ALIGN_LEFT);
 		celda.setBorder(Rectangle.NO_BORDER);

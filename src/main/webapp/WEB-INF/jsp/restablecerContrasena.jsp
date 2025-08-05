@@ -11,7 +11,7 @@
 %>
 <head>
 	<link type="text/css" rel="stylesheet" href="bootstrap3/css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="admision.css">
+	<%-- <link type="text/css" rel="stylesheet" href="admision.css"> --%>
 	<link type="text/css" rel="stylesheet" href="css/login.css">
 	<link href="admision.css" rel="STYLESHEET" type="text/css">
 	<script type="text/javascript" src="boostrap/js/jquery-1.11.2.min.js"></script>

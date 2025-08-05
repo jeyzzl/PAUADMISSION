@@ -10,7 +10,7 @@
 
 
 <head>
-<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 <style>
 	.next{
 		cursor: hand;cursor: pointer;
@@ -49,8 +49,8 @@
 		border-top: 9px solid transparent; 
 	}
 </style>
-<link href="../admision.css" rel="STYLESHEET" type="text/css">
-<script type="text/javascript" src="../js/prototype-1.6.js"></script>
+<link href="<%=request.getContextPath()%>/admision.css" rel="STYLESHEET" type="text/css">
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/prototype-1.6.js"></script>
 <script type="text/javascript">
 
 	function muestraEstados(objEstado, objCiudad, paisId){
@@ -110,7 +110,7 @@
 									return true;
 								}
 								else{
-									alert("El teléfono es incorrecto, escriba por lo menos 10 dígitos");
+									alert("El telï¿½fono es incorrecto, escriba por lo menos 10 dï¿½gitos");
 									document.getElementById("Telefono").focus();
 								}
 							}
@@ -125,7 +125,7 @@
 						}
 					}
 					else{
-						alert("El código postal es requerido");
+						alert("El cï¿½digo postal es requerido");
 						document.getElementById("Postal").focus();
 					}
 				}
@@ -140,7 +140,7 @@
 			}
 		}
 		else{
-			alert("El país es requerido");
+			alert("El paï¿½s es requerido");
 			document.getElementById("nacPais").focus();
 		}
 		

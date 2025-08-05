@@ -4,8 +4,8 @@
 	String documentoNombre 		= (String) request.getAttribute("documentoNombre");
 %>
 <head>
-<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
-<script type="text/javascript" src="../js/prototype-1.6.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/prototype-1.6.js"></script>
 <script type="text/javascript">
 
 	function guardar(){

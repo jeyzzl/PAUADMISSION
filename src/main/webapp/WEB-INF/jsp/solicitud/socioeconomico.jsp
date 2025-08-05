@@ -5,7 +5,7 @@
 
 <html>
 <head>
-	<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 	<script type="text/javascript">
 	</script>
 </head>

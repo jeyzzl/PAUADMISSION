@@ -7,9 +7,9 @@
 <%@ page import= "java.util.Base64"%>
 
 <head>
-<link rel="stylesheet" href="../bootstrap3/css/bootstrap-fileupload.min.css">
-<script type="text/javascript" src="../bootstrap3/js/bootstrap-fileupload.min.js"></script>
-<link href="../admision.css" rel="STYLESHEET" type="text/css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/bootstrap3/css/bootstrap-fileupload.min.css">
+<script type="text/javascript" src="<%=request.getContextPath()%>/bootstrap3/js/bootstrap-fileupload.min.js"></script>
+<link href="<%=request.getContextPath()%>/admision.css" rel="STYLESHEET" type="text/css">
 <%	 
 	String folio 				= (String)session.getAttribute("Folio")==null?"0":(String)session.getAttribute("Folio");
 	String documentoId 			= request.getParameter("documentoId")==null?"0":request.getParameter("documentoId");

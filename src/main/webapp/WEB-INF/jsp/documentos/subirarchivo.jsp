@@ -3,9 +3,9 @@
 	String documentoNombre 		= (String) request.getAttribute("documentoNombre");
 %>
 <head>
-<link href="../admision.css" rel="STYLESHEET" type="text/css">
-<script type="text/javascript" src="../js/prototype-1.6.js"></script>
-<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+<link href="<%=request.getContextPath()%>/admision.css" rel="STYLESHEET" type="text/css">
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/prototype-1.6.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 <script type="text/javascript">
 	function guardar(){
 		if($("archivo").value != ""){

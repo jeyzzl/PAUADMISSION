@@ -4,13 +4,13 @@
 		<link rel="stylesheet" href="<%=request.getContextPath()%>/bootstrap4/css/bootstrap.min.css">		
 		<script type="text/javascript" src="<%=request.getContextPath()%>/js/popper.min.js"></script>
 		<script type="text/javascript" src="<%=request.getContextPath()%>/bootstrap4/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 		<script type="text/javascript">
 		</script>
 	</head>
 	<body>
 		<div class="container"> 
-			<h2>Cómo usar el calendario</h2>
+			<h2>Cï¿½mo usar el calendario</h2>
 			<div class="alert alert-info"></div>
 			<div class="container-fluid d-flex justify-content-around mt-1">
 				<div class="card bg-light mb-3" style="max-width: 27rem;">
@@ -22,7 +22,7 @@
 							<em><u>Instrucciones</u></em>
 						</p>
 						<p class="card-text">En la parte central superior presiona el
-						click dos veces para seleccionar el año.</p>
+						click dos veces para seleccionar el aï¿½o.</p>
 					</div>
 					<div class="card-footer bg-transparent border-success">
 						<span class="badge bg-success" style="font-size:10pt;">Paso 1</span>
@@ -37,7 +37,7 @@
 						<p style="font-size: 14px">
 							<em><u>Instrucciones</u></em>
 						</p>
-						<p class="card-text">Después de elegir el año, selecciona el mes correspondiente.</p>
+						<p class="card-text">Despuï¿½s de elegir el aï¿½o, selecciona el mes correspondiente.</p>
 					</div>
 					<div class="card-footer bg-transparent border-success">
 						<span class="badge bg-success" style="font-size:10pt;">Paso 2</span>
@@ -52,7 +52,7 @@
 						<p style="font-size: 14px">
 							<em><u>Instrucciones</u></em>
 						</p>
-						<p class="card-text">Una vez seleccionado el mes, elige el día correspondiente.</p>
+						<p class="card-text">Una vez seleccionado el mes, elige el dï¿½a correspondiente.</p>
 					</div>
 					<div class="card-footer bg-transparent border-success">
 						<span class="badge bg-success" style="font-size:10pt;">Paso 3</span>

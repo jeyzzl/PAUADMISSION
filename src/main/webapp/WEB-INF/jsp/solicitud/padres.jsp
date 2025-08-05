@@ -12,7 +12,6 @@
 <%@ include file= "../menu.jsp"%>
 <html>
 <head> 
-	<%-- <link rel="STYLESHEET" href="/admision.css"  type="text/css"> --%>
 	<script src="<%=request.getContextPath()%>/js/jquery-1.5.1.min.js" type="text/javascript"></script>
   	<script src='<%=request.getContextPath()%>/js/Globo/jquery.tinyTips2.js' type='text/javascript'></script>		
 	<style>		

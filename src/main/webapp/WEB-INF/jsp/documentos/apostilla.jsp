@@ -1,6 +1,6 @@
 <head>
-  <link href="../admision.css" rel="STYLESHEET" type="text/css">
-  <script type="text/javascript" src="../js/iframeResizer.contentWindow.min.js"></script>
+  <link href="<%=request.getContextPath()%>/admision.css" rel="STYLESHEET" type="text/css">
+  <script type="text/javascript" src="<%=request.getContextPath()%>/js/iframeResizer.contentWindow.min.js"></script>
 </head>
 <body>
 <table align="center">

@@ -139,9 +139,9 @@
     String colorGrabar = tieneDocumentos ? "style='color:green'" : "style='color:orange'";
 %>
 <head>
-    <link rel="STYLESHEET" href="/admision.css"  type="text/css">
-    <script src="../../js/jquery-1.5.1.min.js" type="text/javascript"></script>
-    <script src='../../js/Globo/jquery.tinyTips2.js' type='text/javascript'></script>        
+    <link rel="STYLESHEET" href="<%=request.getContextPath()%>/admision.css"  type="text/css">
+    <script src="<%=request.getContextPath()%>/js/jquery-1.5.1.min.js" type="text/javascript"></script>
+    <script src='<%=request.getContextPath()%>/js/Globo/jquery.tinyTips2.js' type='text/javascript'></script>        
     <style>        
         body{
             background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");

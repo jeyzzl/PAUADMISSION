@@ -12,7 +12,6 @@
 		<meta http-equiv="refresh" content="0;url=inicio" />
 <%	}else{ %>
 <head>
-	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
 	<script src="js/jquery-1.5.1.min.js" type="text/javascript"></script>
   	<script src='js/Globo/jquery.tinyTips2.js' type='text/javascript'></script>		
 	<style>		
@@ -20,10 +19,10 @@
 			background-image: url("imagenes/Biblioteca.png");
 			/* Para dejar la imagen de fondo centrada, vertical y horizontalmente */
 			background-position: center center;
-			/* La imagen se fija en la ventana de visualización para que la altura de la imagen no supere a la del contenido */
+			/* La imagen se fija en la ventana de visualizaciï¿½n para que la altura de la imagen no supere a la del contenido */
 			background-attachment: fixed;
 			background-repeat: no-repeat;
-			/* La imagen de fondo se reescala automáticamente con el cambio del ancho de ventana del navegador */
+			/* La imagen de fondo se reescala automï¿½ticamente con el cambio del ancho de ventana del navegador */
 			background-size: cover;	
 		} 
 		a {text-decoration: none;} 

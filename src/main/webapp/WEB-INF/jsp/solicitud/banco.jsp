@@ -36,7 +36,7 @@
 %>
 
 <head>
-	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
+	<link rel="STYLESHEET" href="<%=request.getContextPath()%>/admision.css"  type="text/css">
 	<style>		
 		body{
 			background-image: url("<%=request.getContextPath()%>/imagenes/Biblioteca.png");

@@ -10,8 +10,8 @@
 
 <%@page import="adm.documento.AdmDocumento"%>
 <head>
-<link rel="stylesheet" href="../bootstrap3/css/bootstrap-fileupload.min.css">
-<script type="text/javascript" src="../bootstrap3/js/bootstrap-fileupload.min.js"></script>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/bootstrap3/css/bootstrap-fileupload.min.css">
+<script type="text/javascript" src="<%=request.getContextPath()%>/bootstrap3/js/bootstrap-fileupload.min.js"></script>
 <style>
 	.enviar{
 		 width:156px;

@@ -5,7 +5,7 @@
 	session.invalidate();
 %>
 <head>
-  	<link rel="STYLESHEET" href="/admision.css"  type="text/css">	  			
+  	<%-- <link rel="STYLESHEET" href="/admision.css"  type="text/css">	  			 --%>
 	<style>		
 		body{
 			background-image: url("imagenes/Biblioteca.png");

@@ -10,8 +10,6 @@
 <%@ include file= "menu.jsp"%>
 <html>
 <head>
-	<link rel="STYLESHEET" href="/admision.css"  type="text/css">
-	<script src="js/jquery-1.5.1.min.js" type="text/javascript"></script>		
 	<style>
 		body{
 			background-image: url("imagenes/Biblioteca.png");
