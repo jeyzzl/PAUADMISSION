@@ -858,23 +858,11 @@ public class ControllerRaiz{
 		
 		String codigo	= adm.util.Fecha.getHora()+adm.util.Fecha.getMinutos()+adm.util.Fecha.getSegundos();		
 		String texto 	= "Code: "+codigo;
-
-		// try{
-		// 	mailService.send(usuario, "admisionenlinea@um.edu.mx", "Code to activate your Admissions Account ("+usuario+")", texto);
-		// }catch(Exception ex){			
-		// 	System.out.println("Error: enviarCodigo|"+ex);
-		// }
 		
 		// Si no existe
 		if (!existe){
 			if(clave.equals(confClave)){
-				try{
-					mailService.send(usuario, "admisionenlinea@um.edu.mx", "Code to activate your Admissions Account ("+usuario+")", texto);
-				}catch(Exception ex){			
-					System.out.println("Error: enviarCodigo|"+ex);
-				}
-
-				// Insertar el nuevo usuario
+				// Verifica nuevo usuario no se encuentra en 
 				if(!admUsuarioDao.existeCuenta(usuario) && !usuario.equals("")){	
 					admUsuario.setUsuarioId(admUsuarioDao.maximoReg());
 					admUsuario.setClave(claveDigest);
@@ -882,6 +870,13 @@ public class ControllerRaiz{
 					admUsuario.setEstado("0");
 					admUsuario.setCodigo(codigo);
 					if(admUsuarioDao.insertReg(admUsuario)){
+						// Send Code Email
+						try{
+							mailService.send(usuario, "admisionenlinea@um.edu.mx", "Code to activate your Admissions Account ("+usuario+")", texto);
+						}catch(Exception ex){			
+							System.out.println("Error: enviarCodigo|"+ex);
+						}
+
 						admProceso.setFolio(admUsuario.getUsuarioId());
 						admProcesoDao.insertReg(admProceso);
 						return "redirect:/valida?usuario="+admUsuario.getCuenta()+"&clave="+clave+"&redir=0";
