@@ -245,6 +245,21 @@ public class AdmUsuarioDao{
 		}		
 		return ok;
 	}
+
+	public boolean existeEmail(String Cuenta) {
+		boolean 		ok 		= false;		
+		try{
+			String comando = "SELECT COUNT(*) FROM SALOMON.ADM_USUARIO "+ 
+					" WHERE EMAIL = ?";			
+			Object[] parametros = new Object[] {Cuenta};
+			if (salomonJdbc.queryForObject(comando,Integer.class, parametros)>=1){
+				ok = true;
+			}			
+		}catch(Exception ex){
+			System.out.println("Error - adm.alumno.spring.AdmUsuarioDao|existeEmail|:"+ex);
+		}		
+		return ok;
+	}
 	
 	public String maximoReg() {
 		String usuarioId = "1";		

@@ -828,6 +828,7 @@ public class ControllerRaiz{
 		AdmUsuario admUsuario		= new AdmUsuario();
 		AdmProceso admProceso		= new AdmProceso();
 		boolean existe 				= false;
+
 		HttpSession sesion			= ((HttpServletRequest)request).getSession();
 		if (sesion!=null){
 			usuarioId 					= (String)sesion.getAttribute("UsuarioId")==null?"0":(String)sesion.getAttribute("UsuarioId");
@@ -863,7 +864,7 @@ public class ControllerRaiz{
 		if (!existe){
 			if(clave.equals(confClave)){
 				// Verifica nuevo usuario no se encuentra en 
-				if(!admUsuarioDao.existeCuenta(usuario) && !usuario.equals("")){	
+				if(!admUsuarioDao.existeCuenta(usuario) && !admUsuarioDao.existeEmail(usuario) && !usuario.equals("")){	
 					admUsuario.setUsuarioId(admUsuarioDao.maximoReg());
 					admUsuario.setClave(claveDigest);
 					admUsuario.setGenero("M");
