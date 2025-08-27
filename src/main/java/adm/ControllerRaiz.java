@@ -1057,7 +1057,7 @@ public class ControllerRaiz{
 		}
 		if (ok) {
 			String texto = "We have received your request to reset your password, please click on the following link to continue the process.\n"
-				+ "Link: "+url+"/recuperarContrasena?correo="+correo+"&clave="+claveSecret.replace("=", "")+" \n\n"
+				+ "Link: "+url+"/recuperarContrasena?correo="+correo+"&clave="+claveSecret.replace("=", "").replace("+", "%2B")+" \n\n"
 				+ "If you do not recognize this action, ignore this email and notify the System's Department.\n";	
 			try {
 				mensaje = "0";
@@ -1102,7 +1102,7 @@ public class ControllerRaiz{
 		String confirmar = request.getParameter("Confirmar")==null?"":request.getParameter("Confirmar");
 		String claveBase = "";
 		String mensaje = "";
-		String url = "recuperarContrasena?Mensaje="+mensaje;
+		String url = "redirect:/recuperarContrasena";
 
 		AdmUsuario admUsuario = new AdmUsuario();
 		if(admUsuarioDao.existeCuenta(cuenta)){
@@ -1110,13 +1110,14 @@ public class ControllerRaiz{
 		}
 
 		AdmRecuperar admRecuperar = new AdmRecuperar();
+
 		if(admRecuperarDao.existeClave(cuenta, clave+"==")){
 			admRecuperar = admRecuperarDao.mapeaRegId(cuenta);
 			if(nueva.equals(confirmar)){
 				claveBase = adm.util.Encriptar.md5ConBase64(nueva);
 				if(admUsuarioDao.updateClaveUsuario(admUsuario.getUsuarioId(), claveBase)){
-					url = "redirect:/login";
 					if(admRecuperarDao.deleteReg(cuenta)){
+						url = "redirect:/login";
 						mensaje = "1";
 					}
 				}else{
@@ -1129,7 +1130,7 @@ public class ControllerRaiz{
 			mensaje = "3";
 		}
 
-		return url;
+		return url+"?Mensaje="+mensaje;
 	}
 
 	@RequestMapping("/valida")

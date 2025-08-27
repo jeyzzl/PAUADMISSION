@@ -8,6 +8,7 @@
     AdmRecuperar admRecuperar 	= (AdmRecuperar)request.getAttribute("admRecuperar");
 
     String clave                = (String)request.getAttribute("clave");
+	
 	String mensaje				= request.getParameter("Mensaje")==null?"-":request.getParameter("Mensaje");
 %>
 <head>
