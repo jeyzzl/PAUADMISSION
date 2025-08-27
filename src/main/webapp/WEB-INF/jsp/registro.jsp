@@ -142,7 +142,7 @@
 </script>
 <div class="container-fluid">
 <%	if(!mensaje.equals("-")){ %>
-	<div class="alert alert-success" role="alert"><%=mensaje%></div>	
+	<div class="alert alert-success" role="alert"><b>This user already exists, please try another</b><br>If you are already registered try <a href='login'>Logging In</a></div>	
 <%	} %>
 <%	if(error.equals("1")){ %>
 	<div class="alert alert-warning" role="alert">The password you entered is not correct</div>	

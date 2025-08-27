@@ -882,13 +882,13 @@ public class ControllerRaiz{
 						admProcesoDao.insertReg(admProceso);
 						return "redirect:/valida?usuario="+admUsuario.getCuenta()+"&clave="+clave+"&redir=0";
 					}else{
-						mensaje = "<font size=3 color=gray><b>Please enter all the mandatory fields (*)</b></font>";
+						mensaje = "enter_all_the_mandatory_fields";
 					}
 				}else{
-					mensaje = "<font size=3 color=gray><b>This user already exists, please try another</b><br>If you are already registered try <a href='login'>Logging In</a></font>";		
+					mensaje = "user_already_exists";		
 				}	
 			}else{
-				mensaje = "<font size=3 color=gray><b>Passwords do not match</b></font>";	
+				mensaje = "passwords_do_not_match";	
 			}	
 		}else{
 			admUsuario.setUsuarioId(usuarioId);			
@@ -896,9 +896,9 @@ public class ControllerRaiz{
 			admUsuario.setGenero("M");
 			admUsuario.setCodigo(codigo);
 			if(admUsuarioDao.updateReg(admUsuario)){
-				mensaje = "<font size=3 color=gray><b>Updated...</b></font>";
+				mensaje = "Updated...";
 			}else{
-				mensaje = "<font size=3 color=gray><b>There was an error while updating. Try again</b></font>";
+				mensaje = "There was an error while updating. Try again";
 			}
 		}
 		
