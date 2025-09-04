@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
 
@@ -54,6 +55,34 @@ public class Fecha{
 			s_fecha = dia + ", "+Integer.toString(fecha.get(Calendar.DAY_OF_MONTH))+"/ "+mes+"/ "+
 				Integer.toString(fecha.get(Calendar.YEAR));
 		}	
+		return s_fecha;
+	}
+
+	public static String getFechayHora( ){
+		String s_fecha = "";
+		TimeZone timeZone = TimeZone.getTimeZone("GMT+10");
+		Calendar fecha = new GregorianCalendar(timeZone);
+		String dia 		= "";
+		String mes 		= "";
+		String year		= "";
+		String hora		= "";
+		String minuto	= "";
+		String segundo	= "";
+		
+		dia 	= Integer.toString(fecha.get(Calendar.DAY_OF_MONTH));
+		if (dia.length() == 1) dia = "0" + dia;
+		mes 	= Integer.toString(fecha.get(Calendar.MONTH)+1);
+		if (mes.length() == 1) mes = "0" + mes;
+		year 	= Integer.toString(fecha.get(Calendar.YEAR));		
+		hora	= Integer.toString(fecha.get(Calendar.HOUR_OF_DAY));
+		if (hora.length()==1) hora = "0" + hora;
+		minuto	= Integer.toString(fecha.get(Calendar.MINUTE));
+		if (minuto.length()==1) minuto = "0" + minuto;
+		segundo	= Integer.toString(fecha.get(Calendar.SECOND));
+		if (segundo.length()==1) segundo = "0" + segundo;
+		
+		s_fecha = dia+"/"+mes+"/"+year+" "+hora+":"+minuto+":"+segundo;
+		
 		return s_fecha;
 	}
 	

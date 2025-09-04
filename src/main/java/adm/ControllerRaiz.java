@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -857,14 +858,15 @@ public class ControllerRaiz{
 		admUsuario.setTelefono(request.getParameter("Telefono"));
 		admUsuario.setFechaNac(request.getParameter("FechaNac"));
 		
-		String codigo	= adm.util.Fecha.getHora()+adm.util.Fecha.getMinutos()+adm.util.Fecha.getSegundos();		
+		String codigo = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
 		String texto 	= "Code: "+codigo;
 		
 		// Si no existe
 		if (!existe){
 			if(clave.equals(confClave)){
 				// Verifica nuevo usuario no se encuentra en 
-				if(!admUsuarioDao.existeCuenta(usuario) && !admUsuarioDao.existeEmail(usuario) && !usuario.equals("")){	
+				if(!admUsuarioDao.existeCuenta(usuario) && !admUsuarioDao.existeEmail(usuario) && !usuario.equals("")){
+					System.out.println("INSERT REGISTRATION: "+usuario);	
 					admUsuario.setUsuarioId(admUsuarioDao.maximoReg());
 					admUsuario.setClave(claveDigest);
 					admUsuario.setGenero("M");
@@ -879,7 +881,9 @@ public class ControllerRaiz{
 						}
 
 						admProceso.setFolio(admUsuario.getUsuarioId());
+
 						admProcesoDao.insertReg(admProceso);
+
 						return "redirect:/valida?usuario="+admUsuario.getCuenta()+"&clave="+clave+"&redir=0";
 					}else{
 						mensaje = "enter_all_the_mandatory_fields";
@@ -891,10 +895,11 @@ public class ControllerRaiz{
 				mensaje = "passwords_do_not_match";	
 			}	
 		}else{
+			System.out.println("UPDATE REGISTRATION: "+usuario);
 			admUsuario.setUsuarioId(usuarioId);			
 			admUsuario.setEstado(request.getParameter("estado")==null?"0":request.getParameter("estado"));
 			admUsuario.setGenero("M");
-			admUsuario.setCodigo(codigo);
+			// admUsuario.setCodigo(codigo);
 			if(admUsuarioDao.updateReg(admUsuario)){
 				mensaje = "Updated...";
 			}else{
@@ -923,6 +928,7 @@ public class ControllerRaiz{
 			if(codigo.equals(admUsuario.getCodigo())) {
 				admUsuario.setEstado("1");
 				if(admUsuarioDao.updateReg(admUsuario)) {
+					System.out.println("User: "+usuarioId+" registered. "+adm.util.Fecha.getFechayHora());
 				}
 			}else {
 				error = "1";
