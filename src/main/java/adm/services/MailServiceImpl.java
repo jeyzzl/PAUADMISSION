@@ -14,17 +14,50 @@ public class MailServiceImpl implements MailService{
 
 	@Autowired
 	private JavaMailSender javaMailSender;
+
+	private String email = "admissions@pau.ac.pg";
 	
 	@Override
 	public void send(String para, String de, String subject, String mensaje) throws Exception{
-		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-		mimeMessageHelper.setFrom(de);
-		mimeMessageHelper.setTo(para);
-		mimeMessageHelper.setSubject(subject);
-		mimeMessageHelper.setText(mensaje);
-		mimeMessageHelper.setSentDate(new Date());
-		javaMailSender.send(mimeMessage);
+		try{
+			MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+			helper.setFrom(de);
+			helper.setTo(para);
+			helper.setSubject(subject);
+
+			helper.setText(mensaje, "<p>" + mensaje + "</p>");
+			helper.setSentDate(new Date());
+
+			javaMailSender.send(mimeMessage);
+			System.out.println("Email sent to "+para);
+
+		} catch (Exception e){
+            System.out.println("Failed to send email to "+ para +" : "+ e.getMessage());
+            // throw e;
+		}
 	}
-	
+
+	@Override
+	public void sendVerificationCode(String to, String code) throws Exception {
+		String subject = "Verify your Admissions Account";
+		String text = "Your verification code is: " + code;
+		// send verification code
+		send(to, email, subject, text);
+	}
+
+	@Override
+	public void sendPasswordRecovery(String to, String text) throws Exception{
+		String subject = "Admission's Account Recovery ("+adm.util.Fecha.getHoy()+")";
+		// send password recovery code
+		send(to, email, subject, text);
+	}
+
+	@Override
+	public void sendRefereeSurvey(String to, String institution, String referee, String text) throws Exception{
+		String subject = institution+" - Admissions Office / "+referee ;
+		//send referee survey
+		send(to, email, subject, text);
+	}		
 }

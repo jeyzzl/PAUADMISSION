@@ -1212,7 +1212,7 @@ public class ControllerSolicitud {
 							"\n\nThis information will be kept confidential, anonymous, and for the exclusive use in the admission process."+
 							"\n\nThank you very much for your cooperation."+
 							"\nAdmissions Office \n"+institucion;
-						mailService.send(recomienda.getEmail(), "admisionenlinea@um.edu.mx", remitente+" - Admissions Office/"+recomienda.getNombre() , texto);
+						mailService.sendRefereeSurvey(recomienda.getEmail(), remitente, recomienda.getNombre(), texto);
 						
 					}catch(Exception ex){
 						System.out.println("Error:"+ex);

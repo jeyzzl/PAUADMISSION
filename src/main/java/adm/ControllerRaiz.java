@@ -875,9 +875,9 @@ public class ControllerRaiz{
 					if(admUsuarioDao.insertReg(admUsuario)){
 						// Send Code Email
 						try{
-							mailService.send(usuario, "admisionenlinea@um.edu.mx", "Code to activate your Admissions Account ("+usuario+")", texto);
+							mailService.sendVerificationCode(usuario, codigo);
 						}catch(Exception ex){			
-							System.out.println("Error: enviarCodigo|"+ex);
+							System.out.println("Error: enviarCodigo| "+ex);
 						}
 
 						admProceso.setFolio(admUsuario.getUsuarioId());
@@ -1067,7 +1067,7 @@ public class ControllerRaiz{
 				+ "If you do not recognize this action, ignore this email and notify the System's Department.\n";	
 			try {
 				mensaje = "0";
-				mailService.send(correo, "admisionenlinea@um.edu.mx", "Admission's Account Recovery ("+adm.util.Fecha.getHoy()+")", texto);
+				mailService.sendPasswordRecovery(correo, texto);
 			} catch (Exception ex) {
 				System.out.println("Error:"+ex);
 			}
